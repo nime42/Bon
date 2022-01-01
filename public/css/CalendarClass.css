@@ -1,0 +1,56 @@
+.calendar-style table {
+    background: lightblue;
+    border-collapse: collapse;
+    
+
+}
+
+.calendar-style .disabled {
+    color: #ddddff;
+    font-style: italic;
+}
+
+.calendar-style .day-nr {  
+    text-align: right;
+    padding: 2px 5px 2px 5px;
+    margin: 0;
+    align-self: stretch;
+}
+
+
+.calendar-style table,
+.calendar-style th,
+.calendar-style td {
+    border: 0.5px solid black;  
+}
+.calendar-style td {
+    height:100px;
+    width:150px;
+}
+
+.calendar-style .day-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: 100%;
+    width: 100%;
+  }
+
+.calendar-style .event {
+    border: 0.5px solid black;  
+    padding: 3px;
+    border-radius: 6px;
+    width:100%;
+    height: 16px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+.calendar-style .circle {
+    border-radius: 50%;
+    padding: 1px;
+    border: 2px solid red;
+    color: #000;
+    text-align: center;
+  }
+

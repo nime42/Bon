@@ -1,0 +1,16 @@
+{
+  "name": "b",
+  "version": "1.0.0",
+  "description": "An order manager",
+  "main": "app/server.js",
+  "dependencies": {
+    "express": "^4.17.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app/server.js"
+  },
+  "author": "Nils Meinhard",
+  "license": "ISC"
+}
