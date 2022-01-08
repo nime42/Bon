@@ -35,6 +35,18 @@ if(config.app.https) {
 
 var db=require('./db-functions.js');
 
+
+app.get("/shutdown",(req,res) => {
+    var isLocal = (req.connection.localAddress === req.connection.remoteAddress);
+    if(isLocal) {
+        console.log("Shutting down!");
+        res.sendStatus(200);
+        process.exit();
+    }
+
+})
+
+
 app.get("/bons",(req,res) => {
     year=req.query.year;
     month=req.query.month;
