@@ -1,6 +1,6 @@
 class BonRepository {
     getBons(year,month,callback) {
-        let url="/bons";
+        let url="bons";
         if(year!==undefined && month!==undefined) {
             url+="?year="+year+"&month="+(month+"").padStart(2,"0");
         }
@@ -10,7 +10,7 @@ class BonRepository {
         let url;
         let type;
         if(bon.id!="") {
-            url="/bons/"+bon.id;
+            url="bons/"+bon.id;
             type="PUT";
         } else {
             url="/bons";
@@ -27,7 +27,7 @@ class BonRepository {
           });
     }
     deleteBon(id,callback) {
-        let url="/bons/"+id;
+        let url="bons/"+id;
         $.ajax({
             type: "DELETE",
             url: url,
