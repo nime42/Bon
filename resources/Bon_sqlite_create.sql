@@ -1,3 +1,5 @@
+--https://app.dbdesigner.net/designer/schema/486863
+
 CREATE TABLE bon (
 	id integer PRIMARY KEY AUTOINCREMENT,
 	status text,

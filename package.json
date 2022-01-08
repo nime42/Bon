@@ -4,7 +4,9 @@
   "description": "An order manager",
   "main": "app/server.js",
   "dependencies": {
-    "express": "^4.17.2"
+    "better-sqlite3": "^7.4.6",
+    "express": "^4.17.2",
+    "swagger-ui-express": "^4.3.0"
   },
   "devDependencies": {},
   "scripts": {

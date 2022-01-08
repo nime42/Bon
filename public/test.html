@@ -1,11 +1,15 @@
 <html>
     <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <link rel="stylesheet" href="css/CalendarClass.css">
         <script src="js/CalendarClass.js"></script>
         <link rel="stylesheet" href="css/ModalPopup.css">
         <script src="js/ModalPopup.js"></script>
         <script src="js/MessageBox.js"></script>
         <script src="js/helpers.js"></script>
+        <script src="js/BonForm.js"></script>
+        <script src="js/BonRepository.js"></script>
+
 
     </head>
     <body>
@@ -16,23 +20,34 @@
         <script>
             var myPopup=new ModalPopup();
             var myCalendar=new CalendarClass("#calendar");
-            var myDayPopupContent=new DayPopupContent(myPopup,myCalendar);
+            var myRepo=new BonRepository();
+            var myBonForm=new BonForm(myPopup,myCalendar,myRepo);
 
             myCalendar.setOnDateClick((date,calObj) => {
-                
-                myDayPopupContent.setupContent({eventTime:date});
-                myPopup.show(myDayPopupContent.getContent());
+                date.setHours(12);
+                myBonForm.init({eventTime:date});
+                myPopup.show(myBonForm.getForm());
             });
             myCalendar.setOnEventClick((eventElem,eventData)=> {
-                myDayPopupContent.setupContent(eventData,eventElem);
-                myPopup.show(myDayPopupContent.getContent());
+                myBonForm.init(eventData,eventElem);
+                myPopup.show(myBonForm.getForm());
             });
 
+            
 
+            myCalendar.setOnMonthChange((year,month)=>{
+                myRepo.getBons(year,month+1,(bons)=>{
+                    bons.forEach(b => {
+                        b.delivery_date=new Date(b.delivery_date);
+                        let [label,statusColor]=myBonForm.createBonLabelAndcolor(b);
+                        myCalendar.addEvent(b.delivery_date,label,statusColor,b);
+                        
+                    });
+                });
 
+            },true);
 
-
-            //Calendar.init("#calendar");
+            
 
         </script>
     </body>

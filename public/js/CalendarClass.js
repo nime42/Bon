@@ -16,12 +16,12 @@ class CalendarClass {
           "December",
         ],
         weekNr: "uge",
-        weekDays: ["mon", "tir", "ons", "tor", "fre", "lör", "sön"],
+        weekDays: ["mon", "tir", "ons", "tor", "fre", "lÃ¶r", "sÃ¶n"],
       };
 
 
 
-    constructor(div,year, month) {
+    constructor(div, year, month) {
         this.myDiv=div;
         this.init(year, month);
     }
@@ -96,6 +96,8 @@ class CalendarClass {
           };
         });
 
+        this.onMonthChange && this.onMonthChange(this.currentYear,this.currentMonth);
+
       }
 
       changeMonth(direction) {
@@ -167,6 +169,13 @@ class CalendarClass {
 
       setOnEventClick(fun) {
         this.onEventClick=fun;
+      }
+
+      setOnMonthChange(fun,refresh) {
+        this.onMonthChange=fun;
+        if(refresh) {
+          this.onMonthChange(this.currentYear,this.currentMonth);
+        }
       }
 
       _createDays(year, month) {

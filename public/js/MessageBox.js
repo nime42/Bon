@@ -23,7 +23,7 @@ class MessageBox {
                 button.innerHTML=buttons[b].text;
                 button.style.display="";
                 button.onclick=function() {
-                    buttons[b].onclick && buttons.onclick();
+                    buttons[b].onclick && buttons[b].onclick();
                     popup.hide();
                 }
             }
