@@ -13,7 +13,7 @@ class BonRepository {
             url="bons/"+bon.id;
             type="PUT";
         } else {
-            url="/bons";
+            url="bons";
             type="POST";
         }
 

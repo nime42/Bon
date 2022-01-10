@@ -38,7 +38,7 @@ class BonForm {
     </fieldset>
     <fieldset>
         <legend>Kunde</legend>
-        <label> Email<br> <input type="email" name="email"></label> 
+        <label> Email<br> <input id="email" type="email" name="email"></label> 
         <span>
         <label style="float:left;width: 30%"> Fornavn<br> <input type="text" name="forename"></label>
         <label> Efternavn<br> <input type="text" name="surname" ></label>
@@ -186,6 +186,10 @@ class BonForm {
             }
         })
 
+        let customer_mail_autocomplete=new AutoCompleteClass(form.querySelector("#email"));
+        customer_mail_autocomplete.typingFunction=(text)=> {
+            return [1,2,3,4];
+        }
     }
 
     createBonLabelAndcolor(bon) {
