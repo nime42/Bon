@@ -33,8 +33,12 @@ class BonRepository {
             url: url,
             success: callback,
           });
-
-
     }
+
+    getCustomers(email,callback) {
+        let url="customers?email="+email;
+        $.get(url,callback);
+    }
+
 
 }

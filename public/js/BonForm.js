@@ -186,9 +186,12 @@ class BonForm {
             }
         })
 
-        let customer_mail_autocomplete=new AutoCompleteClass(form.querySelector("#email"));
-        customer_mail_autocomplete.typingFunction=(text)=> {
-            return [1,2,3,4];
+        this.customer_mail_autocomplete=new AutoCompleteClass(form.querySelector("#email"));
+        this.customer_mail_autocomplete.typingFunction=(text)=> {
+           self.myRepoObj.getCustomers(text,(customers)=>{
+                self.customer_mail_autocomplete.setOptions(customers.map(c=>({value:c.email,data:c})));
+           })
+            return undefined;
         }
     }
 
@@ -357,6 +360,7 @@ class BonForm {
         this.myDiv.querySelectorAll(".for-update").forEach(e=>{
             e.style.display="none";
         })  
+        this.customer_mail_autocomplete.clearOptions();
     }
 
 

@@ -35,13 +35,9 @@ function getBons(year,month,callback=console.log) {
           createSubObject(r,"customer",["forename","surname","email","phone_nr"]);
           createSubObject(r,"company",["name","ean_nr"]);
           r.customer.company=r.company;delete r.company;
-          createSubObject(r,"company_address",["co_street_name","co_street_name2","co_street_nr","co_zip_code","co_city"]);
+          createSubObject(r,"company_address",["co_street_name","co_street_name2","co_street_nr","co_zip_code","co_city"],["street_name","street_name2","street_nr","zip_code","city"]);
           r.customer.company.address=r.company_address;delete r.company_address;
-          Object.keys(r.customer.company.address).forEach(k=>{
-            let newKey=k.replace("co_","");
-            r.customer.company.address[newKey]=r.customer.company.address[k];
-            delete r.customer.company.address[k];
-          });
+          
         });
 
         callback(true, rows);
@@ -102,6 +98,39 @@ function updateBon(id,bonData,callback=console.log) {
 
 }
 
+function getCustomers(email,callback=console.log) {
+  let searchEmail="%";
+  if(email!==undefined) {
+    searchEmail=email+"%";
+  }
+  let sql=`
+    select 
+      c.forename,c.surname,c.email,c.phone_nr,
+      co.name,co.ean_nr,
+      co_a.street_name as co_street_name,co_a.street_name2 as co_street_name2,co_a.street_nr as co_street_nr,co_a.zip_code as co_zip_code,co_a.city as co_city
+    from customers c
+    left join companies co on c.company_id =co.id
+    left join addresses co_a on co_a.id=co.address_id
+    where c.email like ? COLLATE NOCASE
+  `;
+
+  try {
+    const rows=db.prepare(sql).all(searchEmail);
+    
+    rows.forEach((r)=> {
+      createSubObject(r,"company",["name","ean_nr"]);
+      createSubObject(r,"company_address",["co_street_name","co_street_name2","co_street_nr","co_zip_code","co_city"],["street_name","street_name2","street_nr","zip_code","city"]);
+      r.company.address=r.company_address;delete r.company_address;
+
+    });
+    callback(true, rows);
+  } catch(err) {
+      callback(false,err);
+  }
+
+
+
+}
 
 
 function createCustomer(customer) {
@@ -120,8 +149,7 @@ function createCustomer(customer) {
 
     let res=db.prepare(sql).get(customer.email);
 
-    return res.id;
-    
+    return res.id;   
 }
 
 function createCompany(company) {
@@ -144,11 +172,13 @@ function createCompany(company) {
 
 }
 
-function createSubObject(row,mainAttribute,attributes) {
+function createSubObject(row,mainAttribute,attributeNames,newAttributeNames) {
   let s={};
-  attributes.forEach(a=>{
-    s[a]=row[a];
-    delete row[a];
+  attributeNames.forEach((_,i)=>{
+    let attr=attributeNames[i];
+    let newAttr=newAttributeNames?newAttributeNames[i]:attr;
+    s[newAttr]=row[attr];
+    delete row[attr];
   });
   row[mainAttribute]=s;
 
@@ -179,5 +209,6 @@ module.exports={
     getBons:getBons,
     delBon:delBon,
     createBon:createBon,
-    updateBon:updateBon
+    updateBon:updateBon,
+    getCustomers:getCustomers
 }

@@ -2,7 +2,7 @@ module.exports = {
 
     app: {
         http:8080,
-        https:8443
+        https_do_not_use_for_the_moment:8443
     },
 
     certs: {

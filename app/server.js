@@ -48,8 +48,8 @@ app.get("/shutdown",(req,res) => {
 
 
 app.get("/bons",(req,res) => {
-    year=req.query.year;
-    month=req.query.month;
+    let year=req.query.year;
+    let month=req.query.month;
     db.getBons(year,month,function(status,bons){
         if(status) { 
             res.json(bons); 
@@ -100,5 +100,19 @@ app.delete("/bons/:id",(req,res) => {
     })       
 
 })
+
+app.get("/customers",(req,res) => {
+    let email=req.query.email;
+    db.getCustomers(email,function(status,customers){
+        if(status) { 
+            res.json(customers); 
+        } else {
+            console.log("getCustomers",customers);
+            res.sendStatus(500);  
+
+        }
+    })   
+})
+
 
 
