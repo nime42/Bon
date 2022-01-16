@@ -38,7 +38,7 @@ class BonForm {
     </fieldset>
     <fieldset>
         <legend>Kunde</legend>
-        <label> Email<br> <input id="email" type="email" name="email"></label> 
+        <label> Email<br> <input id="email" type="email" name="email" autocomplete="nope"></label> 
         <span>
         <label style="float:left;width: 30%"> Fornavn<br> <input type="text" name="forename"></label>
         <label> Efternavn<br> <input type="text" name="surname" ></label>
@@ -59,7 +59,7 @@ class BonForm {
             <input type="text" name="company_street_nr" placeholder="nr" style="width:15%">
         </span><br>
         <span>
-            <input type="text" name="company_zip_code" placeholder="Postnr" style="width:15%">
+            <input type="text" name="company_zip_code" placeholder="Postnr" style="width:20%">
             <input type="text" name="company_city" placeholder="By">
         </span>
         </fieldset>
@@ -193,6 +193,10 @@ class BonForm {
            })
             return undefined;
         }
+        this.customer_mail_autocomplete.onSelect=(option)=>{
+            form.querySelector("#email")
+            self._customerToForm(option.data,form,true);
+        }
     }
 
     createBonLabelAndcolor(bon) {
@@ -277,11 +281,41 @@ class BonForm {
         return bon;
     }
 
+    _customerToForm(customer,form,merge) {
+        this._updateOrMerge(form.querySelector("input[name=email]"),customer.email,merge);
+        this._updateOrMerge(form.querySelector("input[name=forename]"),customer.forename,merge);
+        this._updateOrMerge(form.querySelector("input[name=surname]"),customer.surname,merge);
+        this._updateOrMerge(form.querySelector("input[name=phone_nr]"),customer.phone_nr,merge);
+
+        this._updateOrMerge(form.querySelector("input[name=company_name]"),customer.company.name,merge);
+        this._updateOrMerge(form.querySelector("input[name=ean_nr]"),customer.company.ean_nr,merge);
+
+        this._updateOrMerge(form.querySelector("input[name=company_street_name]"),customer.company.address.street_name,merge);
+        this._updateOrMerge(form.querySelector("input[name=company_street_name2]"),customer.company.address.street_name2,merge);
+        this._updateOrMerge(form.querySelector("input[name=company_street_nr]"),customer.company.address.street_nr,merge)
+        this._updateOrMerge(form.querySelector("input[name=company_city]"),customer.company.address.city,merge);
+        this._updateOrMerge(form.querySelector("input[name=company_zip_code]"),customer.company.address.zip_code,merge);
+
+
+
+
+    }
+
+    _updateOrMerge(elem,val,merge) {
+        if(merge && elem.value.trim()=="") {
+            elem.value=val;
+        } else if(!merge) {
+            elem.value=val;
+        }
+    }
+
     _bonToForm(bon,formDiv) {
         let form=this.myDiv.querySelector(formDiv);
 
         let date=new Date(bon.delivery_date);
         this._setFormDate(date,formDiv);
+
+        this._customerToForm(bon.customer,form);
 
         form.querySelector("input[name=bon_id]").value=bon.id;
 
