@@ -22,79 +22,92 @@ class BonForm {
     </style>
 
     <form id="order">
-    <div id="input-fields" style="max-height: 600px;overflow: auto;">
+    <div id="input-fields">
     <fieldset>
     <legend>Status</legend>
     <button type="button" id="new" class="status-button" style="float:left" data-active-background="lightgreen">Ny</button>
     <button type="button" id="approved" class="status-button" data-active-background="yellow">Godkendt</button>
     <button type="button" id="offer" class="status-button" style="float:right" data-active-background="lightblue">Tilbud</button>
     </fieldset>
-    <fieldset>
-        <legend>Leveringsdato</legend>
-        <span>
-            <input type="date" name="delivery_date">
-            <input type="time" name="delivery_time">
-        </span>
-    </fieldset>
-    <fieldset>
-        <legend>Kunde</legend>
-        <label> Email<br> <input id="email" type="email" name="email" autocomplete="nope"></label> 
-        <span>
-        <label style="float:left;width: 30%"> Fornavn<br> <input type="text" name="forename"></label>
-        <label> Efternavn<br> <input type="text" name="surname" ></label>
-        </span>
-        <label> Telefon<br> <input type="tel" name="phone_nr"></label>
-        <br>
-        <fieldset>
-        <legend>Forretning <button type="button" id="expand-company-info">&gt;</button></legend>
-        
-        <div id="company-info">
-        <label> Firma navn<br> <input type="text" name="company_name"></label>
-        <label> EAN kod<br> <input type="text" name="ean_nr" ></label>
-        <fieldset>
-        <legend style="font-weight: bold;">Adresse</legend>
-        <input type="text" name="company_street_name2" placeholder="C/O etc"> <br>
-        <span>
-            <input type="text" name="company_street_name" placeholder="Gade">
-            <input type="text" name="company_street_nr" placeholder="nr" style="width:15%">
-        </span><br>
-        <span>
-            <input type="text" name="company_zip_code" placeholder="Postnr" style="width:20%">
-            <input type="text" name="company_city" placeholder="By">
-        </span>
-        </fieldset>
-
-        </div>
-        </fieldset>
-    </fieldset>
-    <fieldset>
-    <legend style="font-weight: bold;">Leveringsadresse</legend>
-    <input type="text" name="street_name2" placeholder="C/O etc"> <br>
-    <span>
-        <input type="text" name="street_name" placeholder="Gade">
-        <input type="text" name="street_nr" placeholder="nr" style="width:15%">
-    </span><br>
-    <span>
-        <input type="text" name="zip_code" placeholder="Postnr" style="width:15%">
-        <input type="text" name="city" placeholder="By">
-    </span>
-    </fieldset>
-    <input type="hidden" name="bon_id"/>
-    </div>
-
     <br>
-    <span>
+    
+    <div id="order-tabs" style="border: 1px solid #ccc;"></div>
+    
+    <div style="margin-top:6px">
         <input type="button" id="save" value="Spara">
         <input type="button" id="delete" value="Ta bort" class="for-update">
         <input type="button" id="copy" value="Kopier" class="for-update">
         <span>&nbsp;&nbsp;</span>
         <input type="button" id="cancel" value="Avbryt">
 
-    </span>
-    </form>
     </div>
+    </form>
+    </div> 
+    `;
+
+    customerInfoTab=`
+    <fieldset>
+    <legend>Leveringsdato</legend>
+    <span>
+        <input type="date" name="delivery_date">
+        <input type="time" name="delivery_time">
+    </span>
+</fieldset>
+<fieldset>
+    <legend>Kunde</legend>
+    <label> Email<br> <input id="email" type="email" name="email" autocomplete="nope"></label> 
+    <span>
+    <label style="float:left;width: 30%"> Fornavn<br> <input type="text" name="forename"></label>
+    <label> Efternavn<br> <input type="text" name="surname" ></label>
+    </span>
+    <label> Telefon<br> <input type="tel" name="phone_nr"></label>
+    <br>
+    <fieldset>
+    <legend>Forretning <button type="button" id="expand-company-info">&gt;</button></legend>
     
-    `
+    <div id="company-info">
+    <label> Firma navn<br> <input type="text" name="company_name"></label>
+    <label> EAN kod<br> <input type="text" name="ean_nr" ></label>
+    <fieldset>
+    <legend style="font-weight: bold;">Adresse</legend>
+    <input type="text" name="company_street_name2" placeholder="C/O etc"> <br>
+    <span>
+        <input type="text" name="company_street_name" placeholder="Gade">
+        <input type="text" name="company_street_nr" placeholder="nr" style="width:15%">
+    </span><br>
+    <span>
+        <input type="text" name="company_zip_code" placeholder="Postnr" style="width:20%">
+        <input type="text" name="company_city" placeholder="By">
+    </span>
+    </fieldset>
+
+    </div>
+    </fieldset>
+</fieldset>
+<fieldset>
+<legend style="font-weight: bold;">Leveringsadresse</legend>
+<input type="text" name="street_name2" placeholder="C/O etc"> <br>
+<span>
+    <input type="text" name="street_name" placeholder="Gade">
+    <input type="text" name="street_nr" placeholder="nr" style="width:15%">
+</span><br>
+<span>
+    <input type="text" name="zip_code" placeholder="Postnr" style="width:15%">
+    <input type="text" name="city" placeholder="By">
+</span>
+</fieldset>
+<input type="hidden" name="bon_id"/>
+</div>      
+    `;
+
+itemsTab=`
+    <div>Varer</div>
+`;
+
+miscTab=`
+<div>Øvrig info</div>
+`;
+
     constructor(popupObj,calendarObj,repoObj) {
         this.myPopupObj=popupObj;
         this.myCalendarObj=calendarObj;
@@ -103,6 +116,14 @@ class BonForm {
         this.myDiv.innerHTML=this.content;
         let self=this;
         let form=this.myDiv.querySelector("#order");
+
+        this.myTabs=new TabsClass(this.myDiv.querySelector("#order-tabs"));
+        this.myTabs.addTab("Navn og Tid",this.customerInfoTab);
+        this.myTabs.addTab("Varer",this.itemsTab);
+        this.myTabs.addTab("Øvrig info",this.miscTab);
+        
+
+
         form.querySelector("#save").onclick=function() {
             let props=Helper.getFormProps(form);
 

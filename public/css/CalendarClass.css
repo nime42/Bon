@@ -44,6 +44,7 @@
     height: 16px;
     font-size: 14px;
     cursor: pointer;
+    white-space: nowrap;
   }
 
 .calendar-style .circle {

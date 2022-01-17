@@ -4,7 +4,6 @@ class ModalPopup {
         this.div.classList.add("modal-popup-background");
         let content=`
         <div class="modal-popup-content" style="display: inline-block;">
-
         </div>
         `;
         this.div.innerHTML=content;
@@ -14,7 +13,10 @@ class ModalPopup {
     show(content) {
         this.initDiv();
         let contentDiv=this.div.querySelector(".modal-popup-content");
-        contentDiv.innerHTML="";
+        contentDiv.innerHTML=`<span class="modal-popup-close">&times;</span>`;
+        contentDiv.querySelector(".modal-popup-close").onclick=()=>{
+            this.hide();
+        }
 
         if(typeof content==="string") {
             contentDiv.innerHTML=content;

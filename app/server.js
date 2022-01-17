@@ -35,6 +35,8 @@ if(config.app.https) {
 
 var db=require('./db-functions.js');
 
+var grocy=require('./grocy-functions.js');
+
 
 app.get("/shutdown",(req,res) => {
     var isLocal = (req.connection.localAddress === req.connection.remoteAddress);
@@ -113,6 +115,64 @@ app.get("/customers",(req,res) => {
         }
     })   
 })
+
+app.get("/getGrocyRecipes",(req,res) => {
+    grocy.getAllRecipes(function(status,recipes){
+        if(status) { 
+            res.json(recipes); 
+        } else {
+            console.log("grocyRecipes",recipes);
+            res.sendStatus(500);  
+
+        }
+    })   
+})
+
+
+app.get("/items",(req,res) => {
+
+    db.getItems(function(status,items){
+        if(status) { 
+            res.json(items); 
+        } else {
+            console.log("getitems",items);
+            res.sendStatus(404);  
+
+        }
+    })   
+})
+
+
+
+
+app.put("/items",(req,res) => {
+    let items=req.body;
+    db.updateItems(items,function(status,err){
+        if(status) { 
+            res.sendStatus(200);  
+ 
+        } else {
+            console.log("updateItems",err);
+            res.sendStatus(500);  
+
+        }
+    })  
+})
+
+app.delete("/items/:id",(req,res) => {
+    db.deleteItems(req.params.id,function(status,err){
+        if(status) { 
+            res.sendStatus(200);  
+ 
+        } else {
+            console.log("deleteItems",err);
+            res.sendStatus(500);  
+
+        }
+    })  
+})
+
+
 
 
 

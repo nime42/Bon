@@ -135,7 +135,6 @@ function getCustomers(email,callback=console.log) {
 
 function createCustomer(customer) {
     customer.company_id=createCompany(customer.company);
-    console.log(customer.company_id);
     let sql=`
     INSERT INTO customers (forename,surname,email,phone_nr,company_id)
     VALUES (@forename, @surname, @email, @phone_nr, @company_id)
@@ -205,10 +204,63 @@ function createAddress(address) {
 }
 
 
+function getItems(callback=console.log) {
+  let sql="SELECT * FROM items";
+  try {
+    const rows=db.prepare(sql).all();
+    callback(true,rows);
+  } catch(err) {
+    callback(false,err);
+  }
+
+}
+
+
+function updateItems(items, callback = console.log) {
+  let sql = `
+  INSERT INTO items (name,category,cost_price,sellable) VALUES (@name,@category,@cost_price,@sellable)
+  ON CONFLICT (name,category) DO
+  UPDATE SET cost_price=ifnull(excluded.cost_price,cost_price),sellable=ifnull(excluded.sellable,sellable) 
+  `;
+
+  try {
+    db.transaction(() => {
+      let ps = db.prepare(sql);
+      items.forEach(i => {
+        ps.run(i);
+      });
+      callback(true);
+    })();
+
+  } catch (err) {
+    callback(false,err);
+
+  }
+}
+
+function deleteItems(id, callback = console.log) {
+  if(id==="*") {
+    id="%";
+  };
+  let sql = "delete from items where id like ?";
+  try {
+    db.prepare(sql).run(id);
+    if(id==="%") {
+      db.prepare("UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='items'").run();
+    }
+    callback(true, null);
+  } catch (err) {
+    callback(false, err);
+  }
+}
+
 module.exports={
     getBons:getBons,
     delBon:delBon,
     createBon:createBon,
     updateBon:updateBon,
-    getCustomers:getCustomers
+    getCustomers:getCustomers,
+    getItems:getItems,
+    updateItems:updateItems,
+    deleteItems:deleteItems
 }
