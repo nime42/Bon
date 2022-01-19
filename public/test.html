@@ -1,56 +1,66 @@
 <html>
-    <head>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <link rel="stylesheet" href="css/CalendarClass.css">
-        <script src="js/CalendarClass.js"></script>
-        <link rel="stylesheet" href="css/ModalPopup.css">
-        <script src="js/ModalPopup.js"></script>
-        <script src="js/TabsClass.js"></script>
-        <script src="js/MessageBox.js"></script>
-        <script src="js/AutocompleteClass.js"></script>
-        <script src="js/helpers.js"></script>
-        <script src="js/BonForm.js"></script>
-        <script src="js/BonRepository.js"></script>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/CalendarClass.css">
+    <script src="js/CalendarClass.js"></script>
+    <link rel="stylesheet" href="css/ModalPopup.css">
+    <script src="js/ModalPopup.js"></script>
+    <script src="js/TabsClass.js"></script>
+    <script src="js/VertTabsClass.js"></script>
+    <script src="js/MessageBox.js"></script>
+    <script src="js/AutocompleteClass.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/BonForm.js"></script>
+    <script src="js/BonRepository.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+    </style>
 
 
-    </head>
-    <body>
-        <div id="calendar">
 
-        </div>
+</head>
 
-        <script>
-            var myPopup=new ModalPopup();
-            var myCalendar=new CalendarClass("#calendar");
-            var myRepo=new BonRepository();
-            var myBonForm=new BonForm(myPopup,myCalendar,myRepo);
+<body>
+    <div id="calendar">
 
-            myCalendar.setOnDateClick((date,calObj) => {
-                date.setHours(12);
-                myBonForm.init({eventTime:date});
-                myPopup.show(myBonForm.getForm());
+    </div>
+
+    <script>
+        var myPopup = new ModalPopup();
+        var myCalendar = new CalendarClass("#calendar");
+        var myRepo = new BonRepository();
+        var myBonForm = new BonForm(myPopup, myCalendar, myRepo);
+        myBonForm.updateItems();
+
+        myCalendar.setOnDateClick((date, calObj) => {
+            date.setHours(12);
+            myBonForm.init({
+                eventTime: date
             });
-            myCalendar.setOnEventClick((eventElem,eventData)=> {
-                myBonForm.init(eventData,eventElem);
-                myPopup.show(myBonForm.getForm());
-            });
+            myPopup.show(myBonForm.getForm());
+        });
+        myCalendar.setOnEventClick((eventElem, eventData) => {
+            myBonForm.init(eventData, eventElem);
+            myPopup.show(myBonForm.getForm());
+        });
 
-            
 
-            myCalendar.setOnMonthChange((year,month)=>{
-                myRepo.getBons(year,month+1,(bons)=>{
-                    bons.forEach(b => {
-                        b.delivery_date=new Date(b.delivery_date);
-                        let [label,statusColor]=myBonForm.createBonLabelAndcolor(b);
-                        myCalendar.addEvent(b.delivery_date,label,statusColor,b);
-                        
-                    });
+
+        myCalendar.setOnMonthChange((year, month) => {
+            myRepo.getBons(year, month + 1, (bons) => {
+                bons.forEach(b => {
+                    b.delivery_date = new Date(b.delivery_date);
+                    let [label, statusColor] = myBonForm.createBonLabelAndcolor(b);
+                    myCalendar.addEvent(b.delivery_date, label, statusColor, b);
+
                 });
+            });
 
-            },true);
+        }, true);
+    </script>
+</body>
 
-            
-
-        </script>
-    </body>
 </html>

@@ -218,9 +218,9 @@ function getItems(callback=console.log) {
 
 function updateItems(items, callback = console.log) {
   let sql = `
-  INSERT INTO items (name,category,cost_price,sellable) VALUES (@name,@category,@cost_price,@sellable)
+  INSERT INTO items (name,category,cost_price,sellable,external_id) VALUES (@name,@category,@cost_price,@sellable,@external_id)
   ON CONFLICT (name,category) DO
-  UPDATE SET cost_price=ifnull(excluded.cost_price,cost_price),sellable=ifnull(excluded.sellable,sellable) 
+  UPDATE SET cost_price=ifnull(excluded.cost_price,cost_price),sellable=ifnull(excluded.sellable,sellable),external_id=ifnull(excluded.external_id,external_id) 
   `;
 
   try {

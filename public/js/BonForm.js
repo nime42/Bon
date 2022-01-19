@@ -1,27 +1,118 @@
 class BonForm {
+    background="#ADEFD1FF";
+    foreground="#00203FFF";
+    shadowColor="#446e74";
     content=`
-    <div style="background:white;padding:20px;border-radius: 10px;border: 3px solid black;border-style: double;">
-    <style>
-    label {
-        display: block;
-        padding-bottom: 3px;
-        padding-top:0px;
-        font-weight: bold;
-    }
-    input[type="text" i] {
-        margin-bottom: 5px;
-    }
+    <div style="background:${this.background};padding:20px;border-radius: 10px;border: 3px solid black;border-style: double;">
 
-    .status-button {
-        border-radius: 6px;
-        margin-right: 3px;
-    }
+    <style type="text/css">
+        .form-style-3 {
 
+            font-family: sans-serif;
+            background:${this.background};
+            padding: 10px;
+            -webkit-border-radius: 10px;
+        }
 
+        .form-style-3 label {
+            display: block;
+            margin-bottom: 10px;
+        }
 
+        .form-style-3 label>span {
+            float: left;
+            width: 100px;
+            color: ${this.foreground};
+            font-weight: bold;
+            font-size: 13px;
+            text-shadow: 1px 1px 1px #fff;
+        }
+
+        .form-style-3 fieldset {
+            border-radius: 10px;
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            margin: 0px 0px 10px 0px;
+            border: 1px solid ${this.foreground};
+            padding: 20px;
+            background: ${this.background};
+            box-shadow: inset 0px 0px 15px #446e74;
+            -moz-box-shadow: inset 0px 0px 15px #446e74;
+            -webkit-box-shadow: inset 0px 0px 15px #446e74;
+        }
+
+        .form-style-3 fieldset legend {
+            color: ${this.foreground};
+            border-top: 1px solid ${this.foreground};
+            border-left: 1px solid ${this.foreground};
+            border-right: 1px solid ${this.foreground};
+            border-radius: 5px 5px 0px 0px;
+            -webkit-border-radius: 5px 5px 0px 0px;
+            -moz-border-radius: 5px 5px 0px 0px;
+            background: ${this.background};
+            padding: 0px 8px 3px 8px;
+            box-shadow: -0px -1px 2px ${this.shadowColor};
+            -moz-box-shadow: -0px -1px 2px ${this.shadowColor};
+            -webkit-box-shadow: -0px -1px 2px ${this.shadowColor};
+            font-weight: normal;
+            font-size: 12px;
+        }
+
+        .form-style-3 textarea {
+            width: 250px;
+            height: 100px;
+        }
+
+        .form-style-3 input[type=text],
+        .form-style-3 input[type=date],
+        .form-style-3 input[type=datetime],
+        .form-style-3 input[type=number],
+        .form-style-3 input[type=search],
+        .form-style-3 input[type=time],
+        .form-style-3 input[type=url],
+        .form-style-3 input[type=email],
+        .form-style-3 input[type=tel],
+        .form-style-3 select,
+        .form-style-3 textarea {
+            border-radius: 3px;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border: 2px solid ${this.foreground};
+            outline: none;
+            color: ${this.foreground};
+            padding: 5px 8px 5px 8px;
+            box-shadow: inset 1px 1px 4px ${this.shadowColor};
+            -moz-box-shadow: inset 1px 1px 4px ${this.shadowColor};
+            -webkit-box-shadow: inset 1px 1px 4px ${this.shadowColor};
+            background: ${this.background};
+            width: 50%;
+        }
+
+        .form-style-3 input[type=submit],
+        .form-style-3 input[type=button] {
+            background: ${this.background};
+            border: 1px solid ${this.foreground};
+            padding: 5px 15px 5px 15px;
+            color: ${this.foreground};
+            box-shadow: inset -1px -1px 3px ${this.shadowColor};
+            -moz-box-shadow: inset -1px -1px 3px ${this.shadowColor};
+            -webkit-box-shadow: inset -1px -1px 3px ${this.shadowColor};
+            border-radius: 3px;
+            border-radius: 3px;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .required {
+            color: red;
+            font-weight: normal;
+        }
     </style>
 
-    <form id="order">
+
+
+    <form id="order" class="form-style-3">
     <div id="input-fields">
     <fieldset>
     <legend>Status</legend>
@@ -31,7 +122,7 @@ class BonForm {
     </fieldset>
     <br>
     
-    <div id="order-tabs" style="border: 1px solid #ccc;"></div>
+    <div id="order-tabs" style=""></div>
     
     <div style="margin-top:6px">
         <input type="button" id="save" value="Spara">
@@ -101,7 +192,7 @@ class BonForm {
     `;
 
 itemsTab=`
-    <div>Varer</div>
+<div id="items" style=";min-height:400px;">
 `;
 
 miscTab=`
@@ -121,7 +212,8 @@ miscTab=`
         this.myTabs.addTab("Navn og Tid",this.customerInfoTab);
         this.myTabs.addTab("Varer",this.itemsTab);
         this.myTabs.addTab("Øvrig info",this.miscTab);
-        
+
+        this.myItems=new VertTabsClass(this.myDiv.querySelector("#items"));
 
 
         form.querySelector("#save").onclick=function() {
@@ -218,6 +310,48 @@ miscTab=`
             form.querySelector("#email")
             self._customerToForm(option.data,form,true);
         }
+    }
+
+    updateItems() {
+        let self=this;
+        this.myRepoObj.getItems((items)=>{
+            let categories={};
+            items.forEach(i=>{
+                if(i.sellable) {
+                    if(!categories[i.category]) {
+                        categories[i.category]=[];
+                    }
+                    categories[i.category].push({name:i.name,id:i.id});
+                }
+            })
+
+            Object.keys(categories).forEach((k)=>{
+                let content=document.createElement("div");
+                content.style.minWidth="150px";
+
+                categories[k].forEach((n)=>{
+                    let button=document.createElement("button");
+                    button.style.width="100%";
+                    button.style.marginBottom="3px";
+                    button.innerHTML=n.name;
+                    button.onclick=()=>{
+                        this.selectItem(n.name,n.id);
+                        return false;
+                    }
+                    content.appendChild(button);
+                    content.appendChild(document.createElement("br"));
+                    
+                })
+                this.myItems.addTab(k,content);
+
+            }
+        )
+        });
+
+    }
+
+    selectItem(name,id) {
+        console.log(name,id);
     }
 
     createBonLabelAndcolor(bon) {

@@ -20,8 +20,9 @@ function parseRecipes(recipes) {
         {
             name:r.name,
             category:r.userfields?r.userfields.grupper:"",
-            cost_price:null,
-            sellable:null
+            cost_price:r.userfields?r.userfields.costprice:"",
+            sellable:null,
+            external_id:r.id
         }
     ));
         

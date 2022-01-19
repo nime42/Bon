@@ -1,46 +1,54 @@
 class TabsClass {
+    background="#ADEFD1FF";
+    foreground="#00203FFF";
     div = `
     <style>
-    .tab {
+    .hori-tab .tab {
         overflow: hidden;
-        border: 1px solid #ccc;
-        background-color: #f1f1f1;
       }
       
       /* Style the buttons that are used to open the tab content */
-      .tab button {
-        background-color: inherit;
-        float: left;
-        border: none;
-        outline: none;
+      .hori-tab .tab button {
         cursor: pointer;
-        padding: 14px 16px;
-        transition: 0.3s;
+        display: inline-block;
+        background-color: ${this.foreground};
+        color: ${this.background};
+        text-align: center;
+        transition: .25s ease;
+        border: none;
+        padding: 10px;
+        border-radius: 12px 12px 0 0;
       }
       
       /* Change background color of buttons on hover */
-      .tab button:hover {
+      .hori-tab .tab button:hover {
         background-color: #ddd;
       }
       
       /* Create an active/current tablink class */
-      .tab button.active {
-        background-color: #ccc;
+      .hori-tab .tab button.active {
+        background-color: ${this.background};
+        color: ${this.foreground};
         border: 1px solid black;
+        border-bottom:0px;
       }
 
    
       
       /* Style the tab content */
-      .tabcontent {
+      .hori-tab .tabcontent {
         display: none;
         padding: 6px 12px;
-        border: 1px solid #ccc;
+        border: 1px solid ${this.foreground};
         border-top: none;
+        border-left: none;
+        background:${this.background};
       }
-      .content-container {
+      .hori-tab .content-container {
         overflow: auto;
         max-height: 450;
+        border: 1px solid ${this.foreground};
+
       }
     </style>
     <div class="tab">
@@ -59,6 +67,7 @@ class TabsClass {
             this.myDiv=div;
         }
         this.myDiv.innerHTML = this.div;
+        this.myDiv.classList.add("hori-tab");
     }
 
     addTab(header, content) {
