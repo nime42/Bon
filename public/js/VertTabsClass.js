@@ -1,5 +1,5 @@
 class VertTabsClass {
-    background="#ADEFD1FF";
+    background=Globals.background;
     div = `
     <style>
     .vert-tab #tabs {

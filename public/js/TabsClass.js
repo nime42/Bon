@@ -1,6 +1,6 @@
 class TabsClass {
-    background="#ADEFD1FF";
-    foreground="#00203FFF";
+    background=Globals.background;
+    foreground=Globals.foreground;
     div = `
     <style>
     .hori-tab .tab {

@@ -1,12 +1,12 @@
 class BonForm {
-    background="#ADEFD1FF";
-    foreground="#00203FFF";
-    shadowColor="#446e74";
+    background=Globals.background;
+    foreground=Globals.foreground;
+    shadowColor="Globals.shadowColor";
     content=`
     <div style="background:${this.background};padding:20px;border-radius: 10px;border: 3px solid black;border-style: double;">
 
     <style type="text/css">
-        .form-style-3 {
+        .form-style {
 
             font-family: sans-serif;
             background:${this.background};
@@ -14,12 +14,12 @@ class BonForm {
             -webkit-border-radius: 10px;
         }
 
-        .form-style-3 label {
+        .form-style label {
             display: block;
             margin-bottom: 10px;
         }
 
-        .form-style-3 label>span {
+        .form-style label>span {
             float: left;
             width: 100px;
             color: ${this.foreground};
@@ -28,7 +28,7 @@ class BonForm {
             text-shadow: 1px 1px 1px #fff;
         }
 
-        .form-style-3 fieldset {
+        .form-style fieldset {
             border-radius: 10px;
             -webkit-border-radius: 10px;
             -moz-border-radius: 10px;
@@ -36,12 +36,12 @@ class BonForm {
             border: 1px solid ${this.foreground};
             padding: 20px;
             background: ${this.background};
-            box-shadow: inset 0px 0px 15px #446e74;
-            -moz-box-shadow: inset 0px 0px 15px #446e74;
-            -webkit-box-shadow: inset 0px 0px 15px #446e74;
+            box-shadow: inset 0px 0px 15px ${this.shadowColor};
+            -moz-box-shadow: inset 0px 0px 15px ${this.shadowColor};
+            -webkit-box-shadow: inset 0px 0px 15px ${this.shadowColor};
         }
 
-        .form-style-3 fieldset legend {
+        .form-style fieldset legend {
             color: ${this.foreground};
             border-top: 1px solid ${this.foreground};
             border-left: 1px solid ${this.foreground};
@@ -58,22 +58,22 @@ class BonForm {
             font-size: 12px;
         }
 
-        .form-style-3 textarea {
+        .form-style textarea {
             width: 250px;
             height: 100px;
         }
 
-        .form-style-3 input[type=text],
-        .form-style-3 input[type=date],
-        .form-style-3 input[type=datetime],
-        .form-style-3 input[type=number],
-        .form-style-3 input[type=search],
-        .form-style-3 input[type=time],
-        .form-style-3 input[type=url],
-        .form-style-3 input[type=email],
-        .form-style-3 input[type=tel],
-        .form-style-3 select,
-        .form-style-3 textarea {
+        .form-style input[type=text],
+        .form-style input[type=date],
+        .form-style input[type=datetime],
+        .form-style input[type=number],
+        .form-style input[type=search],
+        .form-style input[type=time],
+        .form-style input[type=url],
+        .form-style input[type=email],
+        .form-style input[type=tel],
+        .form-style select,
+        .form-style textarea {
             border-radius: 3px;
             -webkit-border-radius: 3px;
             -moz-border-radius: 3px;
@@ -85,11 +85,10 @@ class BonForm {
             -moz-box-shadow: inset 1px 1px 4px ${this.shadowColor};
             -webkit-box-shadow: inset 1px 1px 4px ${this.shadowColor};
             background: ${this.background};
-            width: 50%;
         }
 
-        .form-style-3 input[type=submit],
-        .form-style-3 input[type=button] {
+        .form-style input[type=submit],
+        .form-style input[type=button] {
             background: ${this.background};
             border: 1px solid ${this.foreground};
             padding: 5px 15px 5px 15px;
@@ -112,7 +111,7 @@ class BonForm {
 
 
 
-    <form id="order" class="form-style-3">
+    <form id="order" class="form-style">
     <div id="input-fields">
     <fieldset>
     <legend>Status</legend>
