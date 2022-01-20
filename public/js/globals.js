@@ -1,7 +1,7 @@
 class Globals {
     
-    static background="#ADEFD1FF";
-    static foreground="#00203FFF";
+    static foreground="#8e631f";
+    static background="#f1e6b2";
     static shadowColor="#446e74";
     
 
