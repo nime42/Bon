@@ -131,6 +131,7 @@ class BonForm {
         <input type="button" id="cancel" value="Avbryt">
 
     </div>
+    </div>
     </form>
     </div> 
     `;
