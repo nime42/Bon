@@ -1,7 +1,7 @@
 class BonForm {
     background=Globals.background;
     foreground=Globals.foreground;
-    shadowColor="Globals.shadowColor";
+    shadowColor=Globals.shadowColor;
     content=`
     <div style="background:${this.background};padding:20px;border-radius: 10px;border: 3px solid black;border-style: double;">
 
