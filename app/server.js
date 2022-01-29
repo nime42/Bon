@@ -142,7 +142,18 @@ app.get("/items",(req,res) => {
     })   
 })
 
+app.get("/orders/:id",(req,res) => {
 
+    db.getOrders(req.params.id,function(status,items){
+        if(status) { 
+            res.json(items); 
+        } else {
+            console.log("getitems",items);
+            res.sendStatus(404);  
+
+        }
+    })   
+})
 
 
 app.put("/items",(req,res) => {

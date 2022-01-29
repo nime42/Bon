@@ -46,5 +46,10 @@ class BonRepository {
         $.get(url,callback);
     }
 
+    getOrders(bonId,callback) {
+        let url="orders/"+bonId;
+        $.get(url,callback);
+    }
+
 
 }

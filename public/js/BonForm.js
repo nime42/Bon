@@ -3,7 +3,7 @@ class BonForm {
     foreground=Globals.foreground;
     shadowColor=Globals.shadowColor;
     content=`
-    <div style="background:${this.background};padding:20px;border-radius: 10px;border: 3px solid black;border-style: double;">
+    <div style="background:${this.background};padding:20px;border-radius: 10px;border: 3px solid black;border-style: double; display: flex;flex-direction: row;">
 
     <style type="text/css">
         .form-style {
@@ -12,6 +12,7 @@ class BonForm {
             background:${this.background};
             padding: 10px;
             -webkit-border-radius: 10px;
+            width:550px;
         }
 
         .form-style label {
@@ -111,7 +112,7 @@ class BonForm {
 
 
 
-    <form id="order" class="form-style">
+    <form id="order" class="form-style" autocomplete="off">
     <div id="input-fields">
     <fieldset>
     <legend>Status</legend>
@@ -133,6 +134,8 @@ class BonForm {
     </div>
     </div>
     </form>
+    <div id="bon-strip">
+    </div>
     </div> 
     `;
 
@@ -140,51 +143,49 @@ class BonForm {
     <fieldset>
     <legend>Leveringsdato</legend>
     <span>
-        <input type="date" name="delivery_date">
-        <input type="time" name="delivery_time">
+        <input id="date" type="date" name="delivery_date">
+        <input id="time" type="time" name="delivery_time">
     </span>
 </fieldset>
 <fieldset>
     <legend>Kunde</legend>
     <label> Email<br> <input id="email" type="email" name="email" autocomplete="nope"></label> 
     <span>
-    <label style="float:left;width: 30%"> Fornavn<br> <input type="text" name="forename"></label>
-    <label> Efternavn<br> <input type="text" name="surname" ></label>
+    <label style="float:left;width: 30%"> Fornavn<br> <input autocomplete="nope" id="forename" type="text" name="forename"></label>
+    <label> Efternavn<br> <input autocomplete="nope" id="surname" type="text" name="surname" ></label>
     </span>
-    <label> Telefon<br> <input type="tel" name="phone_nr"></label>
-    <br>
-    <fieldset>
-    <legend>Forretning <button type="button" id="expand-company-info">&gt;</button></legend>
+    <label> Telefon<br> <input id="phone_nr" type="tel" name="phone_nr"></label>
+    <label> Firma navn<br> <input type="text" name="company_name"> <i id="expand-company-info" class="fa fa-caret-down" style="font-size:25px; color: ${this.foreground};"></i></label>
     
-    <div id="company-info">
-    <label> Firma navn<br> <input type="text" name="company_name"></label>
+    <div id="company-info" style="padding: 5px 5px 5px 35px;;border: 1px solid  ${this.foreground};">
     <label> EAN kod<br> <input type="text" name="ean_nr" ></label>
-    <fieldset>
+    <fieldset style="max-width: min-content;min-width: fit-content;">
     <legend style="font-weight: bold;">Adresse</legend>
-    <input type="text" name="company_street_name2" placeholder="C/O etc"> <br>
+    <input type="text" name="company_street_name2" placeholder="C/O etc" autocomplete="nope"> <br>
     <span>
-        <input type="text" name="company_street_name" placeholder="Gade">
-        <input type="text" name="company_street_nr" placeholder="nr" style="width:15%">
+        <input type="text" name="company_street_name" placeholder="Gade" autocomplete="nope">
+        <input type="text" name="company_street_nr" placeholder="nr" style="width:15%" autocomplete="nope">
     </span><br>
     <span>
-        <input type="text" name="company_zip_code" placeholder="Postnr" style="width:20%">
-        <input type="text" name="company_city" placeholder="By">
+        <input type="text" name="company_zip_code" placeholder="Postnr" style="width:25%" autocomplete="off">
+        <input type="text" name="company_city" placeholder="By" autocomplete="nope">
     </span>
     </fieldset>
 
     </div>
-    </fieldset>
+
+    
 </fieldset>
 <fieldset>
 <legend style="font-weight: bold;">Leveringsadresse</legend>
-<input type="text" name="street_name2" placeholder="C/O etc"> <br>
+<input type="text" id="street_name2" name="street_name2" placeholder="C/O etc" autocomplete="nope"> <br>
 <span>
-    <input type="text" name="street_name" placeholder="Gade">
-    <input type="text" name="street_nr" placeholder="nr" style="width:15%">
+    <input type="text" id="street_name" name="street_name" placeholder="Gade" autocomplete="nope">
+    <input type="text" id="street_nr" name="street_nr" placeholder="nr" style="width:15%" autocomplete="nope">
 </span><br>
 <span>
-    <input type="text" name="zip_code" placeholder="Postnr" style="width:15%">
-    <input type="text" name="city" placeholder="By">
+    <input type="text" id="zip_code" name="zip_code" placeholder="Postnr" style="width:25%" autocomplete="nope">
+    <input type="text" id="city" name="city" placeholder="By" autocomplete="nope">
 </span>
 </fieldset>
 <input type="hidden" name="bon_id"/>
@@ -214,6 +215,14 @@ miscTab=`
         this.myTabs.addTab("Øvrig info",this.miscTab);
 
         this.myItems=new VertTabsClass(this.myDiv.querySelector("#items"));
+
+        this.myBonStrip=new BonStrip(this.myDiv.querySelector("#bon-strip"));
+        this.myBonStrip.updateNameOnChange(form.querySelector("#forename"),form.querySelector("#surname"));
+        this.myBonStrip.updateDeliveryAdrOnChange(form.querySelector("#street_name"),form.querySelector("#street_name2"),form.querySelector("#street_nr"),form.querySelector("#zip_code"),form.querySelector("#city"));
+        this.myBonStrip.updateMailAndPhoneNrOnChange(form.querySelector("#email"),form.querySelector("#phone_nr"));
+        this.myBonStrip.updateDateAndTimeOnChange(form.querySelector("#date"),form.querySelector("#time"));
+
+
 
 
         form.querySelector("#save").onclick=function() {
@@ -278,11 +287,13 @@ miscTab=`
         companyInfo.style.display="none";
 
         expandCompanyInfo.onclick=function(e) {
-            if(expandCompanyInfo.innerText===">") {
-                    expandCompanyInfo.innerText="<";
-                    companyInfo.style.display="";
+            if(expandCompanyInfo.classList.contains('fa-caret-down')) {
+                expandCompanyInfo.classList.remove('fa-caret-down');
+                expandCompanyInfo.classList.add('fa-caret-up');
+                companyInfo.style.display="";
             } else {
-                expandCompanyInfo.innerText=">";
+                expandCompanyInfo.classList.remove('fa-caret-up');
+                expandCompanyInfo.classList.add('fa-caret-down');
                 companyInfo.style.display="none";
             }
         }
@@ -309,6 +320,7 @@ miscTab=`
         this.customer_mail_autocomplete.onSelect=(option)=>{
             form.querySelector("#email")
             self._customerToForm(option.data,form,true);
+            self._copyCompanyAddress2Delivery(form,true);
         }
     }
 
@@ -321,7 +333,7 @@ miscTab=`
                     if(!categories[i.category]) {
                         categories[i.category]=[];
                     }
-                    categories[i.category].push({name:i.name,id:i.id});
+                    categories[i.category].push({name:i.name,id:i.id,cost_price:i.cost_price});
                 }
             })
 
@@ -335,7 +347,7 @@ miscTab=`
                     button.style.marginBottom="3px";
                     button.innerHTML=n.name;
                     button.onclick=()=>{
-                        this.selectItem(n.name,n.id);
+                        this.selectOrder(n.name,n.id,n.cost_price);
                         return false;
                     }
                     content.appendChild(button);
@@ -350,9 +362,11 @@ miscTab=`
 
     }
 
-    selectItem(name,id) {
-        console.log(name,id);
+    selectOrder(name,id,cost_price) {
+        this.myBonStrip.configureOrder(1,name,"",id,cost_price);
+
     }
+
 
     createBonLabelAndcolor(bon) {
         let statusColor=this.getStatusColor(bon.status);
@@ -430,7 +444,7 @@ miscTab=`
         bon.delivery_address.city=props.city;
         bon.delivery_address.zip_code=props.zip_code;
 
-
+        bon.orders=this.myBonStrip.getOrders();
 
 
         return bon;
@@ -450,9 +464,13 @@ miscTab=`
         this._updateOrMerge(form.querySelector("input[name=company_street_nr]"),customer.company.address.street_nr,merge)
         this._updateOrMerge(form.querySelector("input[name=company_city]"),customer.company.address.city,merge);
         this._updateOrMerge(form.querySelector("input[name=company_zip_code]"),customer.company.address.zip_code,merge);
-
-
-
+    }
+    _copyCompanyAddress2Delivery(form,merge) {
+        this._updateOrMerge(form.querySelector("input[name=street_name]"),form.querySelector("input[name=company_street_name]").value,merge);
+        this._updateOrMerge(form.querySelector("input[name=street_name2]"),form.querySelector("input[name=company_street_name2]").value,merge);
+        this._updateOrMerge(form.querySelector("input[name=street_nr]"),form.querySelector("input[name=company_street_nr]").value,merge)
+        this._updateOrMerge(form.querySelector("input[name=city]"),form.querySelector("input[name=company_city]").value,merge);
+        this._updateOrMerge(form.querySelector("input[name=zip_code]"),form.querySelector("input[name=company_zip_code]").value,merge);
 
     }
 
@@ -462,6 +480,7 @@ miscTab=`
         } else if(!merge) {
             elem.value=val;
         }
+        try {elem.oninput();} catch(err) {}
     }
 
     _bonToForm(bon,formDiv) {
@@ -474,29 +493,21 @@ miscTab=`
 
         form.querySelector("input[name=bon_id]").value=bon.id;
 
-        form.querySelector("input[name=email]").value=bon.customer.email;
-        form.querySelector("input[name=forename]").value=bon.customer.forename;
-        form.querySelector("input[name=surname]").value=bon.customer.surname;
-        form.querySelector("input[name=phone_nr]").value=bon.customer.phone_nr;
-
-        form.querySelector("input[name=company_name]").value=bon.customer.company.name;
-        form.querySelector("input[name=ean_nr]").value=bon.customer.company.ean_nr;
-
-        form.querySelector("input[name=company_street_name]").value=bon.customer.company.address.street_name;
-        form.querySelector("input[name=company_street_name2]").value=bon.customer.company.address.street_name2;
-        form.querySelector("input[name=company_street_nr]").value=bon.customer.company.address.street_nr;
-        form.querySelector("input[name=company_city]").value=bon.customer.company.address.city;
-        form.querySelector("input[name=company_zip_code]").value=bon.customer.company.address.zip_code;
-
-
-
-        form.querySelector("input[name=street_name]").value=bon.delivery_address.street_name;
-        form.querySelector("input[name=street_name2]").value=bon.delivery_address.street_name2;
-        form.querySelector("input[name=street_nr]").value=bon.delivery_address.street_nr;
-        form.querySelector("input[name=city]").value=bon.delivery_address.city;
-        form.querySelector("input[name=zip_code]").value=bon.delivery_address.zip_code;
+        this._updateOrMerge(form.querySelector("input[name=street_name]"),bon.delivery_address.street_name);
+        this._updateOrMerge(form.querySelector("input[name=street_name2]"),bon.delivery_address.street_name2);
+        this._updateOrMerge(form.querySelector("input[name=street_nr]"),bon.delivery_address.street_nr);
+        this._updateOrMerge(form.querySelector("input[name=city]"),bon.delivery_address.city);
+        this._updateOrMerge(form.querySelector("input[name=zip_code]"),bon.delivery_address.zip_code);
 
         this._setStatus(bon.status!==""?bon.status:"new");
+
+        this.myBonStrip.setBonId(bon.id);
+        this.myRepoObj.getOrders(bon.id,(orders)=>{
+            this.myBonStrip.clear();
+            orders.forEach(o=>{
+                this.myBonStrip.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price);
+            })
+        })
 
     }
 
@@ -508,8 +519,8 @@ miscTab=`
         let hourStr=(date.getHours()+"").padStart(2,"0");
         let minuteStr=(date.getMinutes()+"").padStart(2,"0");
 
-        form.querySelector("input[name=delivery_date]").value=yearStr+"-"+monthStr+"-"+dayStr;
-        form.querySelector("input[name=delivery_time]").value=hourStr+":"+minuteStr;
+        this._updateOrMerge(form.querySelector("input[name=delivery_date]"),yearStr+"-"+monthStr+"-"+dayStr);
+        this._updateOrMerge(form.querySelector("input[name=delivery_time]"),hourStr+":"+minuteStr);
 
 
     }
@@ -528,6 +539,8 @@ miscTab=`
         } else {
             this._setFormDate(new Date(content.eventTime),"#order");
             this._setStatus("new");
+            this.myBonStrip.setBonId("");
+            this.myBonStrip.clear();
         }
         this.myDiv.querySelectorAll(".for-update").forEach(e=>{
             e.style.display=display;

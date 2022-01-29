@@ -1,4 +1,6 @@
 class AutoCompleteClass {
+  background=Globals.background;
+  foreground=Globals.foreground;
   styling=`
   <style>
   .container {
@@ -15,23 +17,24 @@ class AutoCompleteClass {
      
       position: absolute;
       z-index: 1;
-      background: lightgray;
+      background: ${this.background};
       width: 100%;
   }
   .dropdown-item {
       padding: 5px;
       cursor: pointer;
-      background-color: #fff; 
+      background-color: ${this.background}; 
       border-bottom: 1px solid #d4d4d4; 
       overflow: hidden;
       display: block;
       font-style: italic;
       font-weight: normal;
+      color:${this.foreground};
       
   }
   .dropdown-item.active,
   .dropdown-item:hover {
-      background-color: #e9e9e9; 
+      background-color: lightgrey; 
   }
 
 </style>  
@@ -114,6 +117,7 @@ class AutoCompleteClass {
       opt.onclick=function() {
         self.onSelect && self.onSelect(o);
         self.myInputDiv.value=o.value?o.value:o;
+        try {self.myInputDiv.oninput();} catch(err) {}
         self.clearOptions();
       }
       this.myList.appendChild(opt);

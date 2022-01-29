@@ -62,11 +62,15 @@ function delBon(bonId,callback=console.log) {
 
 function createBon(bonData,callback=console.log) {
     bonData.customer_id=createCustomer(bonData.customer);
+    console.log(bonData.orders);
     bonData.delivery_address_id=createAddress(bonData.delivery_address);
     let sql="INSERT INTO bons(status, status2, customer_id,delivery_address_id, delivery_date, nr_of_servings, info, service_type, payment_type) VALUES(@status, @status2, @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings, @info, @service_type, @payment_type);"
     try {
     const res = db.prepare(sql).run(bonData);
-    callback(true,res.lastInsertRowid);
+    let newBonId=res.lastInsertRowid;
+    saveOrders(newBonId,bonData.orders);
+
+    callback(true,newBonId);
     } catch (err) {
         callback(false,err);
     }
@@ -91,6 +95,7 @@ function updateBon(id,bonData,callback=console.log) {
   `;
   try {
   const res = db.prepare(sql).run(bonData);
+  saveOrders(id,bonData.orders);
   callback(true,bonData.id);
   } catch (err) {
       callback(false,err);
@@ -127,8 +132,6 @@ function getCustomers(email,callback=console.log) {
   } catch(err) {
       callback(false,err);
   }
-
-
 
 }
 
@@ -254,6 +257,41 @@ function deleteItems(id, callback = console.log) {
   }
 }
 
+function saveOrders(bonId,orders) {
+  let sql="delete from orders where bon_id=?";
+  db.prepare(sql).run(bonId);
+  let sortOrder=0;
+  let preparedOrders=orders.map(o=>{
+    o.bon_id=bonId;
+    o.sorting_order=sortOrder++;
+    return o;
+  })
+
+  console.log(orders);
+  sql=`insert into orders(bon_id,item_id,price,quantity,special_request,sorting_order) 
+        values(@bon_id,@id,@costPrice,@quantity,@comment,@sorting_order)`;
+
+  let ps = db.prepare(sql);
+  preparedOrders.forEach(o=>{
+    ps.run(o);
+  })
+
+}
+
+function getOrders(bonId,callback = console.log) {
+  let sql=`select i.name,i.category,o.* from orders o 
+  left join items i on o.item_id=i.id
+  where bon_id=? order by sorting_order`;
+
+  try {
+    const rows=db.prepare(sql).all(bonId);
+    callback(true,rows);
+  } catch(err) {
+    callback(false,err);
+  }
+
+}
+
 module.exports={
     getBons:getBons,
     delBon:delBon,
@@ -262,5 +300,6 @@ module.exports={
     getCustomers:getCustomers,
     getItems:getItems,
     updateItems:updateItems,
-    deleteItems:deleteItems
+    deleteItems:deleteItems,
+    getOrders:getOrders
 }

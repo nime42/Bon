@@ -3,7 +3,8 @@ class ModalPopup {
         this.div=document.createElement("div");
         this.div.classList.add("modal-popup-background");
         let content=`
-        <div class="modal-popup-content" style="display: inline-block;">
+        <div class="modal-popup-content" style="display: inline-block; -webkit-border-radius: 10px;">
+
         </div>
         `;
         this.div.innerHTML=content;
@@ -23,7 +24,7 @@ class ModalPopup {
         } else {
             contentDiv.appendChild(content);
         }
-        this.div.style.display="block";
+        this.div.style.display="flex";
     }
     hide() {
         document.querySelector("body").removeChild(this.div);

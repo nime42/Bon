@@ -46,7 +46,7 @@ class TabsClass {
       }
       .hori-tab .content-container {
         overflow: auto;
-        max-height: 450;
+        max-height: 600;
         border: 1px solid ${this.foreground};
 
       }
