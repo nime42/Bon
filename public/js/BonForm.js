@@ -9,6 +9,7 @@ class BonForm {
         .form-style {
 
             font-family: sans-serif;
+            font-size:1vw;
             background:${this.background};
             padding: 10px;
             -webkit-border-radius: 10px;
@@ -25,7 +26,7 @@ class BonForm {
             width: 100px;
             color: ${this.foreground};
             font-weight: bold;
-            font-size: 13px;
+            //font-size: 13px;
             text-shadow: 1px 1px 1px #fff;
         }
 
@@ -56,12 +57,11 @@ class BonForm {
             -moz-box-shadow: -0px -1px 2px ${this.shadowColor};
             -webkit-box-shadow: -0px -1px 2px ${this.shadowColor};
             font-weight: normal;
-            font-size: 12px;
+            //font-size: 13px;
         }
 
         .form-style textarea {
             width: 250px;
-            height: 100px;
         }
 
         .form-style input[type=text],
@@ -104,6 +104,12 @@ class BonForm {
             font-weight: bold;
         }
 
+
+        .form-style .input-icons {
+            color: ${this.foreground};
+            width: 5%;
+        }
+
         .required {
             color: red;
             font-weight: normal;
@@ -117,6 +123,7 @@ class BonForm {
     <fieldset>
     <legend>Status</legend>
     <button type="button" id="new" class="status-button" style="float:left" data-active-background="lightgreen">Ny</button>
+    <button type="button" id="needInfo" class="status-button" data-active-background="red">Venter Info</button>
     <button type="button" id="approved" class="status-button" data-active-background="yellow">Godkendt</button>
     <button type="button" id="offer" class="status-button" style="float:right" data-active-background="lightblue">Tilbud</button>
     </fieldset>
@@ -149,16 +156,35 @@ class BonForm {
 </fieldset>
 <fieldset>
     <legend>Kunde</legend>
-    <label> Email<br> <input id="email" type="email" name="email" autocomplete="nope"></label> 
-    <span>
-    <label style="float:left;width: 30%"> Fornavn<br> <input autocomplete="nope" id="forename" type="text" name="forename"></label>
-    <label> Efternavn<br> <input autocomplete="nope" id="surname" type="text" name="surname" ></label>
-    </span>
-    <label> Telefon<br> <input id="phone_nr" type="tel" name="phone_nr"></label>
-    <label> Firma navn<br> <input type="text" name="company_name"> <i id="expand-company-info" class="fa fa-caret-down" style="font-size:25px; color: ${this.foreground};"></i></label>
+
+    <div style="margin-bottom:5px">
+    <i class="fa fa-user icon input-icons"></i>
+    <input autocomplete="nope" id="forename" type="text" name="forename">
+    <input autocomplete="nope" id="surname" type="text" name="surname" >
+    </div>
+
+    <div style="margin-bottom:5px">
+    <i class="fa fa-envelope icon input-icons"></i>
+    <input id="email" type="email" name="email" autocomplete="nope">
+    </div>
+
+    <div style="margin-bottom:5px">
+    <i class="fa fa-phone icon input-icons"></i>
+    <input id="phone_nr" type="tel" name="phone_nr">
+    </div><br>
+
+    <div style="margin-bottom:5px">
+    <i class="fa fa-industry icon input-icons"></i>
+    <input type="text" name="company_name"> <i id="expand-company-info" class="fa fa-caret-down" style="font-size:25px; color: ${this.foreground};"></i>
+    </div><br>
     
     <div id="company-info" style="padding: 5px 5px 5px 35px;;border: 1px solid  ${this.foreground};">
-    <label> EAN kod<br> <input type="text" name="ean_nr" ></label>
+    
+    <div style="margin-bottom:5px">
+    <i class="fa fa-barcode icon input-icons"></i>
+    <input type="text" name="ean_nr" >
+    </div>
+
     <fieldset style="max-width: min-content;min-width: fit-content;">
     <legend style="font-weight: bold;">Adresse</legend>
     <input type="text" name="company_street_name2" placeholder="C/O etc" autocomplete="nope"> <br>
@@ -193,6 +219,11 @@ class BonForm {
     `;
 
 itemsTab=`
+<span>
+<br>
+<input type="text" name="nr_of_servings" placeholder="Antal Pax" autocomplete="nope" style="vertical-align: top; margin-right:5px">
+<textarea name="info" placeholder="Kunde Önsker" rows="2" autocomplete="nope" ></textarea>
+</span><br><br>
 <div id="items" style=";min-height:400px;">
 `;
 
@@ -414,8 +445,8 @@ miscTab=`
         bon.delivery_date=new Date(props.delivery_date+"T"+props.delivery_time);
         bon.status=this._getStatus();
         bon.status2="";
-        bon.nr_of_servings=0;
-        bon.info= "";
+        bon.nr_of_servings=props.nr_of_servings;
+        bon.info= props.info;
         bon.service_type=null;
         bon.payment_type=null;
     
@@ -492,6 +523,8 @@ miscTab=`
         this._customerToForm(bon.customer,form);
 
         form.querySelector("input[name=bon_id]").value=bon.id;
+        form.querySelector("input[name=nr_of_servings]").value=bon.nr_of_servings;
+        form.querySelector("textarea[name=info]").value=bon.info;
 
         this._updateOrMerge(form.querySelector("input[name=street_name]"),bon.delivery_address.street_name);
         this._updateOrMerge(form.querySelector("input[name=street_name2]"),bon.delivery_address.street_name2);
@@ -552,7 +585,7 @@ miscTab=`
     }
 
     _clear() {
-        this.myDiv.querySelectorAll("#order input").forEach((e) => {
+        this.myDiv.querySelectorAll("#order input,textarea").forEach((e) => {
             let name = e.getAttribute("name");
             if (name !== null) {
               e.value="";

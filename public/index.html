@@ -1,0 +1,167 @@
+<html>
+
+<head>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">    <script src="js/globals.js"></script>
+    
+    <link rel="stylesheet" href="css/CalendarClass.css">
+    <script src="js/CalendarClass.js"></script>
+    <link rel="stylesheet" href="css/ModalPopup.css">
+    <script src="js/ModalPopup.js"></script>
+    <script src="js/TabsClass.js"></script>
+    <script src="js/DraggableList.js"></script>
+    <script src="js/VertTabsClass.js"></script>
+    <script src="js/MessageBox.js"></script>
+    <script src="js/AutocompleteClass.js"></script>
+    <script src="js/BonStrip.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/BonForm.js"></script>
+    <script src="js/BonRepository.js"></script>
+
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+
+        :root {
+            --primary-color: #8e631f;
+            --secondary-color: #f1e6b2;
+            --complimentary-color: #88BFB5;
+            --contrast-color: #F2E527;
+            --light-color: #D2A9D9;
+        }
+
+        .nav-container {
+            background: #191919;
+            min-height: 100vh;
+            font-family: Montserrat, sans-serif;
+        }
+
+        nav a {
+            font-size: 40px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            padding: 20px;
+            text-align: center;
+        }
+
+        a.active {
+            color: var(--primary-color);
+            background: var(--secondary-color);
+
+        }
+
+        nav {
+            position: fixed;
+            left: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: space-around;
+            flex-direction: column;
+            height: 100vh;
+            background: var(--primary-color);
+        }
+
+        section {
+            position: absolute;
+            top: 0;
+            height: 100vh;
+            width: 0;
+            opacity: 0;
+            transition: all ease-in .5s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+
+        /* Styles applied on trigger */
+        section:target {
+            opacity: 1;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .menu-content {
+            background: var(--secondary-color);
+        }
+
+    </style>
+    <script>
+        function toggleMenu(elem) {
+            document.querySelectorAll(".nav-menu").forEach(e=>{
+                e.classList.remove("active");
+            })
+            elem.classList.add("active")
+        }
+
+    </script>
+
+</head>
+
+<body>
+
+    <nav>
+        <a href="#first" class="nav-menu active" onclick="toggleMenu(this)"><i class="fa fa-key"></i></a>
+        <a href="#second" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-home"></i></a>
+        <a href="#third" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-wrench"></i></a>
+
+    </nav>
+
+    <div class='nav-container menu-content'>
+        <section id='first'>
+            <div id="login"></div>
+        </section>
+
+        <section id='second'>
+            <div id="calendar"></div>
+        </section>
+
+        <section id='third'>
+            <div id="admin"></div>
+        </section>
+    </div>
+
+    <script>
+        var myPopup = new ModalPopup();
+        var myCalendar = new CalendarClass("#calendar");
+        var myRepo = new BonRepository();
+        var myBonForm = new BonForm(myPopup, myCalendar, myRepo);
+        myBonForm.updateItems();
+
+        myCalendar.setOnDateClick((date, calObj) => {
+            date.setHours(12);
+            myBonForm.init({
+                eventTime: date
+            });
+            myPopup.show(myBonForm.getForm());
+        });
+        myCalendar.setOnEventClick((eventElem, eventData) => {
+            myBonForm.init(eventData, eventElem);
+            myPopup.show(myBonForm.getForm());
+        });
+
+
+
+        myCalendar.setOnMonthChange((year, month) => {
+            myRepo.getBons(year, month + 1, (bons) => {
+                bons.forEach(b => {
+                    b.delivery_date = new Date(b.delivery_date);
+                    let [label, statusColor] = myBonForm.createBonLabelAndcolor(b);
+                    myCalendar.addEvent(b.delivery_date, label, statusColor, b);
+
+                });
+            });
+
+        }, true);
+    </script>
+
+</body>
+
+</html>

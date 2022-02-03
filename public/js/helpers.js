@@ -3,7 +3,7 @@
 class Helper {
   static getFormProps(form) {
     let res = {};
-    form.querySelectorAll("input").forEach((e) => {
+    form.querySelectorAll("input, textarea").forEach((e) => {
       let name = e.getAttribute("name");
       if (name !== null) {
         res[name] = e.value;
