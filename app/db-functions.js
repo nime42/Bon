@@ -64,7 +64,7 @@ function createBon(bonData,callback=console.log) {
     bonData.customer_id=createCustomer(bonData.customer);
     console.log(bonData.orders);
     bonData.delivery_address_id=createAddress(bonData.delivery_address);
-    let sql="INSERT INTO bons(status, status2,nr_of_servings,info, customer_id,delivery_address_id, delivery_date, nr_of_servings, info, service_type, payment_type) VALUES(@status, @status2,@nr_of_servings,@info @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings, @info, @service_type, @payment_type);"
+    let sql="INSERT INTO bons(status, status2,nr_of_servings,info, customer_id,delivery_address_id, delivery_date, nr_of_servings, info, service_type, payment_type) VALUES(@status, @status2,@nr_of_servings,@info, @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings, @info, @service_type, @payment_type);"
     try {
     const res = db.prepare(sql).run(bonData);
     let newBonId=res.lastInsertRowid;
