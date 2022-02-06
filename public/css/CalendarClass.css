@@ -42,7 +42,7 @@
     border-radius: 6px;
     width:100%;
     height: 16px;
-    font-size: 14px;
+    font-size: medium;
     cursor: pointer;
     white-space: nowrap;
   }

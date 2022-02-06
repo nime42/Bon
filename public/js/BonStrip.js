@@ -5,8 +5,8 @@ class BonStrip {
 
     style=`
     #bon {
-        width:250px;
-        height: 600px;
+        min-width:250px;
+        min-height: 400px;
         background: ${this.background};
         box-shadow: 5px 5px 5px grey;
         padding-left: 10px;
@@ -17,7 +17,7 @@ class BonStrip {
         padding-bottom: 5px;
         font-style: italic;
         font-weight: bold;
-        font-size: 20px;
+        font-size: large;
         font-family: cursive;
     }
     #customer {
@@ -37,10 +37,10 @@ class BonStrip {
         padding-bottom: 10px;
     }
 
-    #date,
-    #time,
-    #phonenr,
-    #email {
+    #bon #date,
+    #bon #time,
+    #bon #phonenr,
+    #bon #email {
         padding-left: 15px;
         font-style: italic;
         font-weight: bold;
@@ -60,7 +60,7 @@ class BonStrip {
     .x-sign {
         font-weight: bold;
         font-family: sans-serif;
-        font-size:12px;
+        font-size:small;
         padding-left: 5px;
         padding-right: 5px;
     }
@@ -90,7 +90,7 @@ class BonStrip {
         margin-bottom: 3px;
     }
     #bon .drag {
-    font-size: 15px;
+    font-size: medium;
     float: right;
     margin-right: 10px;
     opacity: 0.5;
@@ -129,7 +129,7 @@ class BonStrip {
     }
 
     .order-config-style .plus-minus {
-        font-size:20px;
+        font-size:small;
         padding-right:4px; 
         color:${this.foreground}
     }
@@ -148,25 +148,25 @@ class BonStrip {
     <div id="bon">
         <fieldset>
             <legend>Bon-id</legend>
-                <div id="bon-id"></div>
+                <div id="bon-id" class="bonstrip-items"></div>
         </fieldset>
         <fieldset>
             <legend>Navn</legend>
-            <div id="customer"></div>
-            <div id="email"></div>
-            <div id="phonenr"></div>
+            <div id="customer" class="bonstrip-items"></div>
+            <div id="email" class="bonstrip-items"></div>
+            <div id="phonenr" class="bonstrip-items"></div>
         </fieldset>
         <fieldset>
             <legend>Tidspunkt</legend>
             <div>
-            <div id="date" style="float:left"></div>
-            <div id="time" style="float:left"></div>
+            <div id="date" style="float:left" class="bonstrip-items"></div>
+            <div id="time" style="float:left" class="bonstrip-items"></div>
             </div>
         </fieldset>
 
         <fieldset>
             <legend>Leveringsadresse</legend>
-            <div id="address">
+            <div id="address" class="bonstrip-items">
             </div>
         </fieldset>
         <br>
@@ -390,6 +390,9 @@ class BonStrip {
     }
 
     clear() {
+        this.myDiv.querySelectorAll(".bonstrip-items").forEach(e=>{
+            e.innerText="";
+        })
         this.myOrders.clear();
     }
 

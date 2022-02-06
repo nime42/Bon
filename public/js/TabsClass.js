@@ -22,7 +22,7 @@ class TabsClass {
       
       /* Change background color of buttons on hover */
       .hori-tab .tab button:hover {
-        background-color: #ddd;
+        font-weight:bold
       }
       
       /* Create an active/current tablink class */

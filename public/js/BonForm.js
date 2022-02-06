@@ -9,11 +9,11 @@ class BonForm {
         .form-style {
 
             font-family: sans-serif;
-            font-size:1vw;
+            font-size:medium;
             background:${this.background};
             padding: 10px;
             -webkit-border-radius: 10px;
-            width:550px;
+            min-width:450px;
         }
 
         .form-style label {
@@ -26,7 +26,6 @@ class BonForm {
             width: 100px;
             color: ${this.foreground};
             font-weight: bold;
-            //font-size: 13px;
             text-shadow: 1px 1px 1px #fff;
         }
 
@@ -57,7 +56,6 @@ class BonForm {
             -moz-box-shadow: -0px -1px 2px ${this.shadowColor};
             -webkit-box-shadow: -0px -1px 2px ${this.shadowColor};
             font-weight: normal;
-            //font-size: 13px;
         }
 
         .form-style textarea {
@@ -86,6 +84,7 @@ class BonForm {
             -moz-box-shadow: inset 1px 1px 4px ${this.shadowColor};
             -webkit-box-shadow: inset 1px 1px 4px ${this.shadowColor};
             background: ${this.background};
+            font-size:medium;
         }
 
         .form-style input[type=submit],
@@ -159,30 +158,30 @@ class BonForm {
 
     <div style="margin-bottom:5px">
     <i class="fa fa-user icon input-icons"></i>
-    <input autocomplete="nope" id="forename" type="text" name="forename">
-    <input autocomplete="nope" id="surname" type="text" name="surname" >
+    <input autocomplete="nope" id="forename" type="text" name="forename" placeholder="Fornavn" style="width:25%">
+    <input autocomplete="nope" id="surname" type="text" name="surname" placeholder="Efternavn" style="width:35%">
     </div>
 
     <div style="margin-bottom:5px">
     <i class="fa fa-envelope icon input-icons"></i>
-    <input id="email" type="email" name="email" autocomplete="nope">
+    <input id="email" type="email" name="email" autocomplete="nope" placeholder="Email">
     </div>
 
     <div style="margin-bottom:5px">
     <i class="fa fa-phone icon input-icons"></i>
-    <input id="phone_nr" type="tel" name="phone_nr">
+    <input id="phone_nr" type="tel" name="phone_nr" placeholder="Telefon">
     </div><br>
 
     <div style="margin-bottom:5px">
     <i class="fa fa-industry icon input-icons"></i>
-    <input type="text" name="company_name"> <i id="expand-company-info" class="fa fa-caret-down" style="font-size:25px; color: ${this.foreground};"></i>
+    <input type="text" name="company_name" placeholder="Firma navn"> <i id="expand-company-info" class="fa fa-caret-down" style="font-size:25px; color: ${this.foreground};"></i>
     </div><br>
     
     <div id="company-info" style="padding: 5px 5px 5px 35px;;border: 1px solid  ${this.foreground};">
     
     <div style="margin-bottom:5px">
     <i class="fa fa-barcode icon input-icons"></i>
-    <input type="text" name="ean_nr" >
+    <input type="text" name="ean_nr" placeholder="EAN" >
     </div>
 
     <fieldset style="max-width: min-content;min-width: fit-content;">
@@ -515,6 +514,9 @@ miscTab=`
     }
 
     _bonToForm(bon,formDiv) {
+
+        this.myBonStrip.clear();
+
         let form=this.myDiv.querySelector(formDiv);
 
         let date=new Date(bon.delivery_date);
@@ -536,7 +538,6 @@ miscTab=`
 
         this.myBonStrip.setBonId(bon.id);
         this.myRepoObj.getOrders(bon.id,(orders)=>{
-            this.myBonStrip.clear();
             orders.forEach(o=>{
                 this.myBonStrip.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price);
             })
