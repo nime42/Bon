@@ -142,6 +142,21 @@ app.get("/items",(req,res) => {
     })   
 })
 
+
+app.get("/items_prices",(req,res) => {
+
+    db.getItemPrices(function(status,items){
+        if(status) { 
+            res.json(items); 
+        } else {
+            console.log("getitems",items);
+            res.sendStatus(404);  
+
+        }
+    })   
+})
+
+
 app.get("/orders/:id",(req,res) => {
 
     db.getOrders(req.params.id,function(status,items){
@@ -182,7 +197,6 @@ app.delete("/items/:id",(req,res) => {
         }
     })  
 })
-
 
 
 

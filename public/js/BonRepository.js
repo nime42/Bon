@@ -46,6 +46,11 @@ class BonRepository {
         $.get(url,callback);
     }
 
+    getItemsPrices(callback) {
+        let url="items_prices/";
+        $.get(url,callback);
+    }
+
     getOrders(bonId,callback) {
         let url="orders/"+bonId;
         $.get(url,callback);

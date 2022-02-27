@@ -16,17 +16,25 @@ function getAllRecipes(callback=console.log) {
 }
 
 function parseRecipes(recipes) {
-    return recipes.map(r => (
-        {
+    return recipes.map(r => {
+        let salesPrices={};
+        Object.keys(r.userfields).filter(k=>(k.match(/^Salesprice.*/)!=null)).forEach(k=>{
+            let priceCategory=k.replace("Salesprice","");
+            salesPrices[priceCategory]=r.userfields[k];
+        });
+
+        return {
             name:r.name,
             category:r.userfields?r.userfields.grupper:"",
             cost_price:r.userfields?r.userfields.costprice:"",
-            sellable:null,
-            external_id:r.id
+            sellable:r.userfields?r.userfields.sellable:"",
+            sellableZettle:r.userfields?r.userfields.sellableZettle:"",
+            external_id:r.id,
+            salesPrices:salesPrices
         }
-    ));
-        
-    
+    }
+    );
+            
 }
 
 module.exports={
