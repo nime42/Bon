@@ -11,9 +11,6 @@ module.exports = {
         ca:"./resources/ca_bundle.crt"
     },
 
-    grocy:{
-        url:"https://grocytest.ristetrug.dk",
-        apiKey:"9WEtOxgR93OYZAWf0lXS0LTwiYUjFweVA6d6gRuwtaQEitDIdE"
-    }
+
 
 }
