@@ -198,6 +198,25 @@ app.delete("/items/:id",(req,res) => {
     })  
 })
 
+app.get("/updateDB", (req, res) => {
+  grocy.getAllRecipes((status, data) => {
+    if (status) {
+      db.updateItems(data, function (status2, err) {
+        if (status2) {
+          res.sendStatus(200);
+        } else {
+          console.log("updateDB updateItems", err);
+          res.sendStatus(500);
+        }
+      });
+    } else {
+        console.log("updateDB getAllRecepies", err);
+        res.sendStatus(500);
+
+    }
+  });
+});
+
 
 
 

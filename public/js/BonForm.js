@@ -221,9 +221,12 @@ itemsTab=`
 <span>
 <br>
 <input type="text" name="nr_of_servings" placeholder="Antal Pax" autocomplete="nope" style="vertical-align: top; margin-right:5px">
-<textarea name="info" placeholder="Kunde Önsker" rows="2" autocomplete="nope" ></textarea>
+<textarea name="customer_info" placeholder="Kunde Önsker" rows="2" autocomplete="nope" ></textarea>
 </span><br><br>
-<div id="items" style=";min-height:400px;">
+
+<div id="items" style=";min-height:400px;"></div>
+<textarea name="kitchen_info" id="kitchen_info" placeholder="Kökken info" rows="2" autocomplete="nope" ></textarea>
+
 `;
 
 miscTab=`
@@ -251,7 +254,7 @@ miscTab=`
         this.myBonStrip.updateDeliveryAdrOnChange(form.querySelector("#street_name"),form.querySelector("#street_name2"),form.querySelector("#street_nr"),form.querySelector("#zip_code"),form.querySelector("#city"));
         this.myBonStrip.updateMailAndPhoneNrOnChange(form.querySelector("#email"),form.querySelector("#phone_nr"));
         this.myBonStrip.updateDateAndTimeOnChange(form.querySelector("#date"),form.querySelector("#time"));
-
+        this.myBonStrip.updateKitchenInfoOnChange(form.querySelector("#kitchen_info"));
 
 
 
@@ -377,7 +380,7 @@ miscTab=`
                     button.style.marginBottom="3px";
                     button.innerHTML=n.name;
                     button.onclick=()=>{
-                        this.selectOrder(n.name,n.id,n.cost_price);
+                        this.selectOrder(n.name,n.id,n.cost_price,k);
                         return false;
                     }
                     content.appendChild(button);
@@ -392,8 +395,8 @@ miscTab=`
 
     }
 
-    selectOrder(name,id,cost_price) {
-        this.myBonStrip.configureOrder(1,name,"",id,cost_price);
+    selectOrder(name,id,cost_price,category) {
+        this.myBonStrip.configureOrder(1,name,"",id,cost_price,category);
 
     }
 
@@ -445,7 +448,8 @@ miscTab=`
         bon.status=this._getStatus();
         bon.status2="";
         bon.nr_of_servings=props.nr_of_servings;
-        bon.info= props.info;
+        bon.customer_info= props.customer_info;
+        bon.kitchen_info= props.kitchen_info;
         bon.service_type=null;
         bon.payment_type=null;
     
@@ -494,6 +498,8 @@ miscTab=`
         this._updateOrMerge(form.querySelector("input[name=company_street_nr]"),customer.company.address.street_nr,merge)
         this._updateOrMerge(form.querySelector("input[name=company_city]"),customer.company.address.city,merge);
         this._updateOrMerge(form.querySelector("input[name=company_zip_code]"),customer.company.address.zip_code,merge);
+
+
     }
     _copyCompanyAddress2Delivery(form,merge) {
         this._updateOrMerge(form.querySelector("input[name=street_name]"),form.querySelector("input[name=company_street_name]").value,merge);
@@ -526,7 +532,11 @@ miscTab=`
 
         form.querySelector("input[name=bon_id]").value=bon.id;
         form.querySelector("input[name=nr_of_servings]").value=bon.nr_of_servings;
-        form.querySelector("textarea[name=info]").value=bon.info;
+        form.querySelector("textarea[name=customer_info]").value=bon.customer_info;
+        form.querySelector("textarea[name=kitchen_info]").value=bon.kitchen_info;
+
+        this._updateOrMerge(form.querySelector("textarea[name=kitchen_info]"),bon.kitchen_info);
+
 
         this._updateOrMerge(form.querySelector("input[name=street_name]"),bon.delivery_address.street_name);
         this._updateOrMerge(form.querySelector("input[name=street_name2]"),bon.delivery_address.street_name2);
@@ -539,7 +549,7 @@ miscTab=`
         this.myBonStrip.setBonId(bon.id);
         this.myRepoObj.getOrders(bon.id,(orders)=>{
             orders.forEach(o=>{
-                this.myBonStrip.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price);
+                this.myBonStrip.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price,o.category);
             })
         })
 
@@ -590,6 +600,7 @@ miscTab=`
             let name = e.getAttribute("name");
             if (name !== null) {
               e.value="";
+              try {e.oninput();} catch(err) {}
             }
         });
 

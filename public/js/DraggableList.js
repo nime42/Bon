@@ -93,4 +93,12 @@ class DraggableList {
     clear() {
         this.myUl.innerHTML="";
     }
+    sort(sortFun) {
+        console.log(this.myUl);
+        let elems=[...this.myUl.children];
+        let self=this;
+        elems.sort(sortFun).forEach(e=>{
+            self.myUl.appendChild(e);
+        })
+    }
 }

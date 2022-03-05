@@ -5,8 +5,20 @@ class Globals {
     static shadowColor="#446e74";
     
 
-    /*static foreground="#2C5F2D";
-    static background="#97BC62FF"
-    static shadowColor="#446e74";*/
+    static AttributesForItems= {
+        "by-?ekspressen.*": {
+            "link":{
+                url:"https://byexpressen.groupnet.at/lobo/#!//coreLogin/",
+                label:"By-expressen"
+            }
+        }
+    }
+    static BonStripOrder= [
+            "*",
+            "Emballage",
+            "x- Service",
+            "x-Levering"
+        ]
+    
 
 }

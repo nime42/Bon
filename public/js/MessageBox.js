@@ -63,8 +63,10 @@ class MessageBox {
 
         })
 
-     
+
         popup.show(div);
+
+        return popup;
 
     }
     

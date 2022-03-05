@@ -174,6 +174,8 @@ class BonStrip {
         <div id="orders">
 
         </div>
+        <span id="kitchenInfoText"></span>
+
 
     </div>    
     `
@@ -198,8 +200,10 @@ class BonStrip {
             <span class="x-sign">X</span><span class="order-name" id="order-name">Frikadelle</span>
             </div><br>
             <textarea name="comment" placeholder="Extra info" id="comment" ></textarea>
+            <a id="extra-link" style="padding-left" href="https://by-expressen.dk/" target="_blank">By-Expressen</a>
             <input type="hidden" id="item-id" value="-1">
             <input type="hidden" id="cost-price" value="0">
+            <input type="hidden" id="category" value="">
             <br>
             <div>
                 <div style="margin-top:6px">
@@ -238,6 +242,7 @@ class BonStrip {
             let orderName=self.orderConfig.querySelector("#order-name").innerText;
             let id=self.orderConfig.querySelector("#item-id").value;
             let costPrice=self.orderConfig.querySelector("#cost-price").value;
+            let category=self.orderConfig.querySelector("#category").value;
             if(self.currentOrder) {
                 self.currentOrder.querySelector("#quantity").innerText=quantity;
                 self.currentOrder.querySelector("#comment").innerText=comment;
@@ -250,7 +255,7 @@ class BonStrip {
             
 
             } else {
-                self.addOrder(quantity,orderName,comment,id)
+                self.addOrder(quantity,orderName,comment,id,costPrice,category);
             }
 
             self.orderConfigPopup.hide();
@@ -273,17 +278,17 @@ class BonStrip {
 
 
         this.orderConfigPopup=new ModalPopup();
-
     }
 
  
 
-    addOrder(quantity,name,comment,id,costPrice) {
+    addOrder(quantity,name,comment,id,costPrice,category) {
         let tmp=`
         <span id="quantity" class="nr-of">${quantity}</span><span class="x-sign">X</span><span id="order-name" class="order-name">${name}</span><br>
         <span id="comment" class="order-info">${comment}</span>
         <input type="hidden" id="item-id" value="${id}">
         <input type="hidden" id="cost-price" value="${costPrice}">
+        <input type="hidden" id="category" value="${category}">
         `;
 
         let order=document.createElement("div"); 
@@ -298,6 +303,7 @@ class BonStrip {
             this.orderConfig.querySelector("#comment").value=order.querySelector("#comment").innerText;
             this.orderConfig.querySelector("#item-id").value=order.querySelector("#item-id").value;
             this.orderConfig.querySelector("#cost-price").value=order.querySelector("#cost-price").value;
+            this.orderConfig.querySelector("#category").value=order.querySelector("#category").value;
 
             self.orderConfigPopup.show(self.orderConfig);
             self.currentOrder=order;
@@ -307,15 +313,58 @@ class BonStrip {
             order.querySelector("#comment").style.display="none";
         }
         this.myOrders.addElem(order);
+        this._sortOrders();
+
     }
 
-    configureOrder(quantity,name,comment,itemId,costPrice) {
+    _sortOrders() {
+        let allOthers=Globals.BonStripOrder.indexOf("*");
+        let orderPos={};
+        Globals.BonStripOrder.forEach((e,i)=>{
+            orderPos[e]=i;
+        });
+        console.log(orderPos);
+
+        let sortFun=(a,b) => {
+            let aCategory=a.querySelector("#category").value;
+            let bCategory=b.querySelector("#category").value;
+            let aPos=orderPos[aCategory]?orderPos[aCategory]:allOthers;
+            let bPos=orderPos[bCategory]?orderPos[bCategory]:allOthers;
+            return aPos-bPos;
+
+        }
+        this.myOrders.sort(sortFun);
+
+    }
+
+    _getExtraAttributes(itemName) {
+        let result=null;
+        Object.keys(Globals.AttributesForItems).forEach(k=>{
+            if(itemName.match(new RegExp(k,"i"))) {
+                result=Globals.AttributesForItems[k];
+            }
+        })
+        return result;
+    }
+
+    configureOrder(quantity,name,comment,itemId,costPrice,category) {
         this.orderConfig.querySelector("#quantity").value=quantity;
         this.orderConfig.querySelector("#order-name").innerHTML=name;
         this.orderConfig.querySelector("#comment").value="";
         this.orderConfigPopup.show(this.orderConfig);
         this.orderConfig.querySelector("#item-id").value=itemId;
         this.orderConfig.querySelector("#cost-price").value=costPrice;
+        this.orderConfig.querySelector("#category").value=category;
+
+        let extra=this._getExtraAttributes(name);
+        if(extra && extra.link) {
+            this.orderConfig.querySelector("#extra-link").style.display="";
+            this.orderConfig.querySelector("#extra-link").setAttribute("href",extra.link.url);
+            this.orderConfig.querySelector("#extra-link").innerHtml=extra.link.label;
+            this.orderConfig.querySelector("#extra-link").onclick=this.orderConfig.querySelector("#save").onclick;
+        } else {
+            this.orderConfig.querySelector("#extra-link").style.display="none";
+        }
 
     }
 
@@ -352,6 +401,16 @@ class BonStrip {
         forenameElem.oninput=f;
         surnameElem.oninput=f;
     }
+
+
+    updateKitchenInfoOnChange(kitchenInfoElem) {
+        let f=()=> {
+            let text=kitchenInfoElem.value;
+            this.myDiv.querySelector("#kitchenInfoText").innerHTML=text;
+        }
+        kitchenInfoElem.oninput=f;
+
+    }    
 
     updateDeliveryAdrOnChange(streetNameElem,streetName2Elem,streetNrElem,zipCodeElem,cityElem) {
         let f=()=> {

@@ -123,7 +123,17 @@ class BonConfig {
         color: ${this.foreground};
       }
       
-
+      .tableFixHead          { 
+          overflow: auto; 
+          height: 300px; 
+        }
+      .tableFixHead thead th { 
+          position: sticky; 
+          top: 0; 
+          z-index: 1; 
+          color: ${this.background};
+          background: ${this.shadowColor};
+        }
 
     `;
 
@@ -136,16 +146,10 @@ class BonConfig {
         <div class="config-style">
         <input type="button" id="refresh-db" value="Hämta från DB">
         <br><br>
-        <table>
-                <tr>
-                    <th>Kategorie</th>
-                    <th>Vare</th>
-                    <th>Salgbar</th>
-                    <th>Pris - Cafe </th>
-                    <th>Pris - Festival </th>
-                </tr>
+        <div class="tableFixHead">
+        <table id="items-table">
         </table>
-
+        </div>
 
         </div>
         </div>
@@ -158,15 +162,77 @@ class BonConfig {
         this.myTabs.addTab("Varer",this.items);
         this.myTabs.addTab("Bruger","");
         this.getItems();
+        if(typeof div==="string") {
+            this.myItemsTable=document.querySelector(div).querySelector("#items-table");
+            this.myRefreshDB=document.querySelector(div).querySelector("#refresh-db");
+        } else {
+            this.myItemsTable=div.querySelector("##items-table");
+            this.myRefreshDB=div.querySelector("#refresh-db");
+        }
+        let self=this;
+        this.myRefreshDB.onclick=function() {
+            let p=MessageBox.popup("Uppdaterar DB...");
+            self.myRepo.updateDB(function() {
+                self.getItems();
+                p.hide();
+            })
+        };
+
     }
 
     getItems() {
+
+        let self=this; 
+        
+        
         this.myRepo.getItems(items=>{
-            console.log(items);
             this.myRepo.getItemsPrices(prices=>{
-                console.log(prices);
+                self.createItemsTable(items,prices);
             })
         })
+
+    }
+    createItemsTable(items,prices) {
+        this.price_lookup={};
+
+        this.myItems=items.filter(e=>(e.sellable));
+        prices.items.forEach(e=>{this.price_lookup[e.id]=e;});
+
+        this.myItemsTable.innerHTML="";
+        
+        let categoryHeaders=prices.categoryNames.map(n=>(`<th>Pris - ${n} </th>`)).join("\n");
+        let headers=`
+        <tr>
+        <th>Kategorie</th>
+        <th>Vare</th>
+        <th>Pris</th>
+        ${categoryHeaders}
+        </tr>
+        `;
+        let headerRow=document.createElement("thead");
+        headerRow.innerHTML=headers;
+        this.myItemsTable.append(headerRow);
+        let tableRows=document.createElement("tbody");
+
+        let self=this;
+        this.myItems.forEach(i=>{
+            let priceCategories=prices.categoryNames.map(c=>(`<td>${self.price_lookup[i.id].price_categories[c]}</td>`)).join("\n")
+
+            let cols=`
+                <td>${i.category}</td>
+                <td>${i.name}</td>
+                <td>${i.cost_price}</td>
+                ${priceCategories}
+            `;
+
+            let row=document.createElement("tr");
+            row.innerHTML=cols;
+            tableRows.append(row);
+
+        })
+        this.myItemsTable.append(tableRows);
+        
+
 
 
     }

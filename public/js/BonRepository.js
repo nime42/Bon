@@ -54,6 +54,11 @@ class BonRepository {
     getOrders(bonId,callback) {
         let url="orders/"+bonId;
         $.get(url,callback);
+    } 
+
+    updateDB(callback) {
+        let url="updateDB/";
+        $.get(url,callback);
     }
 
 
