@@ -11,13 +11,16 @@ class Globals {
                 url:"https://byexpressen.groupnet.at/lobo/#!//coreLogin/",
                 label:"By-expressen"
             }
+        },
+        ".*rabat.*": {
+            "negateValue":true
         }
     }
     static BonStripOrder= [
             "*",
             "Emballage",
-            "x- Service",
-            "x-Levering"
+            "x-Levering",
+            "x- Service"
         ]
     
 

@@ -6,7 +6,7 @@ class BonCalendar {
         this.myCalendar = new CalendarClass("#calendar");
         this.myRepo = new BonRepository();
         this.myBonForm = new BonForm(this.myPopup, this.myCalendar, this.myRepo);
-        this.myBonForm.updateItems();
+        //this.myBonForm.updateItems();
         let self=this;
 
         this.myCalendar.setOnDateClick((date, calObj) => {

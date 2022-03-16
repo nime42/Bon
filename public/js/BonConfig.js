@@ -161,7 +161,11 @@ class BonConfig {
         this.myTabs=new TabsClass(div);
         this.myTabs.addTab("Varer",this.items);
         this.myTabs.addTab("Bruger","");
-        this.getItems();
+        this.getItemsFromDB(()=>{
+            this.createItemsTable();
+            Globals.myCalender.myBonForm.updateItems();
+
+        });
         if(typeof div==="string") {
             this.myItemsTable=document.querySelector(div).querySelector("#items-table");
             this.myRefreshDB=document.querySelector(div).querySelector("#refresh-db");
@@ -173,14 +177,31 @@ class BonConfig {
         this.myRefreshDB.onclick=function() {
             let p=MessageBox.popup("Uppdaterar DB...");
             self.myRepo.updateDB(function() {
-                self.getItems();
-                p.hide();
+                self.getItemsFromDB(()=>{
+                    self.createItemsTable();
+                    Globals.myCalender.myBonForm.updateItems();
+                    p.hide();
+    
+                });
             })
         };
 
     }
 
-    getItems() {
+    getItemsFromDB(callback) {
+        this.myRepo.getItems(items=>{
+            this.myRepo.getItemsPrices(prices=>{
+                this.price_lookup={};
+                this.myItems=items.filter(e=>(e.sellable));
+                prices.items.forEach(e=>{this.price_lookup[e.id]=e;});
+                this.priceCategories=prices.categoryNames;
+                callback();
+            });
+        });
+
+    }
+
+    getItems(callback) {
 
         let self=this; 
         
@@ -192,15 +213,11 @@ class BonConfig {
         })
 
     }
-    createItemsTable(items,prices) {
-        this.price_lookup={};
-
-        this.myItems=items.filter(e=>(e.sellable));
-        prices.items.forEach(e=>{this.price_lookup[e.id]=e;});
+    createItemsTable() {
 
         this.myItemsTable.innerHTML="";
         
-        let categoryHeaders=prices.categoryNames.map(n=>(`<th>Pris - ${n} </th>`)).join("\n");
+        let categoryHeaders=this.priceCategories.map(n=>(`<th>Pris - ${n} </th>`)).join("\n");
         let headers=`
         <tr>
         <th>Kategorie</th>
@@ -216,7 +233,7 @@ class BonConfig {
 
         let self=this;
         this.myItems.forEach(i=>{
-            let priceCategories=prices.categoryNames.map(c=>(`<td>${self.price_lookup[i.id].price_categories[c]}</td>`)).join("\n")
+            let priceCategories=this.priceCategories.map(c=>(`<td>${self.price_lookup[i.id].price_categories[c]}</td>`)).join("\n")
 
             let cols=`
                 <td>${i.category}</td>

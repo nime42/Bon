@@ -56,6 +56,14 @@ class BonRepository {
         $.get(url,callback);
     } 
 
+    getItemsAndPrices(callback) {
+        this.getItems(items=>{
+            this.getItemsPrices(prices=>{
+                callback(items);
+            })
+        })
+    }
+
     updateDB(callback) {
         let url="updateDB/";
         $.get(url,callback);

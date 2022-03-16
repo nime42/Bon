@@ -13,7 +13,7 @@ function getBons(year, month, callback = console.log) {
 
   let sql = `
     select 
-      b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,
+      b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,
       a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,
       c.forename,c.surname,c.email,c.phone_nr,
       co.name,co.ean_nr,
@@ -84,7 +84,7 @@ function createBon(bonData, callback = console.log) {
   console.log(bonData.orders);
   bonData.delivery_address_id = createAddress(bonData.delivery_address);
   let sql =
-    "INSERT INTO bons(status, status2,nr_of_servings,customer_info, customer_id,delivery_address_id, delivery_date, nr_of_servings, kitchen_info, service_type, payment_type) VALUES(@status, @status2,@nr_of_servings,@customer_info, @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings, @kitchen_info, @service_type, @payment_type);";
+    "INSERT INTO bons(status, status2,customer_info, customer_id,delivery_address_id, delivery_date, nr_of_servings, kitchen_info, service_type, payment_type,price_category) VALUES(@status, @status2,@customer_info, @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings, @kitchen_info, @service_type, @payment_type,@price_category);";
   try {
     const res = db.prepare(sql).run(bonData);
     let newBonId = res.lastInsertRowid;
@@ -110,7 +110,8 @@ function updateBon(id, bonData, callback = console.log) {
     customer_info=@customer_info, 
     kitchen_info=@kitchen_info, 
     service_type=@service_type, 
-    payment_type=@payment_type
+    payment_type=@payment_type,
+    price_category=@price_category
   where id=@id;
   `;
   try {
@@ -351,8 +352,8 @@ function saveOrders(bonId, orders) {
   });
 
   console.log(orders);
-  sql = `insert into orders(bon_id,item_id,price,quantity,special_request,sorting_order) 
-        values(@bon_id,@id,@costPrice,@quantity,@comment,@sorting_order)`;
+  sql = `insert into orders(bon_id,item_id,price,cost_price,quantity,special_request,sorting_order) 
+        values(@bon_id,@id,@price,@cost_price,@quantity,@comment,@sorting_order)`;
 
   let ps = db.prepare(sql);
   preparedOrders.forEach((o) => {

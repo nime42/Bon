@@ -48,6 +48,8 @@ class VertTabsClass {
     `;
     currentIndex = -1;
     tabs = 0;
+    maxHeight=0;
+    maxWidth=0;
 
     constructor(div) {
         if (typeof div === "string") {
@@ -94,11 +96,36 @@ class VertTabsClass {
             headerElem.click();
         }
         this.tabs++;
+        let newHeight=this.myDiv.offsetHeight;
+        if(newHeight>this.maxHeight) {
+            this.maxHeight=newHeight;
+            this.myDiv.style["min-height"]=this.maxHeight;
+        }
+        let newWidth=this.myDiv.offsetWidth;
+        if(newWidth>this.maxWidth) {
+            this.maxWidth=newWidth;
+            this.myDiv.style["min-width"]=this.maxWidth;
+        }
+
     }
 
     clearAll() {
+        this.currentIndex = -1;
+        this.tabs = 0;
+        this.maxHeight=0;
+        this.maxWidth=0;
         this.myDiv.querySelector(".tabs").innerHTML="";
         this.myDiv.querySelector(".content-container").innerHTML="";
+    }
+
+    getActiveTabIndex() {
+        return this.currentIndex;
+    }
+
+    setActiveTabIndex(index) {
+        if(index>=0 && index<=this.tabs) {
+            this.myDiv.querySelectorAll(".tab")[index].click();
+        }
     }
 
 

@@ -6,7 +6,6 @@ class BonStrip {
     style=`
     #bon {
         min-width:250px;
-        min-height: 400px;
         background: ${this.background};
         box-shadow: 5px 5px 5px grey;
         padding-left: 10px;
@@ -73,6 +72,17 @@ class BonStrip {
         font-style: italic;
         font-family: sans-serif;
         padding-left: 20px;
+    }
+
+    .price-box {
+        float: right;
+        margin-right: 3px;
+        margin-left: 20px;
+        Xborder: 1px solid black;
+        padding:2px;
+        font-style: italic;
+        font-weight: bold;
+        font-family: sans-serif;
     }
 
     #bon fieldset {
@@ -147,14 +157,16 @@ class BonStrip {
 
     <div id="bon">
         <fieldset>
-            <legend>Bon-id</legend>
-                <div id="bon-id" class="bonstrip-items"></div>
+            <legend>Bon-id <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
+                <div id="bon-id" class="bonstrip-items field-content"></div>
         </fieldset>
         <fieldset>
-            <legend>Navn</legend>
+            <legend>Navn <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
+            <div class="field-content">
             <div id="customer" class="bonstrip-items"></div>
             <div id="email" class="bonstrip-items"></div>
             <div id="phonenr" class="bonstrip-items"></div>
+            </div>
         </fieldset>
         <fieldset>
             <legend>Tidspunkt</legend>
@@ -171,10 +183,18 @@ class BonStrip {
         </fieldset>
         <br>
 
-        <div id="orders">
-
+        <fieldset id="kitchen-field">
+            <legend>Kökken info</legend>
+            <span id="kitchenInfoText"></span>
+        </fieldset>
+        <br>
+        <div id="orders"></div>
+        <br>
+        <div>
+        <span style="font-style: italic;font-weight: bold;font-family: sans-serif;">Sum:</span>
+        <span id="total-sum" class="price-box">0.00 kr</span>
         </div>
-        <span id="kitchenInfoText"></span>
+        <br>
 
 
     </div>    
@@ -197,12 +217,13 @@ class BonStrip {
         <div id="order-config" class="order-config-style" style="width:350px;background:${this.background};padding:10px;border-radius: 10px;border: 2px solid ${this.foreground};">   
             <div class="order-config-style">
             <span><i id="plus" class="plus-minus fa fa-plus-square"></i><i id="minus" class="plus-minus fa fa-minus-square" ></i><input type="text" class="nr-of" size="3" name="quantity" id="quantity" "value="1"></span>    
-            <span class="x-sign">X</span><span class="order-name" id="order-name">Frikadelle</span>
+            <span class="x-sign">X</span><span class="order-name" id="order-name"></span>
             </div><br>
             <textarea name="comment" placeholder="Extra info" id="comment" ></textarea>
             <a id="extra-link" style="padding-left" href="https://by-expressen.dk/" target="_blank">By-Expressen</a>
             <input type="hidden" id="item-id" value="-1">
-            <input type="hidden" id="cost-price" value="0">
+            <input type="hidden" id="price" value="0">
+            <input type="hidden" id="cost_price" value="0">
             <input type="hidden" id="category" value="">
             <br>
             <div>
@@ -241,10 +262,12 @@ class BonStrip {
             let comment=self.orderConfig.querySelector("#comment").value;
             let orderName=self.orderConfig.querySelector("#order-name").innerText;
             let id=self.orderConfig.querySelector("#item-id").value;
-            let costPrice=self.orderConfig.querySelector("#cost-price").value;
+            let price=self.orderConfig.querySelector("#price").value;
+            let cost_price=self.orderConfig.querySelector("#cost_price").value;
             let category=self.orderConfig.querySelector("#category").value;
             if(self.currentOrder) {
                 self.currentOrder.querySelector("#quantity").innerText=quantity;
+                self.currentOrder.querySelector("#total-cost").innerText=(quantity*price)+" kr";
                 self.currentOrder.querySelector("#comment").innerText=comment;
                 if(comment!=="") {
                     self.currentOrder.querySelector("#comment").style.display="";
@@ -255,11 +278,12 @@ class BonStrip {
             
 
             } else {
-                self.addOrder(quantity,orderName,comment,id,costPrice,category);
+                self.addOrder(quantity,orderName,comment,id,price,cost_price,category);
             }
 
             self.orderConfigPopup.hide();
             self.currentOrder=undefined;
+            self.updateTotalSum();
         };
 
 
@@ -267,6 +291,7 @@ class BonStrip {
             if(self.currentOrder) {
                 self.myOrders.removeElem(self.currentOrder);
                 self.currentOrder=undefined;
+                self.updateTotalSum();
             }
             self.orderConfigPopup.hide();
         };  
@@ -282,12 +307,14 @@ class BonStrip {
 
  
 
-    addOrder(quantity,name,comment,id,costPrice,category) {
+    addOrder(quantity,name,comment,id,price,cost_price,category) {
+        let totalCost=(quantity*price).toFixed(2);
         let tmp=`
-        <span id="quantity" class="nr-of">${quantity}</span><span class="x-sign">X</span><span id="order-name" class="order-name">${name}</span><br>
+        <span id="quantity" class="nr-of">${quantity}</span><span class="x-sign">X</span><span id="order-name" class="order-name">${name}</span><span id="total-cost" class="price-box">${totalCost} kr</span><br>
         <span id="comment" class="order-info">${comment}</span>
         <input type="hidden" id="item-id" value="${id}">
-        <input type="hidden" id="cost-price" value="${costPrice}">
+        <input type="hidden" id="price" value="${price}">
+        <input type="hidden" id="cost_price" value="${cost_price}">
         <input type="hidden" id="category" value="${category}">
         `;
 
@@ -302,8 +329,24 @@ class BonStrip {
             this.orderConfig.querySelector("#order-name").innerHTML=order.querySelector("#order-name").innerText;
             this.orderConfig.querySelector("#comment").value=order.querySelector("#comment").innerText;
             this.orderConfig.querySelector("#item-id").value=order.querySelector("#item-id").value;
-            this.orderConfig.querySelector("#cost-price").value=order.querySelector("#cost-price").value;
+            this.orderConfig.querySelector("#price").value=order.querySelector("#price").value;
+            this.orderConfig.querySelector("#cost_price").value=order.querySelector("#cost_price").value;
             this.orderConfig.querySelector("#category").value=order.querySelector("#category").value;
+
+            let extra=this._getExtraAttributes(order.querySelector("#order-name").innerText);
+            if(extra && extra.link) {
+                this.orderConfig.querySelector("#extra-link").style.display="";
+                this.orderConfig.querySelector("#extra-link").setAttribute("href",extra.link.url);
+                this.orderConfig.querySelector("#extra-link").innerHtml=extra.link.label;
+                this.orderConfig.querySelector("#extra-link").onclick=this.orderConfig.querySelector("#save").onclick;
+            } else {
+                this.orderConfig.querySelector("#extra-link").style.display="none";
+            }
+            if(extra && extra.negateValue) {
+                if(price>0) {
+                    this.orderConfig.querySelector("#price").value=-price; 
+                }
+            }           
 
             self.orderConfigPopup.show(self.orderConfig);
             self.currentOrder=order;
@@ -347,13 +390,14 @@ class BonStrip {
         return result;
     }
 
-    configureOrder(quantity,name,comment,itemId,costPrice,category) {
+    configureOrder(quantity,name,comment,itemId,price,cost_price,category) {
         this.orderConfig.querySelector("#quantity").value=quantity;
         this.orderConfig.querySelector("#order-name").innerHTML=name;
         this.orderConfig.querySelector("#comment").value="";
         this.orderConfigPopup.show(this.orderConfig);
         this.orderConfig.querySelector("#item-id").value=itemId;
-        this.orderConfig.querySelector("#cost-price").value=costPrice;
+        this.orderConfig.querySelector("#price").value=price;
+        this.orderConfig.querySelector("#cost_price").value=cost_price;
         this.orderConfig.querySelector("#category").value=category;
 
         let extra=this._getExtraAttributes(name);
@@ -365,6 +409,25 @@ class BonStrip {
         } else {
             this.orderConfig.querySelector("#extra-link").style.display="none";
         }
+        if(extra && extra.negateValue) {
+            if(price>0) {
+                this.orderConfig.querySelector("#price").value=-price; 
+            }
+        }
+
+    }
+
+    updatePricesFromCategory(category) {
+        Array.from(this.myOrders.getElems()).forEach(order=>{
+            let id=order.querySelector("#item-id").value;
+            let quantity=order.querySelector("#quantity").textContent;
+            let newPrice=Globals.myConfig.price_lookup[id].price_categories[category];
+            //Maybe update cost_price also
+            order.querySelector("#price").value=newPrice;
+            order.querySelector("#total-cost").innerText=(quantity*newPrice).toFixed(2)+" kr";
+
+        });
+        this.updateTotalSum();
 
     }
 
@@ -376,10 +439,25 @@ class BonStrip {
             name:order.querySelector("#order-name").innerText,
             comment:order.querySelector("#comment").innerText,
             id:order.querySelector("#item-id").value,
-            costPrice:order.querySelector("#cost-price").value
+            price:order.querySelector("#price").value,
+            cost_price:order.querySelector("#cost_price").value
             }
 
         })
+
+    }
+
+    updateTotalSum() {
+        let totSum=this.calculateTotalSum();
+        this.myDiv.querySelector("#total-sum").innerHTML=totSum.toFixed(2)+" kr";
+    }
+
+    calculateTotalSum() {
+        let sum=this.getOrders().reduce((tot,order)=>{
+            return tot+(order.quantity*order.price)
+        },0);
+        return sum;
+
 
     }
 
@@ -406,7 +484,16 @@ class BonStrip {
     updateKitchenInfoOnChange(kitchenInfoElem) {
         let f=()=> {
             let text=kitchenInfoElem.value;
-            this.myDiv.querySelector("#kitchenInfoText").innerHTML=text;
+            text=text.replaceAll("\n","<br>");
+        
+            if(text!=="") {
+                this.myDiv.querySelector("#kitchen-field").style.display="";
+                this.myDiv.querySelector("#kitchenInfoText").innerHTML=text;
+            } else {
+                this.myDiv.querySelector("#kitchen-field").style.display="none";
+
+            }
+            
         }
         kitchenInfoElem.oninput=f;
 

@@ -220,11 +220,17 @@ class BonForm {
 itemsTab=`
 <span>
 <br>
-<input type="text" name="nr_of_servings" placeholder="Antal Pax" autocomplete="nope" style="vertical-align: top; margin-right:5px">
+<div>
+<input type="text" name="nr_of_servings" placeholder="Antal Pax" autocomplete="nope" style="vertical-align: top; margin-right:5px"> 
+<select name="price_category" id="price-categories"></select>
+  <br><br>
+
+</div>
 <textarea name="customer_info" placeholder="Kunde Önsker" rows="2" autocomplete="nope" ></textarea>
 </span><br><br>
 
-<div id="items" style=";min-height:400px;"></div>
+
+<div id="items" style=""></div>
 <textarea name="kitchen_info" id="kitchen_info" placeholder="Kökken info" rows="2" autocomplete="nope" ></textarea>
 
 `;
@@ -355,48 +361,100 @@ miscTab=`
             self._customerToForm(option.data,form,true);
             self._copyCompanyAddress2Delivery(form,true);
         }
+
+
+        form.querySelector("#price-categories").onchange=function() {
+            self.updateItems();
+        }
+
     }
+
+
+    
 
     updateItems() {
+        this.updatePriceCategories();
+        let currentPrice=this.getCurrentPriceCategory();
+
+        let currentItemTabIndex=this.myItems.getActiveTabIndex();
+        this.myItems.clearAll();
         let self=this;
-        this.myRepoObj.getItems((items)=>{
-            let categories={};
-            items.forEach(i=>{
-                if(i.sellable) {
-                    if(!categories[i.category]) {
-                        categories[i.category]=[];
-                    }
-                    categories[i.category].push({name:i.name,id:i.id,cost_price:i.cost_price});
+        let categories={};
+        Globals.myConfig.myItems.forEach(i=>{
+            if(i.sellable) {
+                if(!categories[i.category]) {
+                    categories[i.category]=[];
                 }
-            })
-
-            Object.keys(categories).forEach((k)=>{
-                let content=document.createElement("div");
-                content.style.minWidth="150px";
-
-                categories[k].forEach((n)=>{
-                    let button=document.createElement("button");
-                    button.style.width="100%";
-                    button.style.marginBottom="3px";
-                    button.innerHTML=n.name;
-                    button.onclick=()=>{
-                        this.selectOrder(n.name,n.id,n.cost_price,k);
-                        return false;
-                    }
-                    content.appendChild(button);
-                    content.appendChild(document.createElement("br"));
-                    
-                })
-                this.myItems.addTab(k,content);
-
+                categories[i.category].push({name:i.name,id:i.id,cost_price:i.cost_price,prices:Globals.myConfig.price_lookup[i.id].price_categories});
             }
-        )
+        })
+
+        Object.keys(categories).forEach((k)=>{
+            let content=document.createElement("div");
+            content.style.minWidth="150px";
+
+            categories[k].forEach((n)=>{
+                let button=document.createElement("button");
+                button.style.width="100%";
+                button.style.marginBottom="3px";
+                let price=n.prices[currentPrice];
+                button.innerHTML=n.name +" ("+price+" kr)";
+                button.onclick=()=>{
+                    this.selectOrder(n.name,n.id,n.cost_price,k);
+                    return false;
+                }
+                content.appendChild(button);
+                content.appendChild(document.createElement("br"));
+                
+            })
+            this.myItems.addTab(k,content);
+
+        })
+
+        this.myItems.setActiveTabIndex(currentItemTabIndex);
+       
+
+    }
+    updatePriceCategories() {
+        let select=this.myDiv.querySelector("#price-categories");
+        let currentSelected=select.value;
+        select.innerHTML="";
+        let option = document.createElement("option");
+        option.text = "Pris kategorie...";
+        option.disabled=true;
+        select.add(option);
+
+        Globals.myConfig.priceCategories.forEach(c=>{
+            option = document.createElement("option");
+            option.text=c;
+            select.add(option);
+
         });
+        select.value=currentSelected!=""?currentSelected:select.options[select.selectedIndex].value;
+
+        this.myBonStrip.updatePricesFromCategory(select.value);
+        
+        return select.value;
+    }
+
+    getCurrentPriceCategory() {
+        let select=this.myDiv.querySelector("#price-categories");
+        return select.value;
 
     }
 
+    getCurrentPrice(id) {
+        let currentPriceCategory=this.getCurrentPriceCategory();
+        return Globals.myConfig.price_lookup[id].price_categories[currentPriceCategory];
+
+    }
+
+
+
+
     selectOrder(name,id,cost_price,category) {
-        this.myBonStrip.configureOrder(1,name,"",id,cost_price,category);
+        let currentPrice=this.getCurrentPrice(id);
+        this.myBonStrip.configureOrder(1,name,"",id,currentPrice,cost_price,category);
 
     }
 
@@ -448,6 +506,7 @@ miscTab=`
         bon.status=this._getStatus();
         bon.status2="";
         bon.nr_of_servings=props.nr_of_servings;
+        bon.price_category=props.price_category;
         bon.customer_info= props.customer_info;
         bon.kitchen_info= props.kitchen_info;
         bon.service_type=null;
@@ -532,6 +591,8 @@ miscTab=`
 
         form.querySelector("input[name=bon_id]").value=bon.id;
         form.querySelector("input[name=nr_of_servings]").value=bon.nr_of_servings;
+        form.querySelector("select[name=price_category]").value=bon.price_category;
+        form.querySelector("select[name=price_category]").onchange();
         form.querySelector("textarea[name=customer_info]").value=bon.customer_info;
         form.querySelector("textarea[name=kitchen_info]").value=bon.kitchen_info;
 
@@ -549,8 +610,9 @@ miscTab=`
         this.myBonStrip.setBonId(bon.id);
         this.myRepoObj.getOrders(bon.id,(orders)=>{
             orders.forEach(o=>{
-                this.myBonStrip.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price,o.category);
-            })
+                this.myBonStrip.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price,o.cost_price,o.category);
+            });
+            this.myBonStrip.updateTotalSum();
         })
 
     }

@@ -3,7 +3,7 @@
 class Helper {
   static getFormProps(form) {
     let res = {};
-    form.querySelectorAll("input, textarea").forEach((e) => {
+    form.querySelectorAll("input, textarea, select").forEach((e) => {
       let name = e.getAttribute("name");
       if (name !== null) {
         res[name] = e.value;
@@ -61,6 +61,20 @@ class Helper {
       let [r,g,b]=this.colorValues(color);
     var yiq = ((r*299)+(g*587)+(b*114))/1000;
 	return (yiq >= 128) ? 'black' : 'white';
+  }
+
+  static expandShrinkField(legend) {
+      console.log(legend);
+      if(legend.classList.contains("fa-caret-down")) {
+        legend.parentElement.parentElement.querySelector(".field-content").style.display="";
+        legend.classList.toggle("fa-caret-down");
+        legend.classList.toggle("fa-caret-up");
+      } else {
+        legend.parentElement.parentElement.querySelector(".field-content").style.display="none";
+        legend.classList.toggle("fa-caret-down");
+        legend.classList.toggle("fa-caret-up");
+      }
+      
   }
 
 }
