@@ -17,16 +17,23 @@ function getAllRecipes(callback=console.log) {
 
 function parseRecipes(recipes) {
     return recipes.map(r => {
+
+        let sign=1;
+        if(r.name.match(/.*rabat.*/i)) {
+            //Grocy-db can't handle negative values. So we negates the value if the item name contains the word rabat.
+            sign=-1;
+        }
+
         let salesPrices={};
         Object.keys(r.userfields).filter(k=>(k.match(/^Salesprice.*/)!=null)).forEach(k=>{
             let priceCategory=k.replace("Salesprice","");
-            salesPrices[priceCategory]=r.userfields[k];
+            salesPrices[priceCategory]=r.userfields[k]*sign;
         });
 
         return {
             name:r.name,
             category:r.userfields?r.userfields.grupper:"",
-            cost_price:r.userfields?r.userfields.costprice:"",
+            cost_price:r.userfields?r.userfields.costprice*sign:"",
             sellable:r.userfields?r.userfields.sellable:"",
             sellableZettle:r.userfields?r.userfields.sellableZettle:"",
             external_id:r.id,

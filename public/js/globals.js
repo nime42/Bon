@@ -11,9 +11,6 @@ class Globals {
                 url:"https://byexpressen.groupnet.at/lobo/#!//coreLogin/",
                 label:"By-expressen"
             }
-        },
-        ".*rabat.*": {
-            "negateValue":true
         }
     }
     static BonStripOrder= [

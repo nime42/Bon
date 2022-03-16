@@ -341,12 +341,7 @@ class BonStrip {
                 this.orderConfig.querySelector("#extra-link").onclick=this.orderConfig.querySelector("#save").onclick;
             } else {
                 this.orderConfig.querySelector("#extra-link").style.display="none";
-            }
-            if(extra && extra.negateValue) {
-                if(price>0) {
-                    this.orderConfig.querySelector("#price").value=-price; 
-                }
-            }           
+            }          
 
             self.orderConfigPopup.show(self.orderConfig);
             self.currentOrder=order;
@@ -408,11 +403,6 @@ class BonStrip {
             this.orderConfig.querySelector("#extra-link").onclick=this.orderConfig.querySelector("#save").onclick;
         } else {
             this.orderConfig.querySelector("#extra-link").style.display="none";
-        }
-        if(extra && extra.negateValue) {
-            if(price>0) {
-                this.orderConfig.querySelector("#price").value=-price; 
-            }
         }
 
     }
