@@ -69,5 +69,25 @@ class BonRepository {
         $.get(url,callback);
     }
 
+    searchBons(searchParams,callback) {
+        let url="searchBons/";
+
+        url+="?"+Object.keys(searchParams).map(k=>(k+"="+searchParams[k])).join("&");
+        $.get(url,callback);   
+    }
+
+    updateBonStatus(id,status,callback) {
+        let url="bonStatus/"+id;
+        $.ajax({
+            type: "PUT",
+            url: url,
+            data: JSON.stringify({status:status}),
+            success: callback,
+            dataType: "json",
+            contentType: "application/json"
+          });
+    }
+
+
 
 }

@@ -121,9 +121,13 @@ class BonForm {
     <div id="input-fields">
     <fieldset>
     <legend>Status</legend>
-    <button type="button" id="new" class="status-button" style="float:left" data-active-background="lightgreen">Ny</button>
-    <button type="button" id="needInfo" class="status-button" data-active-background="red">Venter Info</button>
-    <button type="button" id="approved" class="status-button" data-active-background="yellow">Godkendt</button>
+    <button type="button" id="new" class="status-button" style="float:left" data-active-background="lightgrey">Ny</button>
+    <button type="button" id="needInfo" class="status-button" data-active-background="yellow">Venter Info</button>
+    <button type="button" id="approved" class="status-button" data-active-background="lightgreen">Godkendt</button>
+    <button type="button" id="preparing" class="status-button" data-active-background="lightgreen">Prep</button>
+    <button type="button" id="done" class="status-button" data-active-background="lightgreen">Klar</button>
+    <button type="button" id="delivered" class="status-button" data-active-background="white">Lev</button>
+    <button type="button" id="invoiced" class="status-button" data-active-background="mediumpurple">Faktureret</button>
     <button type="button" id="offer" class="status-button" style="float:right" data-active-background="lightblue">Tilbud</button>
     </fieldset>
     <br>
@@ -462,7 +466,7 @@ miscTab=`
     createBonLabelAndcolor(bon) {
         let statusColor=this.getStatusColor(bon.status);
         let timeStr=bon.delivery_date.getHours().toString().padStart(2,"0")+"."+bon.delivery_date.getMinutes().toString().padStart(2,"0");
-        let label=timeStr+":"+bon.customer.forename+" "+bon.customer.surname;
+        let label=timeStr+", Pax= "+(bon.nr_of_servings!=""?bon.nr_of_servings:0);
         return [label,statusColor];
 
     }
@@ -483,7 +487,7 @@ miscTab=`
         if(elem) {
             return elem.dataset["activeBackground"];
         } else {
-            return "";
+            return "lightgreen";
         }
     }
 
@@ -496,7 +500,8 @@ miscTab=`
         try {
             let elem=form.querySelector("#"+status);
             elem.click();
-        } catch(err) {}
+        } catch(err) {
+        }
     }
 
     _createBon(props) {

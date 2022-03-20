@@ -77,9 +77,26 @@ app.post("/bons",(req,res) => {
 })
 
 app.put("/bons/:id",(req,res) => {
+    console.log(req);
     db.updateBon(req.params.id,req.body,function(status,msg) {
         if(status) {  
             res.json(msg);
+ 
+        } else {
+            console.log("updateBon",msg);
+            res.sendStatus(500);  
+
+        }
+    });
+})
+
+app.put("/bonStatus/:id",(req,res) => {
+    db.updateBonStatus(req.params.id,req.body.status,function(status,msg) {
+        if(status) {  
+            if(req.body.status=="delivered") {
+                consumeBon(req.params.id);
+            }
+            res.sendStatus(200);
  
         } else {
             console.log("updateBon",msg);
@@ -102,6 +119,16 @@ app.delete("/bons/:id",(req,res) => {
     })       
 
 })
+
+function consumeBon(id) {
+    db.getOrders(id,function(status,items){
+        items.forEach(i => {
+            grocy.consumeItem(i.quantity,i.external_id);
+            
+        });
+    });   
+}
+
 
 app.get("/customers",(req,res) => {
     let email=req.query.email;
@@ -216,6 +243,20 @@ app.get("/updateDB", (req, res) => {
     }
   });
 });
+
+app.get("/searchBons",(req,res) => {
+    db.searchBons(req.query,function(status,items){
+        if(status) { 
+            res.json(items); 
+        } else {
+            console.log("searchBons",items);
+            res.sendStatus(404);  
+
+        }
+    })   
+})
+
+
 
 
 

@@ -68,6 +68,74 @@ function getBons(year, month, callback = console.log) {
   }
 }
 
+
+function searchBons(searchParams,callback = console.log) {
+  ["bonId","status","status2","afterDate","beforeDate"].forEach(p=>{
+    if(!searchParams[p]) {
+      searchParams[p]=null;
+    }
+  })
+  let sql = `
+  select 
+    b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,
+    a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,
+    c.forename,c.surname,c.email,c.phone_nr,
+    co.name,co.ean_nr,
+    co_a.street_name as co_street_name,co_a.street_name2 as co_street_name2,co_a.street_nr as co_street_nr,co_a.zip_code as co_zip_code,co_a.city as co_city
+  from bons b
+   left join addresses a on b.delivery_address_id=a.id
+   left join customers c on b.customer_id =c.id
+   left join companies co on c.company_id =co.id
+   left join addresses co_a on co_a.id=co.address_id
+   where b.id=ifnull(@bonId,b.id) and b.status=ifnull(@status,b.status) and b.status2=ifnull(@status2,b.status2)
+    and b.delivery_date>=ifnull(@afterDate,b.delivery_date) and b.delivery_date<=ifnull(@beforeDate,b.delivery_date)
+  order by b.delivery_date
+  `;
+  try {
+    const rows = db.prepare(sql).all(searchParams);
+
+    rows.forEach((r) => {
+      createSubObject(r, "delivery_address", [
+        "street_name",
+        "street_name2",
+        "street_nr",
+        "zip_code",
+        "city",
+      ]);
+      createSubObject(r, "customer", [
+        "forename",
+        "surname",
+        "email",
+        "phone_nr",
+      ]);
+      createSubObject(r, "company", ["name", "ean_nr"]);
+      r.customer.company = r.company;
+      delete r.company;
+      createSubObject(
+        r,
+        "company_address",
+        [
+          "co_street_name",
+          "co_street_name2",
+          "co_street_nr",
+          "co_zip_code",
+          "co_city",
+        ],
+        ["street_name", "street_name2", "street_nr", "zip_code", "city"]
+      );
+      r.customer.company.address = r.company_address;
+      delete r.company_address;
+    });
+
+    callback(true, rows);
+  } catch (err) {
+    callback(false, err);
+  }}
+
+
+
+
+
 function delBon(bonId, callback = console.log) {
   var sql = "delete from bons where id=?";
   try {
@@ -253,8 +321,8 @@ function getItems(callback = console.log) {
 function updateItems(items, callback = console.log) {
   let sql = `
   INSERT INTO items (name,category,cost_price,sellable,external_id) VALUES (@name,@category,@cost_price,@sellable,@external_id)
-  ON CONFLICT (name,category) DO
-  UPDATE SET cost_price=ifnull(excluded.cost_price,cost_price),sellable=ifnull(excluded.sellable,sellable),external_id=ifnull(excluded.external_id,external_id) 
+  ON CONFLICT (external_id) DO
+  UPDATE SET cost_price=ifnull(excluded.cost_price,cost_price),sellable=ifnull(excluded.sellable,sellable),name=ifnull(excluded.name,name),category=ifnull(excluded.category,category) 
   `;
 
   try {
@@ -362,13 +430,23 @@ function saveOrders(bonId, orders) {
 }
 
 function getOrders(bonId, callback = console.log) {
-  let sql = `select i.name,i.category,o.* from orders o 
+  let sql = `select i.name,i.category,o.*,i.external_id from orders o 
   left join items i on o.item_id=i.id
   where bon_id=? order by sorting_order`;
 
   try {
     const rows = db.prepare(sql).all(bonId);
     callback(true, rows);
+  } catch (err) {
+    callback(false, err);
+  }
+}
+
+function updateBonStatus(id,status,callback=console.log) {
+  let sql="update bons set status=? where id=?";
+  try {
+    db.prepare(sql).run(status,id);
+    callback(true);
   } catch (err) {
     callback(false, err);
   }
@@ -385,4 +463,6 @@ module.exports = {
   updateItems: updateItems,
   deleteItems: deleteItems,
   getOrders: getOrders,
+  searchBons:searchBons,
+  updateBonStatus:updateBonStatus
 };

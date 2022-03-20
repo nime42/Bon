@@ -21,6 +21,7 @@
     <script src="js/BonForm.js"></script>
     <script src="js/BonRepository.js"></script>
     <script src="js/BonConfig.js"></script>
+    <script src="js/BonWall.js"></script>
 
     <style>
         body {
@@ -115,30 +116,63 @@
 <body>
 
     <nav>
-        <a href="#first" class="nav-menu active" onclick="toggleMenu(this)"><i class="fa fa-key"></i></a>
-        <a href="#second" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-home"></i></a>
-        <a href="#third" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-wrench"></i></a>
+        <a href="#login-tab" class="nav-menu active" onclick="toggleMenu(this)"><i class="fa fa-key"></i></a>
+        <a href="#calendar-tab" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-home"></i></a>
+        <a href="#kitchen-tab" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-cutlery"></i></a>
+        <a href="#invoice-tab" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-money"></i></a>
+        <a href="#admin-tab" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-wrench"></i></a>
 
     </nav>
 
     <div class='nav-container menu-content'>
-        <section id='first'>
+        <section id='"login-tab'>
             <div id="login"></div>
         </section>
 
-        <section id='second'>
+        <section id='calendar-tab'>
             <div id="calendar"></div>
         </section>
-
-        <section id='third'>
+        <section id='kitchen-tab'>
+            <div id="kitchen"></div>
+        </section>
+        <section id='invoice-tab'>
+            <div id="invoice"></div>
+        </section>
+        <section id='admin-tab'>
             <div id="admin"></div>
         </section>
     </div>
 
     <script>
+        let kitchenStatuses=[
+            {
+                status:"preparing",
+                label:"Prep"
+            },
+            {
+                status:"done",
+                label:"Klar"
+            },
+            {
+                status:"delivered",
+                label:"Leveret"
+            }
+
+        ];
+        let invoiceStatuses=[
+        {
+                status:"invoiced",
+                label:"Fakturered"
+            },           
+        ]
         Globals.myCalender=new BonCalendar("#calendar");
         Globals.myConfig=new BonConfig("#admin");
+        Globals.myKitchenBonWall=new BonWall("#kitchen","approved",kitchenStatuses,["preparing","done"]);
+        Globals.myKitchenBonWall.getBonsForToday();
 
+        Globals.myInvoiceBonWall=new BonWall("#invoice","delivered",invoiceStatuses,["approved","preparing","done"]);
+        Globals.myInvoiceBonWall.getAllBons();
+        
 </script>
 
 </body>

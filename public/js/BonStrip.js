@@ -306,6 +306,25 @@ class BonStrip {
     }
 
  
+    initFromBon(bon,orders) {
+        this.setBonId(bon.id);
+        this.setCustomerInfo(bon);
+        this.setDeliveryAddr(bon);
+        this.setDeliveryDate(bon.delivery_date);
+        this.setKitchenInfo(bon.kitchen_info);
+
+        if(orders) {
+            orders.forEach(o=>{
+                this.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price,o.cost_price,o.category);
+            })
+
+        }
+        this.updateTotalSum();
+
+
+
+    }
+
 
     addOrder(quantity,name,comment,id,price,cost_price,category) {
         let totalCost=(quantity*price).toFixed(2);
@@ -460,6 +479,41 @@ class BonStrip {
         }
     }
 
+    setCustomerInfo(bon) {
+        let name=bon.customer.forename+" "+bon.customer.surname;
+        this.myDiv.querySelector("#customer").innerHTML=name;
+        this.myDiv.querySelector("#email").innerHTML=bon.customer.email;
+        this.myDiv.querySelector("#phonenr").innerHTML=bon.customer.phone_nr;
+    }
+    setDeliveryAddr(bon) {
+        let addr=`
+        ${bon.delivery_address.street_name2} ${bon.delivery_address.street_name2?"<br>":""}
+        ${bon.delivery_address.street_name} ${bon.delivery_address.street_nr}<br>
+        ${bon.delivery_address.zip_code} ${bon.delivery_address.city}
+        `;
+        this.myDiv.querySelector("#address").innerHTML=addr;
+    }
+    setDeliveryDate(deliveryDate) {
+        let date=new Date(deliveryDate).toLocaleDateString();
+        let time=new Date(deliveryDate).toLocaleTimeString();
+        this.myDiv.querySelector("#date").innerHTML=date;
+        this.myDiv.querySelector("#time").innerHTML=time;
+    }
+
+    setKitchenInfo(text) {
+        text=text.replaceAll("\n","<br>");
+    
+        if(text!=="") {
+            this.myDiv.querySelector("#kitchen-field").style.display="";
+            this.myDiv.querySelector("#kitchenInfoText").innerHTML=text;
+        } else {
+            this.myDiv.querySelector("#kitchen-field").style.display="none";
+
+        }
+
+
+    }
+
 
     updateNameOnChange(forenameElem,surnameElem) {
         let f=()=> {
@@ -472,18 +526,11 @@ class BonStrip {
 
 
     updateKitchenInfoOnChange(kitchenInfoElem) {
+        let self=this;
         let f=()=> {
-            let text=kitchenInfoElem.value;
-            text=text.replaceAll("\n","<br>");
-        
-            if(text!=="") {
-                this.myDiv.querySelector("#kitchen-field").style.display="";
-                this.myDiv.querySelector("#kitchenInfoText").innerHTML=text;
-            } else {
-                this.myDiv.querySelector("#kitchen-field").style.display="none";
 
-            }
-            
+            let text=kitchenInfoElem.value;
+            self.setKitchenInfo(text);
         }
         kitchenInfoElem.oninput=f;
 
