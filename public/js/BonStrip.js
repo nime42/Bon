@@ -2,6 +2,7 @@ class BonStrip {
     background=Globals.background;
     foreground=Globals.foreground;
     shadowColor=Globals.shadowColor;
+    CUSTOMER_COLLECTS_TXT="Afhentes";
 
     style=`
     #bon {
@@ -177,10 +178,26 @@ class BonStrip {
         </fieldset>
 
         <fieldset>
-            <legend>Leveringsadresse</legend>
-            <div id="address" class="bonstrip-items">
+            <legend>Leveringsadresse <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
+            <div id="address" class="bonstrip-items field-content">
             </div>
         </fieldset>
+
+        <fieldset>
+            <legend>Pax <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
+            <div class="field-content">
+            <span id="pax" style="float: left;font-weight: bold;font-style: italic;padding-left: 10px;"></span>
+
+            <label style="font-weight: bold;font-style: italic;float: right">
+            Køkkenet vælger
+            <input onclick="return false;" type="checkbox" id="kitchen-selects" value="1" style="margin-left: 5px;">
+            </label>
+          
+
+
+            </div>
+        </fieldset>
+
         <br>
 
         <fieldset id="kitchen-field">
@@ -216,7 +233,7 @@ class BonStrip {
         let orderConfigDiv=`
         <div id="order-config" class="order-config-style" style="width:350px;background:${this.background};padding:10px;border-radius: 10px;border: 2px solid ${this.foreground};">   
             <div class="order-config-style">
-            <span><i id="plus" class="plus-minus fa fa-plus-square"></i><i id="minus" class="plus-minus fa fa-minus-square" ></i><input type="text" class="nr-of" size="3" name="quantity" id="quantity" "value="1"></span>    
+            <span><i id="plus" class="plus-minus fa fa-plus-square" style="font-size:20px"></i><i id="minus" class="plus-minus fa fa-minus-square" style="font-size:20px"></i><input type="text" class="nr-of" size="3" name="quantity" id="quantity" "value="1"></span>    
             <span class="x-sign">X</span><span class="order-name" id="order-name"></span>
             </div><br>
             <textarea name="comment" placeholder="Extra info" id="comment" ></textarea>
@@ -310,6 +327,7 @@ class BonStrip {
         this.setBonId(bon.id);
         this.setCustomerInfo(bon);
         this.setDeliveryAddr(bon);
+        this.setPaxAndKitchenSelects(bon);
         this.setDeliveryDate(bon.delivery_date);
         this.setKitchenInfo(bon.kitchen_info);
 
@@ -486,11 +504,17 @@ class BonStrip {
         this.myDiv.querySelector("#phonenr").innerHTML=bon.customer.phone_nr;
     }
     setDeliveryAddr(bon) {
-        let addr=`
-        ${bon.delivery_address.street_name2} ${bon.delivery_address.street_name2?"<br>":""}
-        ${bon.delivery_address.street_name} ${bon.delivery_address.street_nr}<br>
-        ${bon.delivery_address.zip_code} ${bon.delivery_address.city}
-        `;
+        let addr;
+        if(bon.customer_collects) {
+            addr=this.CUSTOMER_COLLECTS_TXT;
+        } else {
+            addr=`
+            ${bon.delivery_address.street_name2} ${bon.delivery_address.street_name2?"<br>":""}
+            ${bon.delivery_address.street_name} ${bon.delivery_address.street_nr}<br>
+            ${bon.delivery_address.zip_code} ${bon.delivery_address.city}
+            `;
+    
+        }
         this.myDiv.querySelector("#address").innerHTML=addr;
     }
     setDeliveryDate(deliveryDate) {
@@ -512,6 +536,11 @@ class BonStrip {
         }
 
 
+    }
+
+    setPaxAndKitchenSelects(bon) {
+        this.myDiv.querySelector("#pax").innerHTML=bon.nr_of_servings;
+        this.myDiv.querySelector("#kitchen-selects").checked=bon.kitchen_selects;
     }
 
 
@@ -536,13 +565,19 @@ class BonStrip {
 
     }    
 
-    updateDeliveryAdrOnChange(streetNameElem,streetName2Elem,streetNrElem,zipCodeElem,cityElem) {
+    updateDeliveryAdrOnChange(streetNameElem,streetName2Elem,streetNrElem,zipCodeElem,cityElem,customerCollectsElem) {
         let f=()=> {
-            let addr=`
-            ${streetName2Elem.value} ${streetName2Elem.value?"<br>":""}
-            ${streetNameElem.value} ${streetNrElem.value}<br>
-            ${zipCodeElem.value} ${cityElem.value}
-            `;
+            let addr;
+            if(customerCollectsElem.checked) {
+                addr=this.CUSTOMER_COLLECTS_TXT;
+            } else {
+                addr=`
+                ${streetName2Elem.value} ${streetName2Elem.value?"<br>":""}
+                ${streetNameElem.value} ${streetNrElem.value}<br>
+                ${zipCodeElem.value} ${cityElem.value}
+                `;    
+            }
+
             this.myDiv.querySelector("#address").innerHTML=addr;
         }
         streetNameElem.oninput=f;
@@ -550,6 +585,7 @@ class BonStrip {
         streetNrElem.oninput=f;
         zipCodeElem.oninput=f;
         cityElem.oninput=f;
+        customerCollectsElem.onchange=f;
     }
 
     updateMailAndPhoneNrOnChange(mailElem,phoneNrElem) {
@@ -571,6 +607,20 @@ class BonStrip {
         dateElem.oninput=f;
         timeElem.oninput=f;
     }
+
+    updatePaxOnChange(paxElem) {
+        let f=()=> {
+            this.myDiv.querySelector("#pax").innerHTML=paxElem.value;
+        }
+        paxElem.oninput=f;
+    }
+
+    updateKitchenSelectsOnChange(kitchenSelectsElem) {
+        let f=()=> {
+            this.myDiv.querySelector("#kitchen-selects").checked=kitchenSelectsElem.checked;
+        }
+        kitchenSelectsElem.onchange=f;
+    }    
 
     clear() {
         this.myDiv.querySelectorAll(".bonstrip-items").forEach(e=>{

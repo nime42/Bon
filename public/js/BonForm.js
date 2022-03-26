@@ -121,14 +121,14 @@ class BonForm {
     <div id="input-fields">
     <fieldset>
     <legend>Status</legend>
-    <button type="button" id="new" class="status-button" style="float:left" data-active-background="lightgrey">Ny</button>
-    <button type="button" id="needInfo" class="status-button" data-active-background="yellow">Venter Info</button>
-    <button type="button" id="approved" class="status-button" data-active-background="lightgreen">Godkendt</button>
-    <button type="button" id="preparing" class="status-button" data-active-background="lightgreen">Prep</button>
-    <button type="button" id="done" class="status-button" data-active-background="lightgreen">Klar</button>
-    <button type="button" id="delivered" class="status-button" data-active-background="white">Lev</button>
-    <button type="button" id="invoiced" class="status-button" data-active-background="mediumpurple">Faktureret</button>
-    <button type="button" id="offer" class="status-button" style="float:right" data-active-background="lightblue">Tilbud</button>
+    <button type="button" id="${Globals.Statuses["new"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["new"].color}">${Globals.Statuses["new"].label}</button>
+    <button type="button" id="${Globals.Statuses["needInfo"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["needInfo"].color}">${Globals.Statuses["needInfo"].label}</button>
+    <button type="button" id="${Globals.Statuses["approved"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["approved"].color}">${Globals.Statuses["approved"].label}</button>
+    <button type="button" id="${Globals.Statuses["preparing"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["preparing"].color}">${Globals.Statuses["preparing"].label}</button>
+    <button type="button" id="${Globals.Statuses["done"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["done"].color}">${Globals.Statuses["done"].label}</button>
+    <button type="button" id="${Globals.Statuses["delivered"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["delivered"].color}">${Globals.Statuses["delivered"].label}</button>
+    <button type="button" id="${Globals.Statuses["invoiced"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["invoiced"].color}">${Globals.Statuses["invoiced"].label}</button>
+    <button type="button" id="${Globals.Statuses["offer"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["offer"].color}">${Globals.Statuses["offer"].label}</button>
     </fieldset>
     <br>
     
@@ -161,15 +161,17 @@ class BonForm {
     <legend>Kunde</legend>
 
     <div style="margin-bottom:5px">
+    <i class="fa fa-envelope icon input-icons"></i>
+    <input id="email" type="email" name="email" autocomplete="nope" placeholder="Email">
+    </div>
+
+
+    <div style="margin-bottom:5px">
     <i class="fa fa-user icon input-icons"></i>
     <input autocomplete="nope" id="forename" type="text" name="forename" placeholder="Fornavn" style="width:25%">
     <input autocomplete="nope" id="surname" type="text" name="surname" placeholder="Efternavn" style="width:35%">
     </div>
 
-    <div style="margin-bottom:5px">
-    <i class="fa fa-envelope icon input-icons"></i>
-    <input id="email" type="email" name="email" autocomplete="nope" placeholder="Email">
-    </div>
 
     <div style="margin-bottom:5px">
     <i class="fa fa-phone icon input-icons"></i>
@@ -206,7 +208,9 @@ class BonForm {
     
 </fieldset>
 <fieldset>
-<legend style="font-weight: bold;">Leveringsadresse</legend>
+<legend style="font-weight: bold;">Leveringsadresse </legend>
+<span><input type="checkbox" id="customer_collects" name="customer_collects" value="1" style="float: left;margin-right: 5px;"><label for="customer_collects" style="float: left"> Afhentes</label></span><br><br>
+
 <input type="text" id="street_name2" name="street_name2" placeholder="C/O etc" autocomplete="nope"> <br>
 <span>
     <input type="text" id="street_name" name="street_name" placeholder="Gade" autocomplete="nope">
@@ -225,10 +229,14 @@ itemsTab=`
 <span>
 <br>
 <div>
-<input type="text" name="nr_of_servings" placeholder="Antal Pax" autocomplete="nope" style="vertical-align: top; margin-right:5px"> 
+<input type="text" id="nr_of_servings" name="nr_of_servings" placeholder="Antal Pax" autocomplete="nope" style="vertical-align: top; margin-right:5px"> 
 <select name="price_category" id="price-categories"></select>
   <br><br>
-
+  <label>
+  Køkkenet vælger
+  <input type="checkbox" id="kitchen_selects" name="kitchen_selects" value="1" style="margin-left: 5px;">
+  </label>
+  <br>
 </div>
 <textarea name="customer_info" placeholder="Kunde Önsker" rows="2" autocomplete="nope" ></textarea>
 </span><br><br>
@@ -261,10 +269,12 @@ miscTab=`
 
         this.myBonStrip=new BonStrip(this.myDiv.querySelector("#bon-strip"));
         this.myBonStrip.updateNameOnChange(form.querySelector("#forename"),form.querySelector("#surname"));
-        this.myBonStrip.updateDeliveryAdrOnChange(form.querySelector("#street_name"),form.querySelector("#street_name2"),form.querySelector("#street_nr"),form.querySelector("#zip_code"),form.querySelector("#city"));
+        this.myBonStrip.updateDeliveryAdrOnChange(form.querySelector("#street_name"),form.querySelector("#street_name2"),form.querySelector("#street_nr"),form.querySelector("#zip_code"),form.querySelector("#city"),form.querySelector("#customer_collects"));
         this.myBonStrip.updateMailAndPhoneNrOnChange(form.querySelector("#email"),form.querySelector("#phone_nr"));
         this.myBonStrip.updateDateAndTimeOnChange(form.querySelector("#date"),form.querySelector("#time"));
         this.myBonStrip.updateKitchenInfoOnChange(form.querySelector("#kitchen_info"));
+        this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"));
+        this.myBonStrip.updateKitchenSelectsOnChange(form.querySelector("#kitchen_selects"));
 
 
 
@@ -466,7 +476,7 @@ miscTab=`
     createBonLabelAndcolor(bon) {
         let statusColor=this.getStatusColor(bon.status);
         let timeStr=bon.delivery_date.getHours().toString().padStart(2,"0")+"."+bon.delivery_date.getMinutes().toString().padStart(2,"0");
-        let label=timeStr+", Pax= "+(bon.nr_of_servings!=""?bon.nr_of_servings:0);
+        let label=timeStr+", #"+bon.id+", Pax= "+(bon.nr_of_servings!=""?bon.nr_of_servings:0);
         return [label,statusColor];
 
     }
@@ -475,20 +485,14 @@ miscTab=`
         let form=this.myDiv.querySelector("#order");
         let elem=form.querySelector(".status-button.active");
         if(elem) {
-            return elem.getAttribute("id");
+            return Globals.Statuses[elem.getAttribute("id")].name;
         } else {
             return "";
         }
     }
 
     getStatusColor(status) {
-        let form=this.myDiv.querySelector("#order");
-        let elem=form.querySelector("#"+status);
-        if(elem) {
-            return elem.dataset["activeBackground"];
-        } else {
-            return "lightgreen";
-        }
+        return Globals.Statuses[status]?Globals.Statuses[status].color:"lightgreen";
     }
 
     _setStatus(status) {
@@ -511,6 +515,8 @@ miscTab=`
         bon.status=this._getStatus();
         bon.status2="";
         bon.nr_of_servings=props.nr_of_servings;
+        bon.kitchen_selects=props.kitchen_selects;
+        bon.customer_collects=props.customer_collects;
         bon.price_category=props.price_category;
         bon.customer_info= props.customer_info;
         bon.kitchen_info= props.kitchen_info;
@@ -596,6 +602,10 @@ miscTab=`
 
         form.querySelector("input[name=bon_id]").value=bon.id;
         form.querySelector("input[name=nr_of_servings]").value=bon.nr_of_servings;
+        form.querySelector("input[name=nr_of_servings]").oninput();
+        form.querySelector("input[name=customer_collects]").checked=bon.customer_collects;
+        form.querySelector("input[name=kitchen_selects]").checked=bon.kitchen_selects;
+        form.querySelector("input[name=kitchen_selects]").onchange();
         form.querySelector("select[name=price_category]").value=bon.price_category;
         form.querySelector("select[name=price_category]").onchange();
         form.querySelector("textarea[name=customer_info]").value=bon.customer_info;
@@ -649,7 +659,7 @@ miscTab=`
             this._bonToForm(eventData.misc,"#order");
         } else {
             this._setFormDate(new Date(content.eventTime),"#order");
-            this._setStatus("new");
+            this._setStatus(Globals.Statuses["new"].name);
             this.myBonStrip.setBonId("");
             this.myBonStrip.clear();
         }

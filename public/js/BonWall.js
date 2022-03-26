@@ -22,11 +22,11 @@ class BonWall {
     <div class="bon-item"/>
     `
         
-    constructor(div,startStatus,useStatuses,manageStatus) {
-        this._createStatusRow(useStatuses);
+    constructor(div,startStatus,statusFilter,statusButtons) {
+        this._createStatusRow(statusButtons);
         this.startStatus=startStatus;
-        this.manageStatus=manageStatus;
-        this.manageStatus.push(startStatus);
+        this.statusFilter=statusFilter;
+        this.statusFilter.push(startStatus);
         let parent;
         if(typeof div==="string") {
             parent=document.querySelector(div);
@@ -44,7 +44,7 @@ class BonWall {
     _createStatusRow(statuses) {
         let rows="";
         statuses.forEach(s=>{
-            let row=`<button type="button" class="status-button" value="${s.status}">${s.label}</button>`;
+            let row=`<button type="button" class="status-button" value="${Globals.Statuses[s].name}">${Globals.Statuses[s].label}</button>`;
             rows+=row+"\n";
         })
         this.content=this.content.replace("$STATUSBUTTONS$",rows);
@@ -95,13 +95,11 @@ class BonWall {
         let tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
         let tomorrowStr = tomorrow.toISOString().split('T')[0];
         let self = this;
-        Globals.myConfig.myRepo.searchBons({ afterDate: todayStr, beforeDate: tomorrowStr }, (bons) => {
+        Globals.myConfig.myRepo.searchBons({ afterDate: todayStr, beforeDate: tomorrowStr,status:this.statusFilter.join(",") }, (bons) => {
             bons.forEach(b => {
-                if (self.manageStatus.find(e => (e === b.status))) {
-                    Globals.myConfig.myRepo.getOrders(b.id, (orders) => {
-                        self.addBon(b, orders);
-                    })
-                }
+                Globals.myConfig.myRepo.getOrders(b.id, (orders) => {
+                    self.addBon(b, orders);
+                })
             })
         })
 
@@ -109,13 +107,11 @@ class BonWall {
 
     getAllBons() {
         let self = this;
-        Globals.myConfig.myRepo.searchBons({ }, (bons) => {
+        Globals.myConfig.myRepo.searchBons({status:this.statusFilter.join(",") }, (bons) => {
             bons.forEach(b => {
-                if (self.manageStatus.find(e => (e === b.status))) {
-                    Globals.myConfig.myRepo.getOrders(b.id, (orders) => {
-                        self.addBon(b, orders);
-                    })
-                }
+                Globals.myConfig.myRepo.getOrders(b.id, (orders) => {
+                    self.addBon(b, orders);
+                })
             })
         })
 

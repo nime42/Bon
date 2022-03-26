@@ -19,6 +19,48 @@ class Globals {
             "x-Levering",
             "x- Service"
         ]
+    static Statuses={
+        new:{
+            name:"new",
+            label:"Ny",
+            color:"lightgrey"
+        },
+        needInfo:{
+            name:"needInfo",
+            label:"Venter Info",
+            color:"yellow"
+        },
+        approved:{
+            name:"approved",
+            label:"Godkendt",
+            color:"lightgreen"
+        },
+        preparing:{
+            name:"preparing",
+            label:"Prep",
+            color:"lightgreen"
+        },
+        done:{
+            name:"done",
+            label:"Klar",
+            color:"lightgreen"
+        },
+        delivered:{
+            name:"delivered",
+            label:"Lev",
+            color:"white"
+        },
+        invoiced:{
+            name:"invoiced",
+            label:"Faktureret",
+            color:"mediumpurple"
+        },
+        offer:{
+            name:"offer",
+            label:"Tilbud",
+            color:"lightblue"
+        },
+    }
     
 
 }

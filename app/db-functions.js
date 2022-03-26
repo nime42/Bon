@@ -13,7 +13,7 @@ function getBons(year, month, callback = console.log) {
 
   let sql = `
     select 
-      b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,
+      b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,b.kitchen_selects,b.customer_collects,
       a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,
       c.forename,c.surname,c.email,c.phone_nr,
       co.name,co.ean_nr,
@@ -70,6 +70,24 @@ function getBons(year, month, callback = console.log) {
 
 
 function searchBons(searchParams,callback = console.log) {
+
+  let statuses=['new', 'needInfo', 'approved', 'preparing', 'done', 'delivered', 'invoiced', 'offer'];
+  let statusSearchConstr;
+  if(searchParams.status) {
+    let elems=[];
+    searchParams.status.split(",").forEach(s=>{
+      let elem=s.trim();
+      if(statuses.indexOf(elem)>=0) {
+        elems.push(elem);
+      } else {
+        throw "Unknown status:"+elem;
+      }
+    });
+    statusSearchConstr="b.status in ('"+elems.join("','")+"')";
+  } else {
+    statusSearchConstr="1=1";
+  }
+  
   ["bonId","status","status2","afterDate","beforeDate"].forEach(p=>{
     if(!searchParams[p]) {
       searchParams[p]=null;
@@ -77,7 +95,7 @@ function searchBons(searchParams,callback = console.log) {
   })
   let sql = `
   select 
-    b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,
+    b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,b.kitchen_selects,b.customer_collects,
     a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,
     c.forename,c.surname,c.email,c.phone_nr,
     co.name,co.ean_nr,
@@ -87,7 +105,7 @@ function searchBons(searchParams,callback = console.log) {
    left join customers c on b.customer_id =c.id
    left join companies co on c.company_id =co.id
    left join addresses co_a on co_a.id=co.address_id
-   where b.id=ifnull(@bonId,b.id) and b.status=ifnull(@status,b.status) and b.status2=ifnull(@status2,b.status2)
+   where b.id=ifnull(@bonId,b.id) and ${statusSearchConstr} and b.status2=ifnull(@status2,b.status2)
     and b.delivery_date>=ifnull(@afterDate,b.delivery_date) and b.delivery_date<=ifnull(@beforeDate,b.delivery_date)
   order by b.delivery_date
   `;
@@ -152,7 +170,7 @@ function createBon(bonData, callback = console.log) {
   console.log(bonData.orders);
   bonData.delivery_address_id = createAddress(bonData.delivery_address);
   let sql =
-    "INSERT INTO bons(status, status2,customer_info, customer_id,delivery_address_id, delivery_date, nr_of_servings, kitchen_info, service_type, payment_type,price_category) VALUES(@status, @status2,@customer_info, @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings, @kitchen_info, @service_type, @payment_type,@price_category);";
+    "INSERT INTO bons(status, status2,customer_info, customer_id,delivery_address_id, delivery_date, nr_of_servings,kitchen_selects,customer_collects, kitchen_info, service_type, payment_type,price_category) VALUES(@status, @status2,@customer_info, @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings,@kitchen_selects,@customer_collects, @kitchen_info, @service_type, @payment_type,@price_category);";
   try {
     const res = db.prepare(sql).run(bonData);
     let newBonId = res.lastInsertRowid;
@@ -174,7 +192,9 @@ function updateBon(id, bonData, callback = console.log) {
     customer_id=@customer_id,
     delivery_address_id=@delivery_address_id, 
     delivery_date=@delivery_date, 
-    nr_of_servings=@nr_of_servings, 
+    nr_of_servings=@nr_of_servings,
+    kitchen_selects=@kitchen_selects,
+    customer_collects=@customer_collects,
     customer_info=@customer_info, 
     kitchen_info=@kitchen_info, 
     service_type=@service_type, 

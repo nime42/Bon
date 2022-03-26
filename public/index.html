@@ -144,33 +144,13 @@
     </div>
 
     <script>
-        let kitchenStatuses=[
-            {
-                status:"preparing",
-                label:"Prep"
-            },
-            {
-                status:"done",
-                label:"Klar"
-            },
-            {
-                status:"delivered",
-                label:"Leveret"
-            }
 
-        ];
-        let invoiceStatuses=[
-        {
-                status:"invoiced",
-                label:"Fakturered"
-            },           
-        ]
         Globals.myCalender=new BonCalendar("#calendar");
         Globals.myConfig=new BonConfig("#admin");
-        Globals.myKitchenBonWall=new BonWall("#kitchen","approved",kitchenStatuses,["preparing","done"]);
+        Globals.myKitchenBonWall=new BonWall("#kitchen",Globals.Statuses["approved"].name,["preparing","done"],["preparing","done","delivered"]);
         Globals.myKitchenBonWall.getBonsForToday();
 
-        Globals.myInvoiceBonWall=new BonWall("#invoice","delivered",invoiceStatuses,["preparing","done"]);
+        Globals.myInvoiceBonWall=new BonWall("#invoice",Globals.Statuses["delivered"].name,["preparing","done"],["invoiced"]);
         Globals.myInvoiceBonWall.getAllBons();
         
 </script>
