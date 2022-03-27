@@ -192,26 +192,27 @@ class BonStrip {
             Køkkenet vælger
             <input onclick="return false;" type="checkbox" id="kitchen-selects" value="1" style="margin-left: 5px;">
             </label>
-          
-
-
             </div>
         </fieldset>
-
-        <br>
-
         <fieldset id="kitchen-field">
             <legend>Kökken info</legend>
             <span id="kitchenInfoText"></span>
         </fieldset>
-        <br>
+
+      
+
         <div id="orders"></div>
         <br>
         <div>
         <span style="font-style: italic;font-weight: bold;font-family: sans-serif;">Sum:</span>
         <span id="total-sum" class="price-box">0.00 kr</span>
         </div>
+        <div id="add-items" style="display:none">
         <br>
+        <i id="show-items-list" class="fa fa-plus-square" style="font-size:20px; color:${this.foreground}"></i>        
+        <div id="items-list" style="display:none"/>
+        </div>
+        
 
 
     </div>    
@@ -301,6 +302,8 @@ class BonStrip {
             self.orderConfigPopup.hide();
             self.currentOrder=undefined;
             self.updateTotalSum();
+
+            self.saveOrders && self.saveOrders();
         };
 
 
@@ -309,6 +312,7 @@ class BonStrip {
                 self.myOrders.removeElem(self.currentOrder);
                 self.currentOrder=undefined;
                 self.updateTotalSum();
+                self.saveOrders && self.saveOrders();
             }
             self.orderConfigPopup.hide();
         };  
@@ -320,6 +324,8 @@ class BonStrip {
 
 
         this.orderConfigPopup=new ModalPopup();
+
+
     }
 
  
@@ -339,6 +345,36 @@ class BonStrip {
         }
         this.updateTotalSum();
 
+        this._makeEditable(bon);
+
+    }
+
+    _makeEditable(bon) {
+
+        let itemslistElem = this.myDiv.querySelector("#items-list");
+
+        this.myItemsList = new ItemsList(itemslistElem);
+        this.myItemsList.updateItems(bon.price_category);
+        this.myItemsList.SetOnItemClick((item) => {
+            this.configureOrder(1, item.name, "", item.id, item.price, item.cost_price, item.category);
+        });
+        
+
+
+
+        this.myDiv.querySelector("#add-items").style.display="";
+        this.myDiv.querySelector("#show-items-list").onclick=() => {
+            if(itemslistElem.style.display=="none") {
+                itemslistElem.style.display=""
+            } else {
+                itemslistElem.style.display="none";
+            }
+        }
+        this.saveOrders=()=>{
+            console.log("saving bon " +bon.id,this.getOrders());
+            Globals.myConfig.myRepo.updateOrders(bon.id,this.getOrders());
+
+        }
 
 
     }
@@ -481,7 +517,11 @@ class BonStrip {
 
     calculateTotalSum() {
         let sum=this.getOrders().reduce((tot,order)=>{
-            return tot+(order.quantity*order.price)
+            let s=(order.quantity*order.price);
+            if(isNaN(s)) {
+                s=0;
+            }
+            return tot+s;
         },0);
         return sum;
 

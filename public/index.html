@@ -17,7 +17,8 @@
     <script src="js/AutocompleteClass.js"></script>
     <script src="js/BonCalendar.js"></script>
     <script src="js/BonStrip.js"></script>
-    <script src="js/helpers.js"></script>   
+    <script src="js/helpers.js"></script>
+    <script src="js/ItemsList.js"></script>     
     <script src="js/BonForm.js"></script>
     <script src="js/BonRepository.js"></script>
     <script src="js/BonConfig.js"></script>
@@ -100,6 +101,12 @@
             background: var(--secondary-color);
         }
 
+        .hidden {
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s 2s, opacity 2s linear;
+        }
+
     </style>
     <script>
         function toggleMenu(elem) {
@@ -117,9 +124,9 @@
 
     <nav>
         <a href="#login-tab" class="nav-menu active" onclick="toggleMenu(this)"><i class="fa fa-key"></i></a>
-        <a href="#calendar-tab" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-home"></i></a>
-        <a href="#kitchen-tab" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-cutlery"></i></a>
-        <a href="#invoice-tab" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-money"></i></a>
+        <a href="#calendar-tab" class="nav-menu" onclick="toggleMenu(this);Globals.myCalender.refresh()"><i class="fa fa-home"></i></a>
+        <a href="#kitchen-tab" class="nav-menu" onclick="toggleMenu(this);Globals.myKitchenBonWall.getBonsForToday();"><i class="fa fa-cutlery"></i></a>
+        <a href="#invoice-tab" class="nav-menu" onclick="toggleMenu(this);Globals.myInvoiceBonWall.getAllBons();"><i class="fa fa-money"></i></a>
         <a href="#admin-tab" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-wrench"></i></a>
 
     </nav>
@@ -147,10 +154,10 @@
 
         Globals.myCalender=new BonCalendar("#calendar");
         Globals.myConfig=new BonConfig("#admin");
-        Globals.myKitchenBonWall=new BonWall("#kitchen",Globals.Statuses["approved"].name,["preparing","done"],["preparing","done","delivered"]);
+        Globals.myKitchenBonWall=new BonWall("#kitchen","approved",["preparing","done"],["preparing","done","delivered"]);
         Globals.myKitchenBonWall.getBonsForToday();
 
-        Globals.myInvoiceBonWall=new BonWall("#invoice",Globals.Statuses["delivered"].name,["preparing","done"],["invoiced"]);
+        Globals.myInvoiceBonWall=new BonWall("#invoice","delivered",["preparing","done"],["invoiced"]);
         Globals.myInvoiceBonWall.getAllBons();
         
 </script>

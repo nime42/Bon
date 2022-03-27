@@ -39,4 +39,7 @@ class BonCalendar {
 
 
     }
+    refresh() {
+        this.myCalendar.changeMonth(0);
+    }
 }

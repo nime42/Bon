@@ -197,6 +197,11 @@ app.get("/orders/:id",(req,res) => {
     })   
 })
 
+app.put("/orders/:id",(req,res) => {
+    db.saveOrders(req.params.id,req.body);
+    res.sendStatus(200);
+})
+
 
 app.put("/items",(req,res) => {
     let items=req.body;

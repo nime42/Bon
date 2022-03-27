@@ -483,6 +483,7 @@ module.exports = {
   updateItems: updateItems,
   deleteItems: deleteItems,
   getOrders: getOrders,
+  saveOrders:saveOrders,
   searchBons:searchBons,
   updateBonStatus:updateBonStatus
 };

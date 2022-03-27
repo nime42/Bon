@@ -89,5 +89,17 @@ class BonRepository {
     }
 
 
+    updateOrders(id,orders,callback) {
+        let url="orders/"+id;
+        $.ajax({
+            type: "PUT",
+            url: url,
+            data: JSON.stringify(orders),
+            success: callback,
+            dataType: "json",
+            contentType: "application/json"
+          });
+    }
+
 
 }

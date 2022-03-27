@@ -265,7 +265,8 @@ miscTab=`
         this.myTabs.addTab("Varer",this.itemsTab);
         this.myTabs.addTab("Øvrig info",this.miscTab);
 
-        this.myItems=new VertTabsClass(this.myDiv.querySelector("#items"));
+        //this.myItems=new VertTabsClass(this.myDiv.querySelector("#items"));
+        this.myItems = new ItemsList(this.myDiv.querySelector("#items"));
 
         this.myBonStrip=new BonStrip(this.myDiv.querySelector("#bon-strip"));
         this.myBonStrip.updateNameOnChange(form.querySelector("#forename"),form.querySelector("#surname"));
@@ -276,7 +277,9 @@ miscTab=`
         this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"));
         this.myBonStrip.updateKitchenSelectsOnChange(form.querySelector("#kitchen_selects"));
 
-
+        this.myItems.SetOnItemClick((item)=>{
+            this.myBonStrip.configureOrder(1,item.name,"",item.id,item.price,item.cost_price,item.category);
+        })
 
         form.querySelector("#save").onclick=function() {
             let props=Helper.getFormProps(form);
@@ -389,44 +392,7 @@ miscTab=`
     updateItems() {
         this.updatePriceCategories();
         let currentPrice=this.getCurrentPriceCategory();
-
-        let currentItemTabIndex=this.myItems.getActiveTabIndex();
-        this.myItems.clearAll();
-        let self=this;
-        let categories={};
-        Globals.myConfig.myItems.forEach(i=>{
-            if(i.sellable) {
-                if(!categories[i.category]) {
-                    categories[i.category]=[];
-                }
-                categories[i.category].push({name:i.name,id:i.id,cost_price:i.cost_price,prices:Globals.myConfig.price_lookup[i.id].price_categories});
-            }
-        })
-
-        Object.keys(categories).forEach((k)=>{
-            let content=document.createElement("div");
-            content.style.minWidth="150px";
-
-            categories[k].forEach((n)=>{
-                let button=document.createElement("button");
-                button.style.width="100%";
-                button.style.marginBottom="3px";
-                let price=n.prices[currentPrice];
-                button.innerHTML=n.name +" ("+price+" kr)";
-                button.onclick=()=>{
-                    this.selectOrder(n.name,n.id,n.cost_price,k);
-                    return false;
-                }
-                content.appendChild(button);
-                content.appendChild(document.createElement("br"));
-                
-            })
-            this.myItems.addTab(k,content);
-
-        })
-
-        this.myItems.setActiveTabIndex(currentItemTabIndex);
-       
+        this.myItems.updateItems(currentPrice);
 
     }
     updatePriceCategories() {
@@ -457,20 +423,12 @@ miscTab=`
 
     }
 
-    getCurrentPrice(id) {
-        let currentPriceCategory=this.getCurrentPriceCategory();
-        return Globals.myConfig.price_lookup[id].price_categories[currentPriceCategory];
-
-    }
 
 
 
 
-    selectOrder(name,id,cost_price,category) {
-        let currentPrice=this.getCurrentPrice(id);
-        this.myBonStrip.configureOrder(1,name,"",id,currentPrice,cost_price,category);
 
-    }
+
 
 
     createBonLabelAndcolor(bon) {

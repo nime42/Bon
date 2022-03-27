@@ -3,17 +3,6 @@ class BonWall {
     foreground=Globals.foreground;
     shadowColor=Globals.shadowColor;
 
-    style=`
-    <style>
-        .bon-wall .status-button {
-        }
-        .bon-wall .status-button.active {
-            background:${this.foreground};
-        }
-
-
-    </style>
-    `
 
     content=`
     <div id=status-row style="padding: 10px; border: 2px solid ${this.foreground};border-radius:3px 3px">
@@ -25,6 +14,7 @@ class BonWall {
     constructor(div,startStatus,statusFilter,statusButtons) {
         this._createStatusRow(statusButtons);
         this.startStatus=startStatus;
+        this.endStatus=statusButtons[statusButtons.length-1];
         this.statusFilter=statusFilter;
         this.statusFilter.push(startStatus);
         let parent;
@@ -36,7 +26,6 @@ class BonWall {
 
         this.myDiv=document.createElement("div");
         this.myDiv.classList.add("bon-wall");
-        this.myDiv.innerHTML=this.style;
         this.myDiv.style.cssText=`display: flex;flex-wrap: wrap; background:${this.background};width:100%;height: 100%;margin-top: 10%;margin-left: 10%;` ;
         parent.appendChild(this.myDiv);
     }
@@ -55,11 +44,13 @@ class BonWall {
         let div=document.createElement("div");
         div.style.cssText="margin:10px";
         div.innerHTML=this.content;
+        let color=Globals.Statuses[bon.status].color;
         
         let self=this
         div.querySelectorAll(".status-button").forEach(e=>{
             if(e.value===bon.status) {
                 e.classList.add("active");
+                e.style.background=color;
             }
             e.onclick=(evt)=>{
                 self.clickStatus(bon.id,evt.target);
@@ -74,22 +65,53 @@ class BonWall {
     }
 
     clickStatus(id,elem) {
+        if(this.cancelFunction) {
+            this.cancelFunction();
+        }
         let isActive=elem.classList.contains("active");
         let status=elem.value;
+        let color=Globals.Statuses[status].color;
         
         elem.parentElement.querySelectorAll(".status-button").forEach(e=>{
             e.classList.remove("active");
+            e.style.background="";
         });
         if(!isActive) {
             elem.classList.add("active");
+            elem.style.background=color;
         } else {
             status=this.startStatus;
         }
         Globals.myConfig.myRepo.updateBonStatus(id,status,(status)=>{});
         
+        if(status==this.endStatus) {
+            this._fadeout(elem);
+        }
+    }
+
+    _fadeout(elem) {
+        let bonDiv=elem.parentElement.parentElement;
+        let t=3;
+        let orgStyle=bonDiv.style.cssText;
+        let style=`
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s ${t}s, opacity ${t}s linear;      
+        `;
+        bonDiv.style.cssText+=style;
+
+        let timer=setTimeout(()=>{bonDiv.remove();}, t*1000);
+
+        this.cancelFunction=() => {
+            clearTimeout(timer);
+            bonDiv.style.cssText=orgStyle;
+            this.cancelFunction=undefined;
+        }
+    
     }
 
     getBonsForToday() {
+        this.myDiv.innerHTML="";
         let today = new Date();
         let todayStr = today.toISOString().split('T')[0];
         let tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
@@ -106,6 +128,7 @@ class BonWall {
     }
 
     getAllBons() {
+        this.myDiv.innerHTML="";
         let self = this;
         Globals.myConfig.myRepo.searchBons({status:this.statusFilter.join(",") }, (bons) => {
             bons.forEach(b => {

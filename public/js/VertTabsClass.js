@@ -1,5 +1,8 @@
 class VertTabsClass {
     background=Globals.background;
+    foreground=Globals.foreground;
+    shadowColor=Globals.shadowColor;
+    
     div = `
     <style>
     .vert-tab #tabs {
@@ -8,6 +11,7 @@ class VertTabsClass {
     }
     .vert-tab div {
         background: ${this.background};
+        font-size:small;
     }
 
     .vert-tab .tab {
