@@ -82,15 +82,17 @@ class BonWall {
         } else {
             status=this.startStatus;
         }
-        Globals.myConfig.myRepo.updateBonStatus(id,status,(status)=>{});
         
         if(status==this.endStatus) {
-            this._fadeout(elem);
+            this._fadeout(elem,id,status);
+        } else {
+            Globals.myConfig.myRepo.updateBonStatus(id,status,(status)=>{});
         }
     }
 
-    _fadeout(elem) {
-        let bonDiv=elem.parentElement.parentElement;
+    _fadeout(elem,id,status) {
+        let parentDiv=elem.parentElement.parentElement;
+        let bonDiv=elem.parentElement.nextElementSibling;
         let t=3;
         let orgStyle=bonDiv.style.cssText;
         let style=`
@@ -100,7 +102,10 @@ class BonWall {
         `;
         bonDiv.style.cssText+=style;
 
-        let timer=setTimeout(()=>{bonDiv.remove();}, t*1000);
+        let timer=setTimeout(()=>{
+            Globals.myConfig.myRepo.updateBonStatus(id,status,(status)=>{});
+            parentDiv.remove();
+        }, t*1000);
 
         this.cancelFunction=() => {
             clearTimeout(timer);
@@ -127,6 +132,25 @@ class BonWall {
 
     }
 
+    getFutureBons() {
+        this.myDiv.innerHTML="";
+
+        let tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate()+1);        
+        let tomorrowStr = tomorrow.toISOString().split('T')[0];
+        let self = this;
+        Globals.myConfig.myRepo.searchBons({ afterDate: tomorrowStr, status:this.statusFilter.join(",") }, (bons) => {
+            bons.forEach(b => {
+                Globals.myConfig.myRepo.getOrders(b.id, (orders) => {
+                    self.addBon(b, orders);
+                })
+            })
+        })
+
+    }
+
+
+
     getAllBons() {
         this.myDiv.innerHTML="";
         let self = this;
@@ -137,6 +161,5 @@ class BonWall {
                 })
             })
         })
-
     }    
 }

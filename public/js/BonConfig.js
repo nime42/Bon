@@ -190,7 +190,9 @@ class BonConfig {
 
     getItemsFromDB(callback) {
         this.myRepo.getItems(items=>{
+            this.cachedItems=items;
             this.myRepo.getItemsPrices(prices=>{
+                this.cachedPrices=prices;
                 this.price_lookup={};
                 this.myItems=items.filter(e=>(e.sellable));
                 prices.items.forEach(e=>{this.price_lookup[e.id]=e;});
@@ -207,7 +209,9 @@ class BonConfig {
         
         
         this.myRepo.getItems(items=>{
+            this.cachedItems=items;
             this.myRepo.getItemsPrices(prices=>{
+                this.cachedPrices=prices;
                 self.createItemsTable(items,prices);
             })
         })

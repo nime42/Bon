@@ -101,11 +101,7 @@
             background: var(--secondary-color);
         }
 
-        .hidden {
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0s 2s, opacity 2s linear;
-        }
+
 
     </style>
     <script>
@@ -123,11 +119,13 @@
 <body>
 
     <nav>
-        <a href="#login-tab" class="nav-menu active" onclick="toggleMenu(this)"><i class="fa fa-key"></i></a>
-        <a href="#calendar-tab" class="nav-menu" onclick="toggleMenu(this);Globals.myCalender.refresh()"><i class="fa fa-home"></i></a>
-        <a href="#kitchen-tab" class="nav-menu" onclick="toggleMenu(this);Globals.myKitchenBonWall.getBonsForToday();"><i class="fa fa-cutlery"></i></a>
-        <a href="#invoice-tab" class="nav-menu" onclick="toggleMenu(this);Globals.myInvoiceBonWall.getAllBons();"><i class="fa fa-money"></i></a>
-        <a href="#admin-tab" class="nav-menu" onclick="toggleMenu(this)"><i class="fa fa-wrench"></i></a>
+        <a href="#login-tab" class="nav-menu active" title="Login" onclick="toggleMenu(this)"><i class="fa fa-key"></i></a>
+        <a href="#calendar-tab" class="nav-menu" title="Kalender" onclick="toggleMenu(this);Globals.myCalender.refresh()"><i class="fa fa-home"></i></a>
+        <a href="#kitchen-tab" class="nav-menu" title="Kökken vy idag" onclick="toggleMenu(this);Globals.myKitchenBonWall.getBonsForToday();"><i class="fa fa-cutlery"></i></a>
+        <a href="#future-tab" class="nav-menu" title="Senare" onclick="toggleMenu(this);Globals.myFutureBonWall.getFutureBons();"><i class="fa fa-sun-o"></i></a>
+
+        <a href="#invoice-tab" class="nav-menu" title="Fakturer" onclick="toggleMenu(this);Globals.myInvoiceBonWall.getAllBons();"><i class="fa fa-money"></i></a>
+        <a href="#admin-tab" class="nav-menu" title="Admin" onclick="toggleMenu(this)"><i class="fa fa-wrench"></i></a>
 
     </nav>
 
@@ -142,6 +140,9 @@
         <section id='kitchen-tab'>
             <div id="kitchen"></div>
         </section>
+        <section id='future-tab'>
+            <div id="future"></div>
+        </section>        
         <section id='invoice-tab'>
             <div id="invoice"></div>
         </section>
@@ -159,6 +160,10 @@
 
         Globals.myInvoiceBonWall=new BonWall("#invoice","delivered",["preparing","done"],["invoiced"]);
         Globals.myInvoiceBonWall.getAllBons();
+
+        Globals.myFutureBonWall=new BonWall("#future","new",["needInfo","preparing"],[]);
+        Globals.myFutureBonWall.getFutureBons();
+        
         
 </script>
 

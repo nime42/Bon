@@ -56,11 +56,27 @@ class ItemsList {
 
     }
 
+    _getAllItems(callback) {
+        if(Globals.myConfig.cachedItems) {
+            callback(Globals.myConfig.cachedItems)
+        } else {
+            this.myRepo.getItems(callback);
+        }
+    }
+
+    _getAllPrices(callback) {
+        if(Globals.myConfig.cachedPrices) {
+            callback(Globals.myConfig.cachedPrices)
+        } else {
+            this.myRepo.getItemsPrices(callback);
+        }        
+    }
+
     updateItems(priceCategory) {
         let currentItemTabIndex=this.myItemCategories.getActiveTabIndex();
         this.myItemCategories.clearAll();
-        this.myRepo.getItems(items=>{
-            this.myRepo.getItemsPrices(prices=>{
+        this._getAllItems(items=>{
+            this._getAllPrices(prices=>{
                 this.myItems=items.filter(e=>(e.sellable));
                 let price_lookup={};
                 prices.items.forEach(e=>{price_lookup[e.id]=e;});
