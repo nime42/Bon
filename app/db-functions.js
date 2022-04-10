@@ -13,7 +13,7 @@ function getBons(year, month, callback = console.log) {
 
   let sql = `
     select 
-      b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,b.kitchen_selects,b.customer_collects,
+      b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,
       a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,
       c.forename,c.surname,c.email,c.phone_nr,
       co.name,co.ean_nr,
@@ -95,7 +95,7 @@ function searchBons(searchParams,callback = console.log) {
   })
   let sql = `
   select 
-    b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,b.kitchen_selects,b.customer_collects,
+    b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,
     a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,
     c.forename,c.surname,c.email,c.phone_nr,
     co.name,co.ean_nr,

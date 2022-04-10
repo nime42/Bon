@@ -1,5 +1,9 @@
 ssh bon@172.105.84.13
 
 
+bon@ristedrug.dk
+
+
+
 https://grocytest.ristetrug.dk/
 nils/???

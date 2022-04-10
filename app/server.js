@@ -37,6 +37,13 @@ var db=require('./db-functions.js');
 
 var grocy=require('./grocy-functions.js');
 
+var mailSender=require("./mailSender.js");
+mailSender.init(config.mail);
+
+var loginHandler=require("./LoginHandler/loginHandler");
+
+loginHandler.init(app,config.userDB,mailSender.sendMail,config.forgotPasswordMailTemplate);
+
 
 app.get("/shutdown",(req,res) => {
     var isLocal = (req.connection.localAddress === req.connection.remoteAddress);
@@ -93,9 +100,6 @@ app.put("/bons/:id",(req,res) => {
 app.put("/bonStatus/:id",(req,res) => {
     db.updateBonStatus(req.params.id,req.body.status,function(status,msg) {
         if(status) {  
-            if(req.body.status=="delivered") {
-                consumeBon(req.params.id);
-            }
             res.sendStatus(200);
  
         } else {
@@ -107,6 +111,7 @@ app.put("/bonStatus/:id",(req,res) => {
 })
 
 app.delete("/bons/:id",(req,res) => {
+
     db.delBon(req.params.id,function(status,err){
         if(status) { 
             res.sendStatus(200);  
@@ -117,6 +122,13 @@ app.delete("/bons/:id",(req,res) => {
 
         }
     })       
+
+})
+
+
+app.put("/consumeBon/:id",(req,res) => {
+    consumeBon(req.params.id);
+    res.sendStatus(200);  
 
 })
 
@@ -231,22 +243,26 @@ app.delete("/items/:id",(req,res) => {
 })
 
 app.get("/updateDB", (req, res) => {
-  grocy.getAllRecipes((status, data) => {
-    if (status) {
-      db.updateItems(data, function (status2, err) {
-        if (status2) {
-          res.sendStatus(200);
-        } else {
-          console.log("updateDB updateItems", err);
-          res.sendStatus(500);
-        }
-      });
-    } else {
-        console.log("updateDB getAllRecepies", err);
-        res.sendStatus(500);
-
+    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+        res.sendStatus(401);
+        return;
     }
-  });
+    grocy.getAllRecipes((status, data) => {
+        if (status) {
+            db.updateItems(data, function (status2, err) {
+                if (status2) {
+                    res.sendStatus(200);
+                } else {
+                    console.log("updateDB updateItems", err);
+                    res.sendStatus(500);
+                }
+            });
+        } else {
+            console.log("updateDB getAllRecepies", err);
+            res.sendStatus(500);
+
+        }
+    });
 });
 
 app.get("/searchBons",(req,res) => {

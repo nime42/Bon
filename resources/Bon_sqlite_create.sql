@@ -1,62 +1,8 @@
 --https://app.dbdesigner.net/designer/schema/486863
 
-CREATE TABLE bon (
-	id integer PRIMARY KEY AUTOINCREMENT,
-	status text,
-	status2 text,
-	customer_id integer,
-	delivery_date datetime,
-	nr_of_servings integer,
-	info text,
-	payment_type integer,
-	service_type text,
-	FOREIGN KEY (
-        customer_id
-    )
-    REFERENCES customers (id) ON DELETE NO ACTION
-                          ON UPDATE NO ACTION,
-	FOREIGN KEY (
-        payment_type_id
-    )
-    REFERENCES payment_types (id) ON DELETE NO ACTION
-                          ON UPDATE NO ACTION
-	
-						  
-);
+-- addresses definition
 
-CREATE TABLE customers (
-	id integer PRIMARY KEY AUTOINCREMENT,
-	forname text,
-	surname text,
-	company_id integer,
-	email text,
-	phone_nr text,
-	address_id integer,
-	FOREIGN KEY (
-        company_id
-    )
-    REFERENCES companies (id) ON DELETE NO ACTION
-                          ON UPDATE NO ACTION,
-	FOREIGN KEY (
-			address_id
-		)
-	REFERENCES addresses (id) ON DELETE NO ACTION
-					ON UPDATE NO ACTION						  
-);
-
-CREATE TABLE company (
-	id integer PRIMARY KEY AUTOINCREMENT,
-	name text,
-	address_id integer,
-	ean_nr text,
-	FOREIGN KEY (
-			address_id
-		)
-	REFERENCES addresses (id) ON DELETE NO ACTION
-					ON UPDATE NO ACTION			
-);
-
-CREATE TABLE Addresses (
+CREATE TABLE addresses (
 	id integer PRIMARY KEY AUTOINCREMENT,
 	street_name text,
 	street_name2 text,
@@ -65,32 +11,68 @@ CREATE TABLE Addresses (
 	city text
 );
 
-CREATE TABLE payment_types (
-	id integer PRIMARY KEY AUTOINCREMENT,
-	name text,
-	info text
-);
+CREATE UNIQUE INDEX addresses_u_idx on addresses(
+street_name COLLATE NOCASE,
+street_name2 COLLATE NOCASE,
+street_nr COLLATE NOCASE,
+zip_code,city  COLLATE NOCASE);
+
+
+-- items definition
 
 CREATE TABLE items (
-	id integer PRIMARY KEY AUTOINCREMENT,
-	name text,
-	category text,
-	cost_price numeric,
-	sellable integer
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT,
+	category TEXT,
+	cost_price number,
+	sellable INTEGER,
+	external_id INTEGER
 );
 
-CREATE TABLE order (
-	bon_id integer,
-	item_id integer,
-	price numeric,
-	quantity integer,
-	special_request text,
-	sort_order integer,
+CREATE UNIQUE INDEX items_external_id_IDX ON items (external_id);
+
+
+-- companies definition
+
+CREATE TABLE companies (
+	id integer PRIMARY KEY AUTOINCREMENT,
+	name text,
+	address_id integer,
+	ean_nr text,
 	FOREIGN KEY (
-        bon_id
-    )
-	REFERENCES bon (id) ON DELETE CASCADE
-					ON UPDATE NO ACTION,	
+			address_id
+		)
+	REFERENCES addresses (id) ON DELETE set null
+					ON UPDATE NO ACTION			
+);
+
+CREATE UNIQUE INDEX companies_u_idx on companies(name COLLATE NOCASE);
+
+
+-- customers definition
+
+CREATE TABLE customers (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	forename TEXT,
+	surname TEXT,
+	email TEXT,
+	phone_nr TEXT,
+	company_id Integer,
+	CONSTRAINT FK_customers_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE set null
+);
+
+CREATE UNIQUE INDEX customers_u_idx on customers( 
+	email COLLATE NOCASE 
+
+);
+
+
+-- salesprice_categories definition
+
+CREATE TABLE salesprice_categories (
+	item_id integer,
+	price_category text,
+	price numeric,
 	FOREIGN KEY (
         item_id
     )
@@ -99,10 +81,45 @@ CREATE TABLE order (
 	
 );
 
+CREATE UNIQUE INDEX salesprice_categories_u_idx ON salesprice_categories (item_id,price_category);
 
 
+-- bons definition
+
+CREATE TABLE bons (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	status TEXT,
+	status2 TEXT,
+	customer_id INTEGER,
+	delivery_date DATETIME,
+	delivery_address_id INTEGER,
+	nr_of_servings INTEGER,
+	customer_info TEXT,
+	service_type TEXT,
+	payment_type TEXT, kitchen_info TEXT, price_category TEXT, kitchen_selects INTEGER DEFAULT 0 NOT NULL, customer_collects INTEGER DEFAULT 0, 
+	CONSTRAINT FK_bons_customers FOREIGN KEY (customer_id) REFERENCES customers(id),
+	CONSTRAINT FK_customers_addresses FOREIGN KEY (delivery_address_id) REFERENCES Addresses(id) ON DELETE set null
+);
 
 
+-- orders definition
 
-
-
+CREATE TABLE orders (
+	bon_id integer,
+	item_id integer,
+	price numeric,
+	quantity integer,
+	special_request text,
+	sorting_order integer, cost_price NUMERIC,
+	FOREIGN KEY (
+        bon_id
+    )
+	REFERENCES "bons" (id) ON DELETE CASCADE
+					ON UPDATE NO ACTION,	
+	FOREIGN KEY (
+        item_id
+    )
+	REFERENCES items (id) ON DELETE CASCADE
+					ON UPDATE NO ACTION
+	
+);

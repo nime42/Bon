@@ -229,13 +229,22 @@ itemsTab=`
 <span>
 <br>
 <div>
-<input type="text" id="nr_of_servings" name="nr_of_servings" placeholder="Antal Pax" autocomplete="nope" style="vertical-align: top; margin-right:5px"> 
+<span style="margin-right: 5px;color: ${this.foreground};">Pax:</span><input type="text" id="nr_of_servings" name="nr_of_servings" placeholder="Pax" autocomplete="nope" style="vertical-align: top; margin-right:5px;width: 10%;"> 
 <select name="price_category" id="price-categories"></select>
+<select name="payment_type" id="payment-types">
+    <option disabled >Betaling...</option>
+    <option>Kontant</option>
+    <option>Faktura</option>
+    <option>EAN nr</option>
+
+</select>
+
   <br><br>
-  <label>
+  <label style="color:${this.foreground}">
   Køkkenet vælger
   <input type="checkbox" id="kitchen_selects" name="kitchen_selects" value="1" style="margin-left: 5px;">
   </label>
+  
   <br>
 </div>
 <textarea name="customer_info" placeholder="Kunde Önsker" rows="2" autocomplete="nope" ></textarea>
@@ -275,6 +284,7 @@ miscTab=`
         this.myBonStrip.updateDateAndTimeOnChange(form.querySelector("#date"),form.querySelector("#time"));
         this.myBonStrip.updateKitchenInfoOnChange(form.querySelector("#kitchen_info"));
         this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"));
+        this.myBonStrip.updatePaymentTypeOnChange(form.querySelector("#payment-types"));
         this.myBonStrip.updateKitchenSelectsOnChange(form.querySelector("#kitchen_selects"));
 
         this.myItems.SetOnItemClick((item)=>{
@@ -476,10 +486,10 @@ miscTab=`
         bon.kitchen_selects=props.kitchen_selects;
         bon.customer_collects=props.customer_collects;
         bon.price_category=props.price_category;
+        bon.payment_type=props.payment_type;
         bon.customer_info= props.customer_info;
         bon.kitchen_info= props.kitchen_info;
         bon.service_type=null;
-        bon.payment_type=null;
     
 
 
@@ -566,6 +576,9 @@ miscTab=`
         form.querySelector("input[name=kitchen_selects]").onchange();
         form.querySelector("select[name=price_category]").value=bon.price_category;
         form.querySelector("select[name=price_category]").onchange();
+        form.querySelector("select[name=payment_type]").value=bon.payment_type;
+        form.querySelector("select[name=payment_type]").onchange();
+
         form.querySelector("textarea[name=customer_info]").value=bon.customer_info;
         form.querySelector("textarea[name=kitchen_info]").value=bon.kitchen_info;
 

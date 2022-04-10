@@ -184,6 +184,11 @@ class BonStrip {
         </fieldset>
 
         <fieldset>
+        <legend>Betaling</legend>
+        <span id="payment-type" class="field-content" style="float: left;font-weight: bold;font-style: italic;padding-left: 10px;">Kontant</span>
+        </fieldset>
+
+        <fieldset>
             <legend>Pax <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
             <div class="field-content">
             <span id="pax" style="float: left;font-weight: bold;font-style: italic;padding-left: 10px;"></span>
@@ -207,6 +212,7 @@ class BonStrip {
         <span style="font-style: italic;font-weight: bold;font-family: sans-serif;">Sum:</span>
         <span id="total-sum" class="price-box">0.00 kr</span>
         </div>
+
         <div id="add-items" style="display:none">
         <br>
         <i id="show-items-list" class="fa fa-plus-square" style="font-size:20px; color:${this.foreground}"></i>        
@@ -653,6 +659,13 @@ class BonStrip {
             this.myDiv.querySelector("#pax").innerHTML=paxElem.value;
         }
         paxElem.oninput=f;
+    }
+
+    updatePaymentTypeOnChange(paymentElem) {
+        let f=()=> {
+            this.myDiv.querySelector("#payment-type").innerHTML=paymentElem.value;
+        }
+        paymentElem.onchange=f;
     }
 
     updateKitchenSelectsOnChange(kitchenSelectsElem) {

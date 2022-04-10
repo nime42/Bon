@@ -3,6 +3,8 @@ class Globals {
     static foreground="#8e631f";
     static background="#f1e6b2";
     static shadowColor="#446e74";
+
+    static grocyLink="https://grocytest.ristetrug.dk/";
     
 
     static AttributesForItems= {

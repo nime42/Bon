@@ -69,6 +69,27 @@ function getProductIdsForRecipies(recipeIds, result, callback = console.log) {
 
 }
 
+function consumeProducts(quantity, products, result, callback = console.log) {
+    console.log("consumeProducts", quantity, products, result);
+    if (products.length == 0) {
+        callback(result);
+        return;
+    }
+    let p = products[0];
+    consumeProduct(p.product_id, quantity * parseFloat(p.amount), (status, actual_amount) => {
+        p.actual_amount = actual_amount;
+        consumeProducts(quantity, products.slice(1), result.concat(p), callback);
+    })
+
+}
+
+function consumeItem2(quantity, recipe_external_id,callback=console.log) {
+    getAllProducts(recipe_external_id, (products) => {
+        //console.log("consumeItem2",products);
+        consumeProducts(quantity,products,[],callback);
+    })
+}
+//consumeItem2(2,29);
 
 function consumeItem(quantity, recipe_external_id) {
     getAllProducts(recipe_external_id, (products) => {
@@ -88,7 +109,15 @@ function consumeItem(quantity, recipe_external_id) {
 }
 
 
-
+/**
+ * Withdraw an amount of a product from grocy
+ * 
+ * @param {*} productId the grocy product-id
+ * @param {*} quantityAmount total amount of the product
+ * @param {*} callback fun(status,consumed_amount)
+ *                          status - true if call succeeded
+ *                          consumed_amount - total amount consumed, total amount consumed from grocy. 
+ */
 
 function consumeProduct(productId, quantityAmount, callback = console.log) {
     let httpReq = config.grocy.url + "/api/stock/products/" + productId + "?GROCY-API-KEY=" + config.grocy.apiKey;
@@ -98,10 +127,10 @@ function consumeProduct(productId, quantityAmount, callback = console.log) {
             json => {
 
                 let stock_amount = json.stock_amount;
-                let consume_amount = quantityAmount < stock_amount ? quantityAmount : stock_amount;
+                let consumed_amount = quantityAmount < stock_amount ? quantityAmount : stock_amount;
                 httpReq = config.grocy.url + "/api/stock/products/" + productId + "/consume" + "?GROCY-API-KEY=" + config.grocy.apiKey;
                 let body = {
-                    "amount": consume_amount,
+                    "amount": consumed_amount,
                     "transaction_type": "consume",
                     "spoiled": false
                 };
@@ -116,7 +145,7 @@ function consumeProduct(productId, quantityAmount, callback = console.log) {
                         method: "POST",
                         body: JSON.stringify(body)
                     })
-                    .then(function (res) { callback(true, consume_amount)})
+                    .then(function (res) { callback(true, consumed_amount)})
                     .catch(function (res) {callback(false, 0) })
 
 
