@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 
 var sessionHandler = require('./sessionHandler.js');
 var db = require('./dbFunctions.js');
+const dbFunctions = require('./dbFunctions.js');
 
 var mailSender=undefined;
 var forgottenPasswordMailTemplate=undefined;
@@ -34,6 +35,12 @@ function init(app,dbFile,mailfunc,mailTemplate) {
     })
 
     app.post('/register', (req, res) => {
+
+        if (!haveRoles(req, ["ADMIN"], "ALL")) {
+            res.sendStatus(401);
+            return;
+        }
+
         var username = req.body.username;
         try {
             db.getDbInstance().transaction(() => {
@@ -41,8 +48,18 @@ function init(app,dbFile,mailfunc,mailTemplate) {
                     if (status) {
                         db.updateUserInfo(id, req.body, function (status, err) {
                             if (status) {
-                                sessionHandler.addSession(req, res, id);
-                                res.sendStatus(200);
+                                if(req.body.roles) {
+                                    db.updateRoles(id,req.body.roles,function(status) {
+                                        if(status) {
+                                            res.sendStatus(200);
+                                        } else {
+                                            res.sendStatus(500);
+                                            throw "rollback";
+                                        }
+                                    });
+                                } else {
+                                    res.sendStatus(200);
+                                }
                             } else {
                                 res.sendStatus(500);
                                 throw "rollback";
@@ -162,18 +179,17 @@ function init(app,dbFile,mailfunc,mailTemplate) {
         }
 
 
-        if(req.body.userId) {
-            if(req.body.userId!==userId) {
+        if(req.body.userid) {
+            if(req.body.userid!==userId) {
                 if (!haveRoles(req, ["ADMIN"], "ALL")) {
                     res.sendStatus(401);
                     return;
                 } else {
-                    userId=req.body.userId;  
+                    userId=req.body.userid;  
                 }
 
             }
         }
-
         db.updateUserInfo(userId, req.body, function (status, err) {
             if (status) {
                 res.sendStatus(200);
@@ -187,15 +203,24 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
 
 
-
-    
-
-    app.put('/updateRoles', (req, res) => {
+    app.get('/roles/:id', (req, res) => {
         if (!haveRoles(req, ["ADMIN"], "ALL")) {
             res.sendStatus(401);
             return;
         }
-        let userId=req.body.userId;
+
+        let roles=dbFunctions.getRoles(req.params.id);
+        res.json(roles);
+
+    })
+    
+
+    app.put('/updateRoles/:id', (req, res) => {
+        if (!haveRoles(req, ["ADMIN"], "ALL")) {
+            res.sendStatus(401);
+            return;
+        }
+        let userId=req.params.id;
         let roles=req.body.roles;
         db.updateRoles(userId,roles,function (status, error) {
             if (status) {
@@ -210,6 +235,41 @@ function init(app,dbFile,mailfunc,mailTemplate) {
     })
 
 
+
+    app.get('/getUsers', (req, res) => {
+        if (!haveRoles(req, ["ADMIN"], "ALL")) {
+            res.sendStatus(401);
+            return;
+        }
+        db.getUsers(function (status, rows) {
+            if (status) {
+                res.json(rows);
+            } else {
+                console.log('getusers');
+                res.sendStatus(500);
+
+            }
+        });
+
+    })    
+
+
+    app.get('/getAllRoles', (req, res) => {
+        if (!haveRoles(req, ["ADMIN"], "ALL")) {
+            res.sendStatus(401);
+            return;
+        }
+        db.getAllRoles(function (status, rows) {
+            if (status) {
+                res.json(rows);
+            } else {
+                console.log('getAllRoles');
+                res.sendStatus(500);
+
+            }
+        });
+
+    }) 
 
 
 

@@ -94,9 +94,25 @@ function getUserInfo(userId, callback=console.log) {
     }
 }
 
+
+function getUsers(callback=console.log) {
+    const rows = db.prepare('SELECT * FROM v_userinfo order by username').all();
+    
+
+    if (rows !== undefined) {
+        rows.forEach(r=>{
+            delete r.password;
+        })
+        callback(true, rows);
+    } else {
+        callback(false);
+    }
+}
+
+
 function getAllRoles(callback=console.log) {
     const rows = db.prepare('SELECT * FROM roles').all();
-    callback(rows);
+    callback(true,rows);
 
 }
 
@@ -186,5 +202,7 @@ module.exports = {
     updateRoles:updateRoles,
     getRoles:getRoles,
     createPassWordResetToken:createPassWordResetToken,
-    getUserInfoByUserNameOrEmailOrPhone:getUserInfoByUserNameOrEmailOrPhone
+    getUserInfoByUserNameOrEmailOrPhone:getUserInfoByUserNameOrEmailOrPhone,
+    getUsers:getUsers,
+    getAllRoles:getAllRoles
 }

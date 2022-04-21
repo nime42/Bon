@@ -70,7 +70,7 @@ class TabsClass {
         this.myDiv.classList.add("hori-tab");
     }
 
-    addTab(header, content) {
+    addTab(header, content,onclick) {
         let headerElem = document.createElement("button");
         headerElem.classList.add("tablinks");
         headerElem.innerHTML = header;
@@ -97,6 +97,7 @@ class TabsClass {
             self.myDiv.querySelector(".content-container").children.item(tabNr).style.display="block";
 
             self.currentIndex=tabNr;
+            onclick && onclick();
             return false;
         }
         if(this.tabs===0) {

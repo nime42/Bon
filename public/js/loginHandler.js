@@ -255,6 +255,52 @@ class LoginHandler {
 
     }
 
+    createUser(userParams,callback) {
+        $.ajax({
+            type: "POST",
+            url: "register",
+            cache: false,
+            data: userParams,
+            success: function (data, status, jqxhr) {
+               callback(true,data);
+            },
+            error: function (data, status, jqxhr) {
+                callback(false,data);
+            }
+
+        });
+    }
+
+    updateUser(userParams,callback) {
+        $.ajax({
+            type: "POST",
+            url: "updateInfo",
+            cache: false,
+            data: userParams,
+            success: function (data, status, jqxhr) {
+               callback(true,data);
+            },
+            error: function (data, status, jqxhr) {
+                callback(false,data);
+            }
+
+        });
+    }
+
+
+
+    getAllUsers(callback) {
+
+        let url="getUsers/";
+        $.get(url,callback);
+    }
+
+    getAllRoles(callback) {
+
+        let url="getAllRoles/";
+        $.get(url,callback);
+    }
+
 
     isResetRequest() {
         let urlVars = this._getUrlVars();
@@ -305,6 +351,29 @@ class LoginHandler {
     getUserInfo(callback) {
         let url = "getUserInfo";
         $.get(url, callback);
+    }
+
+    getUserRoles(id,callback) {
+        let url="roles/"+id;
+        $.get(url, callback);
+    }
+
+    updateUserRoles(id,roles,callback) {
+        let url="updateRoles/"+id;
+        let body={roles:roles};
+
+        $.ajax({
+            type: "PUT",
+            url: url,
+            data: JSON.stringify(body),
+            success: function (data, status, jqxhr) {
+                callback(true,data);
+             },
+             error: function (data, status, jqxhr) {
+                 callback(false,data);
+             },
+            contentType: "application/json"
+          });
     }
 
     populateUserInfoForm(form) {
