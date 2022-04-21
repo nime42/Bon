@@ -4,7 +4,7 @@ class Globals {
     static background="#f1e6b2";
     static shadowColor="#446e74";
 
-    static grocyLink="https://grocytest.ristetrug.dk/";
+    static grocyLink="${config.grocy.url}"; //this value is replaced from resources/config.js by replaceFromConfig.js
     
 
     static AttributesForItems= {

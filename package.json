@@ -15,7 +15,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app/server.js",
-    "shutdown": "curl --silent --fail --show-error \"http://localhost:8080/shutdown\""
+    "shutdown": "node app/shutdown.js",
+    "replaceClientVars": "node app/replaceFromConfig.js ./public/js/globals.js"
   },
   "author": "Nils Meinhard",
   "license": "ISC"
