@@ -292,6 +292,9 @@ class BonStrip {
             if(self.currentOrder) {
                 self.currentOrder.querySelector("#quantity").innerText=quantity;
                 self.currentOrder.querySelector("#total-cost").innerText=(quantity*price)+" kr";
+                if(self.hidePrice) {
+                    self.currentOrder.querySelector("#total-cost").style.display="none";
+                }
                 self.currentOrder.querySelector("#comment").innerText=comment;
                 if(comment!=="") {
                     self.currentOrder.querySelector("#comment").style.display="";
@@ -377,8 +380,7 @@ class BonStrip {
             }
         }
         this.saveOrders=()=>{
-            console.log("saving bon " +bon.id,this.getOrders());
-            Globals.myConfig.myRepo.updateOrders(bon.id,this.getOrders());
+            Globals.myConfig.myRepo.updateOrders(bon.id,this.getOrders().orders);
 
         }
 
@@ -400,6 +402,9 @@ class BonStrip {
         let order=document.createElement("div"); 
         order.classList.add("order");
         order.innerHTML=tmp;
+        if(this.hidePrice) {
+            order.querySelector("#total-cost").style.display="none";
+        }
 
         let self=this;
         order.onclick=() => {
@@ -494,25 +499,45 @@ class BonStrip {
             //Maybe update cost_price also
             order.querySelector("#price").value=newPrice;
             order.querySelector("#total-cost").innerText=(quantity*newPrice).toFixed(2)+" kr";
+            if(this.hidePrice) {
+                order.querySelector("#total-cost").style.display="none";
+            }            
 
         });
         this.updateTotalSum();
 
     }
 
+    hidePrices() {
+        this.hidePrice=true;
+        this.myDiv.querySelector("#orders").querySelectorAll("#total-cost").forEach(e=>{
+            e.style.display="none";
+        })
+    }
+
     getOrders() {
-        let res=[];
-        return Array.from(this.myOrders.getElems()).map(order=>{
+        let totCostPrice=0;
+        let totPrice=0;
+        let orders=Array.from(this.myOrders.getElems()).map(order=>{
+            let costPrice=order.querySelector("#cost_price").value;
+            let price=order.querySelector("#price").value;
+
+            totCostPrice+=costPrice!=undefined?costPrice:0;
+            totPrice+=price!=undefined?price:0;
            return {
             quantity:order.querySelector("#quantity").innerText,
             name:order.querySelector("#order-name").innerText,
             comment:order.querySelector("#comment").innerText,
             id:order.querySelector("#item-id").value,
-            price:order.querySelector("#price").value,
-            cost_price:order.querySelector("#cost_price").value
+            price:price,
+            cost_price:costPrice
             }
-
         })
+        return {
+            orders:orders,
+            totPrice:totPrice,
+            totCostPrice:totCostPrice
+        }
 
     }
 
@@ -522,7 +547,7 @@ class BonStrip {
     }
 
     calculateTotalSum() {
-        let sum=this.getOrders().reduce((tot,order)=>{
+        let sum=this.getOrders().orders.reduce((tot,order)=>{
             let s=(order.quantity*order.price);
             if(isNaN(s)) {
                 s=0;
@@ -680,6 +705,7 @@ class BonStrip {
             e.innerText="";
         })
         this.myOrders.clear();
+        this.updateTotalSum();
     }
 
 

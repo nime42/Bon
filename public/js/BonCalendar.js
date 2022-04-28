@@ -5,20 +5,48 @@ class BonCalendar {
         this.myPopup = new ModalPopup();
         this.myCalendar = new CalendarClass("#calendar");
         this.myRepo = new BonRepository();
-        this.myBonForm = new BonForm(this.myPopup, this.myCalendar, this.myRepo);
+        this.myBonForm = new BonForm(this.myPopup, this.myRepo);
         //this.myBonForm.updateItems();
         let self=this;
 
         this.myCalendar.setOnDateClick((date, calObj) => {
             date.setHours(12);
-            self.myBonForm.init({
-                eventTime: date
+            self.myBonForm.initFromDate(date,(event,arg1,arg2,arg3) => {
+                if(event==="saved") {
+                    let bon=arg1;
+                    let [label,statusColor]=self.myBonForm.createBonLabelAndcolor(bon);
+                    self.myCalendar.addEvent(bon.delivery_date,label,statusColor,bon);
+                }
+
+
+            
             });
-            self.myPopup.show(self.myBonForm.getForm());
         });
+
         this.myCalendar.setOnEventClick((eventElem, eventData) => {
-            self.myBonForm.init(eventData, eventElem);
-            self.myPopup.show(self.myBonForm.getForm());
+            self.myBonForm.initFromBonId(eventData.misc.id,(event,arg1,arg2,arg3) => {
+                let bon,label,statusColor;
+                switch(event) {
+                    case "saved":
+                        bon=arg1;
+                        [label,statusColor]=self.myBonForm.createBonLabelAndcolor(bon);
+                        self.myCalendar.updateEvent(eventElem,bon.delivery_date,label,statusColor,bon);
+                        break;
+                    case "copied":
+                        bon=arg1;
+                        [label,statusColor]=self.myBonForm.createBonLabelAndcolor(bon);
+                        self.myCalendar.addEvent(bon.delivery_date,label,statusColor,bon);
+                        break;
+                    case "deleted":
+                        self.myCalendar.deleteEvent(eventElem);
+
+
+
+                }
+                console.log(event);
+            })
+            //self.myBonForm.init(eventData, eventElem);
+            //self.myPopup.show(self.myBonForm.getForm());
         });
 
 

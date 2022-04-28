@@ -57,6 +57,12 @@ class Globals {
             label:"Faktureret",
             color:"mediumpurple"
         },
+        closed:{
+            name:"closed",
+            label:"Afslutet",
+            color:"red"
+        },
+
         offer:{
             name:"offer",
             label:"Tilbud",

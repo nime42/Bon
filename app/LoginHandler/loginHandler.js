@@ -271,8 +271,28 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
     }) 
 
+    app.delete("/user/:id",(req,res) => {
+
+        
+        if (!haveRoles(req, ["ADMIN"], "ALL")) {
+            res.sendStatus(401);
+            return;
+        }
+
+        db.deleteUser(req.params.id,function(status,err){
+            if(status) { 
+                res.sendStatus(200);  
+     
+            } else {
+                console.log("deleteUser",err);
+                res.sendStatus(500);  
+    
+            }
+        })      
+    
 
 
+    })
 }
 
 

@@ -68,6 +68,35 @@ function getBons(year, month, callback = console.log) {
   }
 }
 
+function getBonSummary(bonId) {
+let sql=`
+with boninfo as (select 
+  b.id,b.delivery_date,b.status,b.nr_of_servings,
+  b.price_category,b.payment_type,
+  b.kitchen_selects,b.customer_collects,
+  case b.customer_collects 
+  when true then ''
+  else trim(a.street_name2||' '||a.street_name||' '||a.street_nr||', '||a.zip_code||' '||a.city) end as delivery_adr,
+  c.forename ||' '||c.surname as name,
+  c.email,c.phone_nr,
+  co.name as company,co.ean_nr,
+  o.quantity * o.price as price,
+  o.quantity * o.cost_price cost_price
+from bons b
+ left join addresses a on b.delivery_address_id=a.id
+ left join customers c on b.customer_id =c.id
+ left join companies co on c.company_id =co.id
+ left join addresses co_a on co_a.id=co.address_id
+ left join orders o on b.id=o.bon_id)
+select id,delivery_date,status ,nr_of_servings,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,name,email,phone_nr,company,ean_nr,sum(price) as price,sum(cost_price) as cost_price from boninfo
+where coalesce(?,id)=id
+group by id order by id desc
+`;
+
+return rows = db.prepare(sql).all(bonId);
+
+
+}
 
 function searchBons(searchParams,callback = console.log) {
 
@@ -485,5 +514,6 @@ module.exports = {
   getOrders: getOrders,
   saveOrders:saveOrders,
   searchBons:searchBons,
-  updateBonStatus:updateBonStatus
+  updateBonStatus:updateBonStatus,
+  getBonSummary:getBonSummary
 };

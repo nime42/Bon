@@ -287,7 +287,21 @@ class LoginHandler {
         });
     }
 
+    deleteUser(userId,callback) {
+        $.ajax({
+            type: "DELETE",
+            url: "user/"+userId,
+            cache: false,
+            success: function (data, status, jqxhr) {
+               callback(true,data);
+            },
+            error: function (data, status, jqxhr) {
+                callback(false,data);
+            }
 
+        });
+
+    }
 
     getAllUsers(callback) {
 

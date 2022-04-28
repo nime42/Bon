@@ -61,6 +61,7 @@ class BonWall {
         this.myDiv.appendChild(div);
         let bs=new BonStrip(bonDiv);
         bs.initFromBon(bon,orders);
+        bs.hidePrices();
 
     }
 

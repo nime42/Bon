@@ -70,6 +70,88 @@ app.get("/bons",(req,res) => {
     })   
 })
 
+
+app.get("/bonSummary",(req,res) => {
+    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+        res.sendStatus(401);
+        return;
+    }
+
+    res.json(db.getBonSummary());
+})
+
+
+app.get("/bonSummary/:id",(req,res) => {
+    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+        res.sendStatus(401);
+        return;
+    }
+    let bonId=req.params.id;
+    res.json(db.getBonSummary(bonId));
+})
+
+
+app.get("/bonSummaryFile",(req,res) => {
+    /*if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+        res.sendStatus(401);
+        return;
+    }*/
+
+
+    let rows=[];
+    let headers=[
+        "Id",
+        "Leveringsdato",
+        "Status",
+        "Pax",
+        "Køkkenet vælger",
+        "Leveringsadresse",
+        "Navn",
+        "Mail",
+        "Telefon",
+        "Firma",
+        "EAN",
+        "Betaling",
+        "Priskategorie",
+        "Købspris",
+        "Pris"
+    ];
+    rows.push("\""+headers.join('";"')+"\"");
+    let bons=db.getBonSummary();
+    bons.forEach(b=>{
+        let r=[
+            "#"+b.id,
+            new Date(b.delivery_date).toLocaleString(),
+            b.status,
+            b.nr_of_servings,
+            b.kitchen_selects?"Ja":"Nej",
+            b.customer_collects?"Afhentes":b.delivery_adr,
+            b.name,
+            b.email,
+            b.phone_nr,
+            b.company,
+            b.ean_nr,
+            b.payment_type,
+            b.price_category,
+            b.cost_price?b.cost_price.toFixed(2):0,
+            b.price?b.price.toFixed(2):0
+        ]
+        rows.push("\""+r.join('";"')+"\"");
+   })
+   res.header('Content-Type', 'text/csv');
+   res.header('Content-Encoding: utf-8');
+   res.charset = 'utf-8';
+
+
+   res.send(rows.join("\n"));
+})
+
+
+
+
+
+
+
 app.post("/bons",(req,res) => {
     db.createBon(req.body,function(status,msg) {
         if(status) {  

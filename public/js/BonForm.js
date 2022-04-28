@@ -1,8 +1,8 @@
 class BonForm {
-    background=Globals.background;
-    foreground=Globals.foreground;
-    shadowColor=Globals.shadowColor;
-    content=`
+  background = Globals.background;
+  foreground = Globals.foreground;
+  shadowColor = Globals.shadowColor;
+  content = `
     <div style="background:${this.background};padding:20px;border-radius: 10px;border: 3px solid black;border-style: double; display: flex;flex-direction: row;">
 
     <style type="text/css">
@@ -128,6 +128,8 @@ class BonForm {
     <button type="button" id="${Globals.Statuses["done"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["done"].color}">${Globals.Statuses["done"].label}</button>
     <button type="button" id="${Globals.Statuses["delivered"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["delivered"].color}">${Globals.Statuses["delivered"].label}</button>
     <button type="button" id="${Globals.Statuses["invoiced"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["invoiced"].color}">${Globals.Statuses["invoiced"].label}</button>
+    <button type="button" id="${Globals.Statuses["closed"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["closed"].color}">${Globals.Statuses["closed"].label}</button>
+
     <button type="button" id="${Globals.Statuses["offer"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["offer"].color}">${Globals.Statuses["offer"].label}</button>
     </fieldset>
     <br>
@@ -149,7 +151,7 @@ class BonForm {
     </div> 
     `;
 
-    customerInfoTab=`
+  customerInfoTab = `
     <fieldset>
     <legend>Leveringsdato</legend>
     <span>
@@ -225,7 +227,7 @@ class BonForm {
 </div>      
     `;
 
-itemsTab=`
+  itemsTab = `
 <span>
 <br>
 <div>
@@ -256,411 +258,547 @@ itemsTab=`
 
 `;
 
-miscTab=`
+  miscTab = `
 <div>Øvrig info</div>
 `;
 
-    constructor(popupObj,calendarObj,repoObj) {
-        this.myPopupObj=popupObj;
-        this.myCalendarObj=calendarObj;
-        this.myRepoObj=repoObj;
-        this.myDiv=document.createElement("div");
-        this.myDiv.innerHTML=this.content;
-        let self=this;
-        let form=this.myDiv.querySelector("#order");
+  constructor(popupObj, repoObj) {
+    this.myPopupObj = popupObj;
+    this.myRepoObj = repoObj;
+    this.myDiv = document.createElement("div");
+    this.myDiv.innerHTML = this.content;
+    let self = this;
+    let form = this.myDiv.querySelector("#order");
 
-        this.myTabs=new TabsClass(this.myDiv.querySelector("#order-tabs"));
-        this.myTabs.addTab("Navn og Tid",this.customerInfoTab);
-        this.myTabs.addTab("Varer",this.itemsTab);
-        this.myTabs.addTab("Øvrig info",this.miscTab);
+    this.myTabs = new TabsClass(this.myDiv.querySelector("#order-tabs"));
+    this.myTabs.addTab("Navn og Tid", this.customerInfoTab);
+    this.myTabs.addTab("Varer", this.itemsTab);
+    this.myTabs.addTab("Øvrig info", this.miscTab);
 
-        //this.myItems=new VertTabsClass(this.myDiv.querySelector("#items"));
-        this.myItems = new ItemsList(this.myDiv.querySelector("#items"));
+    //this.myItems=new VertTabsClass(this.myDiv.querySelector("#items"));
+    this.myItems = new ItemsList(this.myDiv.querySelector("#items"));
 
-        this.myBonStrip=new BonStrip(this.myDiv.querySelector("#bon-strip"));
-        this.myBonStrip.updateNameOnChange(form.querySelector("#forename"),form.querySelector("#surname"));
-        this.myBonStrip.updateDeliveryAdrOnChange(form.querySelector("#street_name"),form.querySelector("#street_name2"),form.querySelector("#street_nr"),form.querySelector("#zip_code"),form.querySelector("#city"),form.querySelector("#customer_collects"));
-        this.myBonStrip.updateMailAndPhoneNrOnChange(form.querySelector("#email"),form.querySelector("#phone_nr"));
-        this.myBonStrip.updateDateAndTimeOnChange(form.querySelector("#date"),form.querySelector("#time"));
-        this.myBonStrip.updateKitchenInfoOnChange(form.querySelector("#kitchen_info"));
-        this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"));
-        this.myBonStrip.updatePaymentTypeOnChange(form.querySelector("#payment-types"));
-        this.myBonStrip.updateKitchenSelectsOnChange(form.querySelector("#kitchen_selects"));
+    this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"));
+    this.myBonStrip.updateNameOnChange(
+      form.querySelector("#forename"),
+      form.querySelector("#surname")
+    );
+    this.myBonStrip.updateDeliveryAdrOnChange(
+      form.querySelector("#street_name"),
+      form.querySelector("#street_name2"),
+      form.querySelector("#street_nr"),
+      form.querySelector("#zip_code"),
+      form.querySelector("#city"),
+      form.querySelector("#customer_collects")
+    );
+    this.myBonStrip.updateMailAndPhoneNrOnChange(
+      form.querySelector("#email"),
+      form.querySelector("#phone_nr")
+    );
+    this.myBonStrip.updateDateAndTimeOnChange(
+      form.querySelector("#date"),
+      form.querySelector("#time")
+    );
+    this.myBonStrip.updateKitchenInfoOnChange(
+      form.querySelector("#kitchen_info")
+    );
+    this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"));
+    this.myBonStrip.updatePaymentTypeOnChange(
+      form.querySelector("#payment-types")
+    );
+    this.myBonStrip.updateKitchenSelectsOnChange(
+      form.querySelector("#kitchen_selects")
+    );
 
-        this.myItems.SetOnItemClick((item)=>{
-            this.myBonStrip.configureOrder(1,item.name,"",item.id,item.price,item.cost_price,item.category);
-        })
+    this.myItems.SetOnItemClick((item) => {
+      this.myBonStrip.configureOrder(
+        1,
+        item.name,
+        "",
+        item.id,
+        item.price,
+        item.cost_price,
+        item.category
+      );
+    });
 
-        form.querySelector("#save").onclick=function() {
-            let props=Helper.getFormProps(form);
+    form.querySelector("#save").onclick = function () {
+      let props = Helper.getFormProps(form);
 
-            let bon=self._createBon(props);
-            self.myRepoObj.saveBon(bon,function(bonId) {
-                bon.id=bonId;
-                let [label,statusColor]=self.createBonLabelAndcolor(bon);
-                if(self.currentEvent!==undefined) {
-                    self.myCalendarObj.updateEvent(self.currentEvent,bon.delivery_date,label,statusColor,bon);
-                } else {
-                    self.myCalendarObj.addEvent(bon.delivery_date,label,statusColor,bon);
-                }
-                self.myPopupObj.hide();
-    
+      let bon = self._createBon(props);
+      let isNew = bon.id === undefined;
+      self.myRepoObj.saveBon(bon, function (bonId) {
+          bon.id=bonId;
+        self.onFormClose && self.onFormClose("saved", bon, isNew);
+        self.myPopupObj.hide();
+      });
+    };
 
+    form.querySelector("#cancel").onclick = function (e) {
+      self.onFormClose && self.onFormClose("canceled");
+      self.myPopupObj.hide();
+    };
+
+    form.querySelector("#delete").onclick = function (e) {
+      MessageBox.popup("Vill du verkligen ta bort denna Bon?", {
+        b1: {
+          text: "Ja",
+          onclick: () => {
+            self.myRepoObj.deleteBon(self.currentId, function () {
+              self.onFormClose && self.onFormClose("deleted", self.currentId);
+              self.myPopupObj.hide();
             });
+          },
+        },
+        b2: { text: "Nej" },
+      });
+    };
 
-        }
+    form.querySelector("#copy").onclick = function (e) {
+      let props = Helper.getFormProps(form);
+      let bon = self._createBon(props);
+      bon.id = "";
+      self.myRepoObj.saveBon(bon, function (bonId) {
+        bon.id = bonId;
+        self.onFormClose && self.onFormClose("copied", bon);
+        self.myPopupObj.hide();
+      });
+    };
 
-        form.querySelector("#cancel").onclick=function(e) {
-            self.myPopupObj.hide();
-        };
+    let expandCompanyInfo = form.querySelector("#expand-company-info");
+    let companyInfo = form.querySelector("#company-info");
+    companyInfo.style.display = "none";
 
-        form.querySelector("#delete").onclick=function(e) {
+    expandCompanyInfo.onclick = function (e) {
+      if (expandCompanyInfo.classList.contains("fa-caret-down")) {
+        expandCompanyInfo.classList.remove("fa-caret-down");
+        expandCompanyInfo.classList.add("fa-caret-up");
+        companyInfo.style.display = "";
+      } else {
+        expandCompanyInfo.classList.remove("fa-caret-up");
+        expandCompanyInfo.classList.add("fa-caret-down");
+        companyInfo.style.display = "none";
+      }
+    };
 
-            MessageBox.popup("Vill du verkligen ta bort denna Bon?",
-            {
-                b1:{
-                    text: "Ja",
-                    onclick:()=>{
-                        self.myRepoObj.deleteBon(self.currentEvent.myData.misc.id,function() {
-                            self.myCalendarObj.deleteEvent(self.currentEvent);
-                            self.myPopupObj.hide();
-                        })
-                    }
-                },
-             b2:{text:"Nej"}
-            });
-        };
-
-        form.querySelector("#copy").onclick=function(e) {
-            if(self.currentEvent!==undefined) {
-                let props=Helper.getFormProps(form);
-
-                let bon=self._createBon(props);
-                bon.id="";
-                self.myRepoObj.saveBon(bon,function(bonId) {
-                    bon.id=bonId;
-                    let [label,statusColor]=self.createBonLabelAndcolor(bon);
-
-                    self.myCalendarObj.addEvent(bon.delivery_date,label,statusColor,bon);
-                    self.myPopupObj.hide();
-                })
-
-            }
-        };
-
-        let expandCompanyInfo=form.querySelector("#expand-company-info");
-        let companyInfo=form.querySelector("#company-info");
-        companyInfo.style.display="none";
-
-        expandCompanyInfo.onclick=function(e) {
-            if(expandCompanyInfo.classList.contains('fa-caret-down')) {
-                expandCompanyInfo.classList.remove('fa-caret-down');
-                expandCompanyInfo.classList.add('fa-caret-up');
-                companyInfo.style.display="";
-            } else {
-                expandCompanyInfo.classList.remove('fa-caret-up');
-                expandCompanyInfo.classList.add('fa-caret-down');
-                companyInfo.style.display="none";
-            }
-        }
-
-        form.querySelectorAll(".status-button").forEach(e=>{
-            e.onclick=(event)=>{
-                form.querySelectorAll(".status-button").forEach(s=>{
-                    s.style.background="";
-                    s.classList.remove("active");
-                });
-                let elem=event.target;
-                elem.style.background=elem.dataset["activeBackground"];
-                elem.classList.add("active");
-            }
-        })
-
-        this.customer_mail_autocomplete=new AutoCompleteClass(form.querySelector("#email"));
-        this.customer_mail_autocomplete.typingFunction=(text)=> {
-           self.myRepoObj.getCustomers(text,(customers)=>{
-                self.customer_mail_autocomplete.setOptions(customers.map(c=>({value:c.email,data:c})));
-           })
-            return undefined;
-        }
-        this.customer_mail_autocomplete.onSelect=(option)=>{
-            form.querySelector("#email")
-            self._customerToForm(option.data,form,true);
-            self._copyCompanyAddress2Delivery(form,true);
-        }
-
-
-        form.querySelector("#price-categories").onchange=function() {
-            self.updateItems();
-        }
-
-    }
-
-
-    
-
-    updateItems() {
-        this.updatePriceCategories();
-        let currentPrice=this.getCurrentPriceCategory();
-        this.myItems.updateItems(currentPrice);
-
-    }
-    updatePriceCategories() {
-        let select=this.myDiv.querySelector("#price-categories");
-        let currentSelected=select.value;
-        select.innerHTML="";
-        let option = document.createElement("option");
-        option.text = "Pris kategorie...";
-        option.disabled=true;
-        select.add(option);
-
-        Globals.myConfig.priceCategories.forEach(c=>{
-            option = document.createElement("option");
-            option.text=c;
-            select.add(option);
-
+    form.querySelectorAll(".status-button").forEach((e) => {
+      e.onclick = (event) => {
+        form.querySelectorAll(".status-button").forEach((s) => {
+          s.style.background = "";
+          s.classList.remove("active");
         });
-        select.value=currentSelected!=""?currentSelected:select.options[select.selectedIndex].value;
+        let elem = event.target;
+        elem.style.background = elem.dataset["activeBackground"];
+        elem.classList.add("active");
+      };
+    });
 
-        this.myBonStrip.updatePricesFromCategory(select.value);
-        
-        return select.value;
+    this.customer_mail_autocomplete = new AutoCompleteClass(
+      form.querySelector("#email")
+    );
+    this.customer_mail_autocomplete.typingFunction = (text) => {
+      self.myRepoObj.getCustomers(text, (customers) => {
+        self.customer_mail_autocomplete.setOptions(
+          customers.map((c) => ({ value: c.email, data: c }))
+        );
+      });
+      return undefined;
+    };
+    this.customer_mail_autocomplete.onSelect = (option) => {
+      form.querySelector("#email");
+      self._customerToForm(option.data, form, true);
+      self._copyCompanyAddress2Delivery(form, true);
+    };
+
+    form.querySelector("#price-categories").onchange = function () {
+      self.updateItems();
+    };
+  }
+
+  updateItems() {
+    this.updatePriceCategories();
+    let currentPrice = this.getCurrentPriceCategory();
+    this.myItems.updateItems(currentPrice);
+  }
+  updatePriceCategories() {
+    let select = this.myDiv.querySelector("#price-categories");
+    let currentSelected = select.value;
+    select.innerHTML = "";
+    let option = document.createElement("option");
+    option.text = "Pris kategorie...";
+    option.disabled = true;
+    select.add(option);
+
+    Globals.myConfig.priceCategories.forEach((c) => {
+      option = document.createElement("option");
+      option.text = c;
+      select.add(option);
+    });
+    select.value =
+      currentSelected != ""
+        ? currentSelected
+        : select.options[select.selectedIndex].value;
+
+    this.myBonStrip.updatePricesFromCategory(select.value);
+
+    return select.value;
+  }
+
+  getCurrentPriceCategory() {
+    let select = this.myDiv.querySelector("#price-categories");
+    return select.value;
+  }
+
+  createBonLabelAndcolor(bon) {
+    let statusColor = this.getStatusColor(bon.status);
+    let timeStr =
+      bon.delivery_date.getHours().toString().padStart(2, "0") +
+      "." +
+      bon.delivery_date.getMinutes().toString().padStart(2, "0");
+    let label =
+      timeStr +
+      ", #" +
+      bon.id +
+      ", Pax= " +
+      (bon.nr_of_servings != "" ? bon.nr_of_servings : 0);
+    return [label, statusColor];
+  }
+
+  _getStatus() {
+    let form = this.myDiv.querySelector("#order");
+    let elem = form.querySelector(".status-button.active");
+    if (elem) {
+      return Globals.Statuses[elem.getAttribute("id")].name;
+    } else {
+      return "";
     }
+  }
 
-    getCurrentPriceCategory() {
-        let select=this.myDiv.querySelector("#price-categories");
-        return select.value;
+  getStatusColor(status) {
+    return Globals.Statuses[status]
+      ? Globals.Statuses[status].color
+      : "lightgreen";
+  }
 
+  _setStatus(status) {
+    let form = this.myDiv.querySelector("#order");
+    form.querySelectorAll(".status-button").forEach((s) => {
+      s.style.background = "";
+      s.classList.remove("active");
+    });
+    try {
+      let elem = form.querySelector("#" + status);
+      elem.click();
+    } catch (err) {}
+  }
+
+  _createBon(props) {
+    let bon = {};
+    bon.id = props.bon_id;
+    bon.delivery_date = new Date(
+      props.delivery_date + "T" + props.delivery_time
+    );
+    bon.status = this._getStatus();
+    bon.status2 = "";
+    bon.nr_of_servings = props.nr_of_servings;
+    bon.kitchen_selects = props.kitchen_selects;
+    bon.customer_collects = props.customer_collects;
+    bon.price_category = props.price_category;
+    bon.payment_type = props.payment_type;
+    bon.customer_info = props.customer_info;
+    bon.kitchen_info = props.kitchen_info;
+    bon.service_type = null;
+
+    bon.customer = {};
+    bon.customer.forename = props.forename;
+    bon.customer.surname = props.surname;
+    bon.customer.email = props.email;
+    bon.customer.phone_nr = props.phone_nr;
+    bon.customer.company = {};
+    bon.customer.company.name = props.company_name;
+    bon.customer.company.ean_nr = props.ean_nr;
+    bon.customer.company.address = {};
+    bon.customer.company.address.street_name = props.company_street_name;
+    bon.customer.company.address.street_name2 = props.company_street_name2;
+    bon.customer.company.address.street_nr = props.company_street_nr;
+    bon.customer.company.address.city = props.company_city;
+    bon.customer.company.address.zip_code = props.company_zip_code;
+
+    bon.delivery_address = {};
+    bon.delivery_address.street_name = props.street_name;
+    bon.delivery_address.street_name2 = props.street_name2;
+    bon.delivery_address.street_nr = props.street_nr;
+    bon.delivery_address.city = props.city;
+    bon.delivery_address.zip_code = props.zip_code;
+
+    let orderInfo=this.myBonStrip.getOrders();
+    bon.orders = orderInfo.orders;
+    bon.price=orderInfo.totPrice;
+    bon.cost_price=orderInfo.totCostPrice;
+
+
+    return bon;
+  }
+
+  _customerToForm(customer, form, merge) {
+    this._updateOrMerge(
+      form.querySelector("input[name=email]"),
+      customer.email,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=forename]"),
+      customer.forename,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=surname]"),
+      customer.surname,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=phone_nr]"),
+      customer.phone_nr,
+      merge
+    );
+
+    this._updateOrMerge(
+      form.querySelector("input[name=company_name]"),
+      customer.company.name,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=ean_nr]"),
+      customer.company.ean_nr,
+      merge
+    );
+
+    this._updateOrMerge(
+      form.querySelector("input[name=company_street_name]"),
+      customer.company.address.street_name,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=company_street_name2]"),
+      customer.company.address.street_name2,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=company_street_nr]"),
+      customer.company.address.street_nr,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=company_city]"),
+      customer.company.address.city,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=company_zip_code]"),
+      customer.company.address.zip_code,
+      merge
+    );
+  }
+  _copyCompanyAddress2Delivery(form, merge) {
+    this._updateOrMerge(
+      form.querySelector("input[name=street_name]"),
+      form.querySelector("input[name=company_street_name]").value,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=street_name2]"),
+      form.querySelector("input[name=company_street_name2]").value,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=street_nr]"),
+      form.querySelector("input[name=company_street_nr]").value,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=city]"),
+      form.querySelector("input[name=company_city]").value,
+      merge
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=zip_code]"),
+      form.querySelector("input[name=company_zip_code]").value,
+      merge
+    );
+  }
+
+  _updateOrMerge(elem, val, merge) {
+    if (merge && elem.value.trim() == "") {
+      elem.value = val;
+    } else if (!merge) {
+      elem.value = val;
     }
+    try {
+      elem.oninput();
+    } catch (err) {}
+  }
 
+  _bonToForm(bon, formDiv) {
+    this.myBonStrip.clear();
 
+    let form = this.myDiv.querySelector(formDiv);
 
+    let date = new Date(bon.delivery_date);
+    this._setFormDate(date, formDiv);
 
+    this._customerToForm(bon.customer, form);
 
+    form.querySelector("input[name=bon_id]").value = bon.id;
+    form.querySelector("input[name=nr_of_servings]").value = bon.nr_of_servings;
+    form.querySelector("input[name=nr_of_servings]").oninput();
+    form.querySelector("input[name=customer_collects]").checked =
+      bon.customer_collects;
+    form.querySelector("input[name=kitchen_selects]").checked =
+      bon.kitchen_selects;
+    form.querySelector("input[name=kitchen_selects]").onchange();
+    form.querySelector("select[name=price_category]").value =
+      bon.price_category;
+    form.querySelector("select[name=price_category]").onchange();
+    form.querySelector("select[name=payment_type]").value = bon.payment_type;
+    form.querySelector("select[name=payment_type]").onchange();
 
+    form.querySelector("textarea[name=customer_info]").value =
+      bon.customer_info;
+    form.querySelector("textarea[name=kitchen_info]").value = bon.kitchen_info;
 
+    this._updateOrMerge(
+      form.querySelector("textarea[name=kitchen_info]"),
+      bon.kitchen_info
+    );
 
+    this._updateOrMerge(
+      form.querySelector("input[name=street_name]"),
+      bon.delivery_address.street_name
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=street_name2]"),
+      bon.delivery_address.street_name2
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=street_nr]"),
+      bon.delivery_address.street_nr
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=city]"),
+      bon.delivery_address.city
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=zip_code]"),
+      bon.delivery_address.zip_code
+    );
 
-    createBonLabelAndcolor(bon) {
-        let statusColor=this.getStatusColor(bon.status);
-        let timeStr=bon.delivery_date.getHours().toString().padStart(2,"0")+"."+bon.delivery_date.getMinutes().toString().padStart(2,"0");
-        let label=timeStr+", #"+bon.id+", Pax= "+(bon.nr_of_servings!=""?bon.nr_of_servings:0);
-        return [label,statusColor];
+    this._setStatus(bon.status !== "" ? bon.status : "new");
 
+    this.myBonStrip.setBonId(bon.id);
+
+    this.myRepoObj.getOrders(bon.id, (orders) => {
+      orders.forEach((o) => {
+        this.myBonStrip.addOrder(
+          o.quantity,
+          o.name,
+          o.special_request,
+          o.item_id,
+          o.price,
+          o.cost_price,
+          o.category
+        );
+      });
+      this.myBonStrip.updateTotalSum();
+    });
+  }
+
+  _setFormDate(date, formDiv) {
+    let form = this.myDiv.querySelector(formDiv);
+    let yearStr = date.getFullYear() + "";
+    let monthStr = (date.getMonth() + 1 + "").padStart(2, "0");
+    let dayStr = (date.getDate() + "").padStart(2, "0");
+    let hourStr = (date.getHours() + "").padStart(2, "0");
+    let minuteStr = (date.getMinutes() + "").padStart(2, "0");
+
+    this._updateOrMerge(
+      form.querySelector("input[name=delivery_date]"),
+      yearStr + "-" + monthStr + "-" + dayStr
+    );
+    this._updateOrMerge(
+      form.querySelector("input[name=delivery_time]"),
+      hourStr + ":" + minuteStr
+    );
+  }
+
+  init(content, eventElem) {
+    this._clear();
+
+    this.currentEvent = eventElem;
+
+    let display = "none";
+    let eventData = undefined;
+    if (eventElem !== undefined) {
+      eventData = eventElem.myData;
+      display = "";
+      this._bonToForm(eventData.misc, "#order");
+    } else {
+      this._setFormDate(new Date(content.eventTime), "#order");
+      this._setStatus(Globals.Statuses["new"].name);
+      this.myBonStrip.setBonId("");
+      this.myBonStrip.clear();
     }
+    this.myDiv.querySelectorAll(".for-update").forEach((e) => {
+      e.style.display = display;
+    });
+  }
 
-    _getStatus() {
-        let form=this.myDiv.querySelector("#order");
-        let elem=form.querySelector(".status-button.active");
-        if(elem) {
-            return Globals.Statuses[elem.getAttribute("id")].name;
-        } else {
-            return "";
-        }
-    }
+  initFromBonId(id, onClose) {
+    this._clear();
+    this.onFormClose = onClose;
+    this.currentId = id;
 
-    getStatusColor(status) {
-        return Globals.Statuses[status]?Globals.Statuses[status].color:"lightgreen";
-    }
+    this.myRepoObj.searchBons({ bonId: id }, (bons) => {
+      let bonData = bons[0];
+      this._bonToForm(bonData, "#order");
+      this.myDiv.querySelectorAll(".for-update").forEach((e) => {
+        e.style.display = "";
+      });
+      this.myPopupObj.show(this.getForm());
+    });
+  }
 
-    _setStatus(status) {
-        let form=this.myDiv.querySelector("#order");
-        form.querySelectorAll(".status-button").forEach(s=>{
-            s.style.background="";
-            s.classList.remove("active");
-        });
+  initFromDate(date, onClose) {
+    this._clear();
+    this.onFormClose = onClose;
+
+    this._setFormDate(date, "#order");
+    this._setStatus(Globals.Statuses["new"].name);
+    this.myBonStrip.setBonId("");
+    this.myBonStrip.clear();
+    this.myDiv.querySelectorAll(".for-update").forEach((e) => {
+      e.style.display = "none";
+    });
+    this.myPopupObj.show(this.getForm());
+  }
+
+  _clear() {
+    this.myDiv.querySelectorAll("#order input,textarea").forEach((e) => {
+      let name = e.getAttribute("name");
+      if (name !== null) {
+        e.value = "";
         try {
-            let elem=form.querySelector("#"+status);
-            elem.click();
-        } catch(err) {
-        }
-    }
+          e.oninput();
+        } catch (err) {}
+      }
+    });
 
-    _createBon(props) {
-        let bon={};
-        bon.id=props.bon_id;
-        bon.delivery_date=new Date(props.delivery_date+"T"+props.delivery_time);
-        bon.status=this._getStatus();
-        bon.status2="";
-        bon.nr_of_servings=props.nr_of_servings;
-        bon.kitchen_selects=props.kitchen_selects;
-        bon.customer_collects=props.customer_collects;
-        bon.price_category=props.price_category;
-        bon.payment_type=props.payment_type;
-        bon.customer_info= props.customer_info;
-        bon.kitchen_info= props.kitchen_info;
-        bon.service_type=null;
-    
+    this.myDiv.querySelectorAll(".for-update").forEach((e) => {
+      e.style.display = "none";
+    });
+    this.customer_mail_autocomplete.clearOptions();
+  }
 
-
-
-        bon.customer={};
-        bon.customer.forename=props.forename;
-        bon.customer.surname=props.surname;
-        bon.customer.email=props.email;
-        bon.customer.phone_nr=props.phone_nr;
-        bon.customer.company={};
-        bon.customer.company.name=props.company_name;
-        bon.customer.company.ean_nr=props.ean_nr;
-        bon.customer.company.address={};
-        bon.customer.company.address.street_name=props.company_street_name;
-        bon.customer.company.address.street_name2=props.company_street_name2;
-        bon.customer.company.address.street_nr=props.company_street_nr;
-        bon.customer.company.address.city=props.company_city;
-        bon.customer.company.address.zip_code=props.company_zip_code;
-
-        bon.delivery_address={};
-        bon.delivery_address.street_name=props.street_name;
-        bon.delivery_address.street_name2=props.street_name2;
-        bon.delivery_address.street_nr=props.street_nr;
-        bon.delivery_address.city=props.city;
-        bon.delivery_address.zip_code=props.zip_code;
-
-        bon.orders=this.myBonStrip.getOrders();
-
-
-        return bon;
-    }
-
-    _customerToForm(customer,form,merge) {
-        this._updateOrMerge(form.querySelector("input[name=email]"),customer.email,merge);
-        this._updateOrMerge(form.querySelector("input[name=forename]"),customer.forename,merge);
-        this._updateOrMerge(form.querySelector("input[name=surname]"),customer.surname,merge);
-        this._updateOrMerge(form.querySelector("input[name=phone_nr]"),customer.phone_nr,merge);
-
-        this._updateOrMerge(form.querySelector("input[name=company_name]"),customer.company.name,merge);
-        this._updateOrMerge(form.querySelector("input[name=ean_nr]"),customer.company.ean_nr,merge);
-
-        this._updateOrMerge(form.querySelector("input[name=company_street_name]"),customer.company.address.street_name,merge);
-        this._updateOrMerge(form.querySelector("input[name=company_street_name2]"),customer.company.address.street_name2,merge);
-        this._updateOrMerge(form.querySelector("input[name=company_street_nr]"),customer.company.address.street_nr,merge)
-        this._updateOrMerge(form.querySelector("input[name=company_city]"),customer.company.address.city,merge);
-        this._updateOrMerge(form.querySelector("input[name=company_zip_code]"),customer.company.address.zip_code,merge);
-
-
-    }
-    _copyCompanyAddress2Delivery(form,merge) {
-        this._updateOrMerge(form.querySelector("input[name=street_name]"),form.querySelector("input[name=company_street_name]").value,merge);
-        this._updateOrMerge(form.querySelector("input[name=street_name2]"),form.querySelector("input[name=company_street_name2]").value,merge);
-        this._updateOrMerge(form.querySelector("input[name=street_nr]"),form.querySelector("input[name=company_street_nr]").value,merge)
-        this._updateOrMerge(form.querySelector("input[name=city]"),form.querySelector("input[name=company_city]").value,merge);
-        this._updateOrMerge(form.querySelector("input[name=zip_code]"),form.querySelector("input[name=company_zip_code]").value,merge);
-
-    }
-
-    _updateOrMerge(elem,val,merge) {
-        if(merge && elem.value.trim()=="") {
-            elem.value=val;
-        } else if(!merge) {
-            elem.value=val;
-        }
-        try {elem.oninput();} catch(err) {}
-    }
-
-    _bonToForm(bon,formDiv) {
-
-        this.myBonStrip.clear();
-
-        let form=this.myDiv.querySelector(formDiv);
-
-        let date=new Date(bon.delivery_date);
-        this._setFormDate(date,formDiv);
-
-        this._customerToForm(bon.customer,form);
-
-        form.querySelector("input[name=bon_id]").value=bon.id;
-        form.querySelector("input[name=nr_of_servings]").value=bon.nr_of_servings;
-        form.querySelector("input[name=nr_of_servings]").oninput();
-        form.querySelector("input[name=customer_collects]").checked=bon.customer_collects;
-        form.querySelector("input[name=kitchen_selects]").checked=bon.kitchen_selects;
-        form.querySelector("input[name=kitchen_selects]").onchange();
-        form.querySelector("select[name=price_category]").value=bon.price_category;
-        form.querySelector("select[name=price_category]").onchange();
-        form.querySelector("select[name=payment_type]").value=bon.payment_type;
-        form.querySelector("select[name=payment_type]").onchange();
-
-        form.querySelector("textarea[name=customer_info]").value=bon.customer_info;
-        form.querySelector("textarea[name=kitchen_info]").value=bon.kitchen_info;
-
-        this._updateOrMerge(form.querySelector("textarea[name=kitchen_info]"),bon.kitchen_info);
-
-
-        this._updateOrMerge(form.querySelector("input[name=street_name]"),bon.delivery_address.street_name);
-        this._updateOrMerge(form.querySelector("input[name=street_name2]"),bon.delivery_address.street_name2);
-        this._updateOrMerge(form.querySelector("input[name=street_nr]"),bon.delivery_address.street_nr);
-        this._updateOrMerge(form.querySelector("input[name=city]"),bon.delivery_address.city);
-        this._updateOrMerge(form.querySelector("input[name=zip_code]"),bon.delivery_address.zip_code);
-
-        this._setStatus(bon.status!==""?bon.status:"new");
-
-        this.myBonStrip.setBonId(bon.id);
-        this.myRepoObj.getOrders(bon.id,(orders)=>{
-            orders.forEach(o=>{
-                this.myBonStrip.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price,o.cost_price,o.category);
-            });
-            this.myBonStrip.updateTotalSum();
-        })
-
-    }
-
-    _setFormDate(date,formDiv) {
-        let form=this.myDiv.querySelector(formDiv);
-        let yearStr=date.getFullYear()+"";
-        let monthStr=((date.getMonth()+1)+"").padStart(2,"0");
-        let dayStr=(date.getDate()+"").padStart(2,"0");
-        let hourStr=(date.getHours()+"").padStart(2,"0");
-        let minuteStr=(date.getMinutes()+"").padStart(2,"0");
-
-        this._updateOrMerge(form.querySelector("input[name=delivery_date]"),yearStr+"-"+monthStr+"-"+dayStr);
-        this._updateOrMerge(form.querySelector("input[name=delivery_time]"),hourStr+":"+minuteStr);
-
-
-    }
-
-    init(content,eventElem) {
-        this._clear();
-
-        this.currentEvent=eventElem;
-
-        let display="none";
-        let eventData=undefined;
-        if(eventElem!==undefined) {
-            eventData=eventElem.myData;
-            display="";
-            this._bonToForm(eventData.misc,"#order");
-        } else {
-            this._setFormDate(new Date(content.eventTime),"#order");
-            this._setStatus(Globals.Statuses["new"].name);
-            this.myBonStrip.setBonId("");
-            this.myBonStrip.clear();
-        }
-        this.myDiv.querySelectorAll(".for-update").forEach(e=>{
-            e.style.display=display;
-        });
-
-
-
-
-    }
-
-    _clear() {
-        this.myDiv.querySelectorAll("#order input,textarea").forEach((e) => {
-            let name = e.getAttribute("name");
-            if (name !== null) {
-              e.value="";
-              try {e.oninput();} catch(err) {}
-            }
-        });
-
-        this.myDiv.querySelectorAll(".for-update").forEach(e=>{
-            e.style.display="none";
-        })  
-        this.customer_mail_autocomplete.clearOptions();
-    }
-
-
-
-    getForm() {
-        return this.myDiv;
-    }
+  getForm() {
+    return this.myDiv;
+  }
 }

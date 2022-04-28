@@ -35,6 +35,14 @@ class BonRepository {
           });
     }
 
+    getBonSummary(id,callback) {
+        let url="bonSummary";
+        if(id) {
+            url+="/"+id;
+        }
+        $.get(url,callback);
+    }
+
     getCustomers(email,callback) {
         let url="customers?email="+email;
         $.get(url,callback);

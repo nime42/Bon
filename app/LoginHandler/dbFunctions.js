@@ -95,6 +95,17 @@ function getUserInfo(userId, callback=console.log) {
 }
 
 
+function deleteUser(userId,callback=console.log) {
+    let sql="delete from users where id = ?";
+    try {
+        const res = db.prepare(sql).run(userId);
+        callback(true, null);
+    } catch (err) {
+        callback(false, err);
+    }    
+
+}
+
 function getUsers(callback=console.log) {
     const rows = db.prepare('SELECT * FROM v_userinfo order by username').all();
     
@@ -194,6 +205,7 @@ function getDbInstance() {
 module.exports = {
     init:init,
     createUser: createUser,
+    deleteUser:deleteUser,
     authenticateUser: authenticateUser,
     updateUserInfo: updateUserInfo,
     getUserInfo:getUserInfo,

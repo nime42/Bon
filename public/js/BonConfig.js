@@ -121,11 +121,16 @@ class BonConfig {
         border: 1px solid ${this.foreground};
         padding: 8px;
         color: ${this.foreground};
+        text-overflow: ellips;
+        white-space: nowrap;
+        overflow:hidden;
+        max-width:80px;
       }
       
       .tableFixHead          { 
           overflow: auto; 
           height: 300px; 
+      }
         }
       .tableFixHead thead th { 
           position: sticky; 
@@ -170,6 +175,23 @@ class BonConfig {
     </div>
     `
 
+    bons=`
+    <div>
+    <style>
+        ${this.style}
+    </style>
+    <div class="config-style">
+    <div class="tableFixHead" style="width: 90%;">
+    <table id="bons-table">
+    </table>
+    </div>
+    <a href="bonSummaryFile">Download</a>
+
+    </div>
+    </div>
+    `
+
+
     userForm=`
     <form id="user-admin" class="form"  autocomplete="off" method="post" >
         <p id="error-msg" style="color:red"></p>
@@ -201,22 +223,25 @@ class BonConfig {
         this.myTabs=new TabsClass(div);
         this.myTabs.addTab("Varer",this.items);
         this.myTabs.addTab("Bruger",this.users,()=>{this.getUsers()});
+        this.myTabs.addTab("Bons",this.bons,()=>{this.getBons()});
+
+
+
         this.getItemsFromDB(()=>{
             this.createItemsTable();
             Globals.myCalender.myBonForm.updateItems();
 
         });
         if(typeof div==="string") {
-            this.myItemsTable=document.querySelector(div).querySelector("#items-table");
-            this.myRefreshDB=document.querySelector(div).querySelector("#refresh-db");
-            this.myUsersTable=document.querySelector(div).querySelector("#users-table");
-            this.myAddUser=document.querySelector(div).querySelector("#add-user");
-        } else {
-            this.myItemsTable=div.querySelector("#items-table");
-            this.myRefreshDB=div.querySelector("#refresh-db");
-            this.myUsersTable=div.querySelector("#users-table");
-            this.myAddUser=div.querySelector("#add-user");
+            div=document.querySelector(div);
         }
+
+        this.myItemsTable=div.querySelector("#items-table");
+        this.myRefreshDB=div.querySelector("#refresh-db");
+        this.myUsersTable=div.querySelector("#users-table");
+        this.myAddUser=div.querySelector("#add-user");
+        this.myBonTable=div.querySelector("#bons-table");
+        
         let self=this;
         this.myRefreshDB.onclick=function() {
             let p=MessageBox.popup("Uppdaterar DB...");
@@ -244,6 +269,7 @@ class BonConfig {
     
 
         this.userInfoAdminPopup=new ModalPopup();
+        
 
         this.myAddUser.onclick=function() {
             self.UserAdminForm.querySelector("#create-update-user").value="Spar";
@@ -314,6 +340,8 @@ class BonConfig {
 
     }
 
+
+
     getUsers() {
         this.getAllRoles();
 
@@ -363,6 +391,12 @@ class BonConfig {
             res.push(c.value);
         })
         return res;
+    }
+
+    getBons() {
+        this.myRepo.getBonSummary(undefined,bons=>{
+            this.createBonSummaryTable(bons);
+        })    
     }
 
 
@@ -424,7 +458,7 @@ class BonConfig {
             <td>${u.name}</td>
             <td>${u.email}</td>
             <td>${u.phonenr}</td>
-        `;
+            `;
 
         let row=document.createElement("tr");
         row.style.cursor="pointer";
@@ -474,9 +508,28 @@ class BonConfig {
                     }
                 })
     
-                return false;
-
-                                
+                return false;                     
+            }
+            this.UserAdminForm.querySelector("#remove-user").onclick=function() {
+                MessageBox.popup("Vill du verkligen ta bort denna användare?", {
+                    b1: {
+                      text: "Ja",
+                      onclick: () => {
+                          let userId=self.UserAdminForm.querySelector("#userid").value;
+                          Globals.myLoginHandler.deleteUser(userId, (status)=> {
+                            if(status) {
+                                self.userInfoAdminPopup.hide();
+                                row.remove();
+                            } else {
+                                self.UserAdminForm.querySelector("#error-msg").innerHTML="Det gick inte att ta bort brugeren";
+                            }
+                          })
+                      },
+                    },
+                    b2: { text: "Nej" },
+                  });
+                  return false;
+            
             }
         }
         tableRows.append(row);
@@ -486,6 +539,82 @@ class BonConfig {
 
     }
 
+    createBonSummaryTable(bons) {
+        this.myBonTable.innerHTML="";
+        
+        let headers=`
+        <tr>
+        <th>Id</th>
+        <th>Leveringsdato</th>
+        <th>Status</th>
+        <th>Pax</th>
+        <th>Køkkenet vælger</th>
+        <th>Leveringsadresse</th>
+        <th>Navn</th>
+        <th>Mail</th>
+        <th>Telefon</th>
+        <th>Firma</th>
+        <th>EAN</th>
+        <th>Betaling</th>
+        <th>Priskategorie</th>
+        <th>Købspris</th>
+        <th>Pris</th>
+        </tr>
+        `;
+        let headerRow=document.createElement("thead");
+        headerRow.innerHTML=headers;
+        this.myBonTable.append(headerRow);
+        let tableRows=document.createElement("tbody");
+        bons.forEach(b=>{
+            let cols=this._createTableRow(b);
+            let row=document.createElement("tr");
+            row.innerHTML=cols;
+            tableRows.append(row);
+        });
+        this.myBonTable.append(tableRows);
+    }
+
+     _createTableRow(b) {
+        
+        return `
+        <td><a href="javascript:void(0);"  onclick="Globals.myConfig.showBonForm(${b.id},this.parentNode.parentNode);">#${b.id}</a></td>
+        <td>${new Date(b.delivery_date).toLocaleString()}</td>
+        <td style="background-color:${Globals.Statuses[b.status].color};color:${Helper.contrastColor(Globals.Statuses[b.status].color)}">${Globals.Statuses[b.status].label}</td>
+        <td>${b.nr_of_servings}</td>
+        <td>${b.kitchen_selects?"Ja":"Nej"}</td>
+        <td>${b.customer_collects?"Afhentes":b.delivery_adr}</td>
+        <td>${b.name}</td>
+        <td>${b.email}</td>
+        <td>${b.phone_nr}</td>
+        <td>${b.company}</td>
+        <td>${b.ean_nr}</td>
+        <td>${b.payment_type}</td>
+        <td>${b.price_category}</td>
+        <td>${b.cost_price?b.cost_price.toFixed(2):0}</td>
+        <td>${b.price?b.price.toFixed(2):0}</td>
+        `;
+    }
+
+
+    showBonForm(id,rowElem) {
+        Globals.myCalender.myBonForm.initFromBonId(id,(event,arg1,arg2,arg3) => {
+            switch(event) {
+                case "saved":
+                    let bon=arg1;
+                    this.myRepo.getBonSummary(bon.id,bons=>{
+                        bon=bons[0];
+                        rowElem.innerHTML=this._createTableRow(bon);
+                    })
+                    break;
+                case "deleted":
+                    rowElem.remove();
+                    break;
+                case "copied":
+                    this.getBons();
+                    break;
+            }
+        });
+    }
 
 
     _populateUserForm(userProps) {
