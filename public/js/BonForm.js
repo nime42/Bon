@@ -157,6 +157,14 @@ class BonForm {
     <span>
         <input id="date" type="date" name="delivery_date">
         <input id="time" type="time" name="delivery_time">
+        <select name="payment_type" id="payment-types">
+            <option disabled >Betaling...</option>
+            <option>Kontant</option>
+            <option>Faktura</option>
+            <option>EAN nr</option>
+        </select>
+
+
     </span>
 </fieldset>
 <fieldset>
@@ -233,13 +241,7 @@ class BonForm {
 <div>
 <span style="margin-right: 5px;color: ${this.foreground};">Pax:</span><input type="text" id="nr_of_servings" name="nr_of_servings" placeholder="Pax" autocomplete="nope" style="vertical-align: top; margin-right:5px;width: 10%;"> 
 <select name="price_category" id="price-categories"></select>
-<select name="payment_type" id="payment-types">
-    <option disabled >Betaling...</option>
-    <option>Kontant</option>
-    <option>Faktura</option>
-    <option>EAN nr</option>
 
-</select>
 
   <br><br>
   <label style="color:${this.foreground}">
