@@ -4,41 +4,14 @@ class ItemsList {
     shadowColor=Globals.shadowColor;
 
     style=`
-    .items-list fieldset {
-        border-radius: 10px;
-        -webkit-border-radius: 10px;
-        -moz-border-radius: 10px;
-        margin: 0px 0px 10px 0px;
-        border: 1px solid ${this.foreground};
-        padding: 20px;
-        background: ${this.background};
-        box-shadow: inset 0px 0px 15px ${this.shadowColor};
-        -moz-box-shadow: inset 0px 0px 15px ${this.shadowColor};
-        -webkit-box-shadow: inset 0px 0px 15px ${this.shadowColor};
-    }
-
-    .items-list fieldset legend {
-        color: ${this.foreground};
-        border-top: 1px solid ${this.foreground};
-        border-left: 1px solid ${this.foreground};
-        border-right: 1px solid ${this.foreground};
-        border-radius: 5px 5px 0px 0px;
-        -webkit-border-radius: 5px 5px 0px 0px;
-        -moz-border-radius: 5px 5px 0px 0px;
-        background: ${this.background};
-        padding: 0px 8px 3px 8px;
-        box-shadow: -0px -1px 2px ${this.shadowColor};
-        -moz-box-shadow: -0px -1px 2px ${this.shadowColor};
-        -webkit-box-shadow: -0px -1px 2px ${this.shadowColor};
-        font-weight: normal;
-    }
+ 
     `
 
     content=`
     <style>
     ${this.style}
     </style>
-    <div id="items" class="items-list"></div>
+    <div id="items" class="items-list" style="box-shadow: 5px 5px 5px grey; background:${this.background};padding-left: 10px;border: 2px solid ${this.foreground}; overflow: auto;max-height: 80vh;"></div>
     `
 
     constructor(div) {
@@ -108,9 +81,14 @@ class ItemsList {
             content.style.minWidth="150px";
 
             categories[k].forEach((n)=>{
-                let button=document.createElement("button");
-                button.style.width="100%";
-                button.style.marginBottom="3px";
+                let button=document.createElement("span");
+                button.style.cssText=`
+                width: 100%;
+                margin-bottom: 5px;
+                border: 1px solid black;
+                padding: 2px;
+                border-radius: 4px;
+                cursor: pointer;`;
                 button.innerHTML=n.name +" ("+n.price+" kr)";
                 button.onclick=()=>{
                     this.onItemClick && this.onItemClick(n);

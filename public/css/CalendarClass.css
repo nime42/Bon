@@ -1,57 +1,70 @@
-.calendar-style table {
-    background: lightblue;
-    border-collapse: collapse;
-    
-
-}
-
-.calendar-style .disabled {
-    color: #ddddff;
-    font-style: italic;
-}
-
-.calendar-style .day-nr {  
+.week-row>.day {
+    border: 0.5px solid black;
+    background-color: rgb(227, 232, 219);
+    margin-left: 0;
+    min-width: 12%;
     text-align: right;
-    padding: 2px 5px 2px 5px;
-    margin: 0;
-    align-self: stretch;
-}
-
-
-.calendar-style table,
-.calendar-style th,
-.calendar-style td {
-    border: 0.5px solid black;  
-}
-.calendar-style td {
-    height:100px;
-    width:150px;
-}
-
-.calendar-style .day-content {
+    padding-right: 3px;
+    font-weight: bold;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    height: 100%;
-    width: 100%;
+}
+
+
+/* For devices larger than 400px */
+/* the columns need not to be on the same height when there is only one column*/
+@media (min-width: 400px) {
+    .week-row {
+        display: flex;
+    }
+
+  }
+  
+  /* hide weekdays headers when days is in one column*/
+  @media (max-width: 400px) {
+    .week-header {
+        display: none;
+    }      
   }
 
-.calendar-style .event {
-    border: 0.5px solid black;  
-    padding: 3px;
-    border-radius: 6px;
-    width:100%;
-    height: 16px;
-    font-size: medium;
-    cursor: pointer;
+.day-headers {
+    text-align: center;
+}  
+
+
+.week-row>.week-nr {
+    font-weight: bold;
     white-space: nowrap;
-  }
+    height: auto;
+    min-height: 100% !important;
+    min-width: 40px;
 
-.calendar-style .circle {
+}
+
+.circle-to-day {
     border-radius: 50%;
     padding: 1px;
     border: 2px solid red;
     color: #000;
     text-align: center;
-  }
+}
 
+.not-current-month {
+    color: #ddddff;
+    font-style: italic;
+}
+
+.event-list {
+    margin-top: auto;
+}
+
+.event {
+    border: 0.5px solid black;  
+    padding: 3px;
+    border-radius: 6px;
+    height: 16px;
+    font-size: small;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+  }

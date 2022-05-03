@@ -2,7 +2,7 @@ class BonCalendar {
 
     constructor(div) {
 
-        this.myPopup = new ModalPopup();
+        this.myPopup = new OverLay();
         this.myCalendar = new CalendarClass("#calendar");
         this.myRepo = new BonRepository();
         this.myBonForm = new BonForm(this.myPopup, this.myRepo);

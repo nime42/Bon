@@ -3,236 +3,261 @@ class BonForm {
   foreground = Globals.foreground;
   shadowColor = Globals.shadowColor;
   content = `
-    <div style="background:${this.background};padding:20px;border-radius: 10px;border: 3px solid black;border-style: double; display: flex;flex-direction: row;">
+  <div class="bon-container" style="margin-top:25px;width: 95%;margin: 60px auto;background:wheat;padding: 10px;border: 1px solid black;border-radius: 5px;">
+  <div class="bon-row" style="align-self: end;" onclick="this.parentElement.querySelector('#cancel').click()"><i class="fa fa-times" aria-hidden="true"></i></div>
+  <div class="bon-row" style="margin: auto;min-width: 80%;">
+      
 
-    <style type="text/css">
-        .form-style {
+      <div class="bon-column">
+          <form id="order" class="bon-form" style="box-shadow: 5px 5px 5px grey; background:${this.background};padding-left: 10px;border: 2px solid ${this.foreground}; overflow: auto;max-height: 80vh;">
 
-            font-family: sans-serif;
-            font-size:medium;
-            background:${this.background};
-            padding: 10px;
-            -webkit-border-radius: 10px;
-            min-width:450px;
-        }
+              <h5>Status</h5>
+              <div class="bon-row">
+                  <button type="button" id="${Globals.Statuses["new"].name}" class="status-button" style="float:left"
+                      data-active-background="${Globals.Statuses["new"].color}">${Globals.Statuses["new"].label}</button>
+                  <button type="button" id="${Globals.Statuses["needInfo"].name}" class="status-button"
+                      style="float:left" data-active-background="${Globals.Statuses["needInfo"].color}">${Globals.Statuses["needInfo"].label}</button>
+                  <button type="button" id="${Globals.Statuses["approved"].name}" class="status-button"
+                      style="float:left" data-active-background="${Globals.Statuses["approved"].color}">${Globals.Statuses["approved"].label}</button>
+                  <button type="button" id="${Globals.Statuses["preparing"].name}" class="status-button"
+                      style="float:left" data-active-background="${Globals.Statuses["preparing"].color}">${Globals.Statuses["preparing"].label}</button>
+                  <button type="button" id="${Globals.Statuses["done"].name}" class="status-button"
+                      style="float:left" data-active-background="${Globals.Statuses["done"].color}">${Globals.Statuses["done"].label}</button>
+                  <button type="button" id="${Globals.Statuses["delivered"].name}" class="status-button"
+                      style="float:left" data-active-background="${Globals.Statuses["delivered"].color}">${Globals.Statuses["delivered"].label}</button>
+                  <button type="button" id="${Globals.Statuses["invoiced"].name}" class="status-button"
+                      style="float:left" data-active-background="${Globals.Statuses["invoiced"].color}">${Globals.Statuses["invoiced"].label}</button>
+                  <button type="button" id="${Globals.Statuses["closed"].name}" class="status-button"
+                      style="float:left" data-active-background="${Globals.Statuses["closed"].color}">${Globals.Statuses["closed"].label}</button>
+                  <button type="button" id="${Globals.Statuses["offer"].name}" class="status-button"
+                      style="float:left" data-active-background="${Globals.Statuses["offer"].color}">${Globals.Statuses["offer"].label}</button>
 
-        .form-style label {
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .form-style label>span {
-            float: left;
-            width: 100px;
-            color: ${this.foreground};
-            font-weight: bold;
-            text-shadow: 1px 1px 1px #fff;
-        }
-
-        .form-style fieldset {
-            border-radius: 10px;
-            -webkit-border-radius: 10px;
-            -moz-border-radius: 10px;
-            margin: 0px 0px 10px 0px;
-            border: 1px solid ${this.foreground};
-            padding: 20px;
-            background: ${this.background};
-            box-shadow: inset 0px 0px 15px ${this.shadowColor};
-            -moz-box-shadow: inset 0px 0px 15px ${this.shadowColor};
-            -webkit-box-shadow: inset 0px 0px 15px ${this.shadowColor};
-        }
-
-        .form-style fieldset legend {
-            color: ${this.foreground};
-            border-top: 1px solid ${this.foreground};
-            border-left: 1px solid ${this.foreground};
-            border-right: 1px solid ${this.foreground};
-            border-radius: 5px 5px 0px 0px;
-            -webkit-border-radius: 5px 5px 0px 0px;
-            -moz-border-radius: 5px 5px 0px 0px;
-            background: ${this.background};
-            padding: 0px 8px 3px 8px;
-            box-shadow: -0px -1px 2px ${this.shadowColor};
-            -moz-box-shadow: -0px -1px 2px ${this.shadowColor};
-            -webkit-box-shadow: -0px -1px 2px ${this.shadowColor};
-            font-weight: normal;
-        }
-
-        .form-style textarea {
-            width: 250px;
-        }
-
-        .form-style input[type=text],
-        .form-style input[type=date],
-        .form-style input[type=datetime],
-        .form-style input[type=number],
-        .form-style input[type=search],
-        .form-style input[type=time],
-        .form-style input[type=url],
-        .form-style input[type=email],
-        .form-style input[type=tel],
-        .form-style select,
-        .form-style textarea {
-            border-radius: 3px;
-            -webkit-border-radius: 3px;
-            -moz-border-radius: 3px;
-            border: 2px solid ${this.foreground};
-            outline: none;
-            color: ${this.foreground};
-            padding: 5px 8px 5px 8px;
-            box-shadow: inset 1px 1px 4px ${this.shadowColor};
-            -moz-box-shadow: inset 1px 1px 4px ${this.shadowColor};
-            -webkit-box-shadow: inset 1px 1px 4px ${this.shadowColor};
-            background: ${this.background};
-            font-size:medium;
-        }
-
-        .form-style input[type=submit],
-        .form-style input[type=button] {
-            background: ${this.background};
-            border: 1px solid ${this.foreground};
-            padding: 5px 15px 5px 15px;
-            color: ${this.foreground};
-            box-shadow: inset -1px -1px 3px ${this.shadowColor};
-            -moz-box-shadow: inset -1px -1px 3px ${this.shadowColor};
-            -webkit-box-shadow: inset -1px -1px 3px ${this.shadowColor};
-            border-radius: 3px;
-            border-radius: 3px;
-            -webkit-border-radius: 3px;
-            -moz-border-radius: 3px;
-            font-weight: bold;
-        }
+              </div>
 
 
-        .form-style .input-icons {
-            color: ${this.foreground};
-            width: 5%;
-        }
+              <h5>Leveringsdato</h5>
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <input id="date" type="date" name="delivery_date">
+                  </div>
+                  <div class="bon-column">
+                      <input id="time" type="time" name="delivery_time">
+                  </div>
 
-        .required {
-            color: red;
-            font-weight: normal;
-        }
-    </style>
+                  <div class="bon-column">
+                      <select name="payment_type" id="payment-types" style="height: auto;">
+                          <option>Betaling...</option>
+                          <option>Kontant</option>
+                          <option>Faktura</option>
+                          <option>EAN nr</option>
+                      </select>
+                  </div>
+              </div>
+
+
+              <h5>Kunde</h5>
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <i class="fa fa-envelope icon input-icons"></i>
+                  </div>
+                  <div class="bon-column">
+                      <input id="email" class="u-full-width" type="email" name="email" autocomplete="nope"
+                          placeholder="Email">
+                  </div>
+              </div>
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <i class="fa fa-user icon input-icons"></i>
+                  </div>
+                  <div class="bon-column" style="width:30%">
+                      <input autocomplete="nope" id="forename" type="text" name="forename" placeholder="Fornavn">
+                  </div>
+                  <div class="bon-column" style="width:50%">
+                      <input autocomplete="nope" id="surname" type="text" name="surname" placeholder="Efternavn">
+                  </div>
+              </div>
+
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <i class="fa fa-phone icon input-icons"></i>
+                  </div>
+                  <div class="bon-column">
+                      <input id="phone_nr" type="tel" name="phone_nr" placeholder="Telefon">
+                  </div>
+              </div>
 
 
 
-    <form id="order" class="form-style" autocomplete="off">
-    <div id="input-fields">
-    <fieldset>
-    <legend>Status</legend>
-    <button type="button" id="${Globals.Statuses["new"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["new"].color}">${Globals.Statuses["new"].label}</button>
-    <button type="button" id="${Globals.Statuses["needInfo"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["needInfo"].color}">${Globals.Statuses["needInfo"].label}</button>
-    <button type="button" id="${Globals.Statuses["approved"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["approved"].color}">${Globals.Statuses["approved"].label}</button>
-    <button type="button" id="${Globals.Statuses["preparing"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["preparing"].color}">${Globals.Statuses["preparing"].label}</button>
-    <button type="button" id="${Globals.Statuses["done"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["done"].color}">${Globals.Statuses["done"].label}</button>
-    <button type="button" id="${Globals.Statuses["delivered"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["delivered"].color}">${Globals.Statuses["delivered"].label}</button>
-    <button type="button" id="${Globals.Statuses["invoiced"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["invoiced"].color}">${Globals.Statuses["invoiced"].label}</button>
-    <button type="button" id="${Globals.Statuses["closed"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["closed"].color}">${Globals.Statuses["closed"].label}</button>
+              <h5>Leveringsadresse </h5>
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <span>
+                      <input type="checkbox" id="customer_collects" name="customer_collects" value="1"
+                          style="margin-right: 5px;"> Afhentes
+                      </span>
+                  </div>
+              </div>
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <input type="text" id="street_name2" name="street_name2" placeholder="C/O etc"
+                          autocomplete="nope">
+                  </div>
+              </div>
 
-    <button type="button" id="${Globals.Statuses["offer"].name}" class="status-button" style="float:left" data-active-background="${Globals.Statuses["offer"].color}">${Globals.Statuses["offer"].label}</button>
-    </fieldset>
-    <br>
-    
-    <div id="order-tabs" style=""></div>
-    
-    <div style="margin-top:6px">
-        <input type="button" id="save" value="Spara">
-        <input type="button" id="delete" value="Ta bort" class="for-update">
-        <input type="button" id="copy" value="Kopier" class="for-update">
-        <span>&nbsp;&nbsp;</span>
-        <input type="button" id="cancel" value="Avbryt">
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <input type="text" id="street_name" name="street_name" placeholder="Gade" autocomplete="nope">
+                  </div>
+                  <div class="bon-column" style="width:15%">
+                      <input type="text" id="street_nr" name="street_nr" placeholder="nr" autocomplete="nope">
+                  </div>
 
-    </div>
-    </div>
-    </form>
-    <div id="bon-strip">
-    </div>
-    </div> 
-    `;
-
-  customerInfoTab = `
-    <fieldset>
-    <legend>Leveringsdato</legend>
-    <span>
-        <input id="date" type="date" name="delivery_date">
-        <input id="time" type="time" name="delivery_time">
-        <select name="payment_type" id="payment-types">
-            <option disabled >Betaling...</option>
-            <option>Kontant</option>
-            <option>Faktura</option>
-            <option>EAN nr</option>
-        </select>
+              </div>
 
 
-    </span>
-</fieldset>
-<fieldset>
-    <legend>Kunde</legend>
-
-    <div style="margin-bottom:5px">
-    <i class="fa fa-envelope icon input-icons"></i>
-    <input id="email" type="email" name="email" autocomplete="nope" placeholder="Email">
-    </div>
-
-
-    <div style="margin-bottom:5px">
-    <i class="fa fa-user icon input-icons"></i>
-    <input autocomplete="nope" id="forename" type="text" name="forename" placeholder="Fornavn" style="width:25%">
-    <input autocomplete="nope" id="surname" type="text" name="surname" placeholder="Efternavn" style="width:35%">
-    </div>
+              <div class="bon-row indent">
+                  <div class="bon-column" style="width:15%">
+                      <input type="text" id="zip_code" name="zip_code" placeholder="Postnr" autocomplete="nope">
+                  </div>
+                  <div class="bon-column">
+                      <input type="text" id="city" name="city" placeholder="By" autocomplete="nope">
+                  </div>
+              </div>
 
 
-    <div style="margin-bottom:5px">
-    <i class="fa fa-phone icon input-icons"></i>
-    <input id="phone_nr" type="tel" name="phone_nr" placeholder="Telefon">
-    </div><br>
 
-    <div style="margin-bottom:5px">
-    <i class="fa fa-industry icon input-icons"></i>
-    <input type="text" name="company_name" placeholder="Firma navn"> <i id="expand-company-info" class="fa fa-caret-down" style="font-size:25px; color: ${this.foreground};"></i>
-    </div><br>
-    
-    <div id="company-info" style="padding: 5px 5px 5px 35px;;border: 1px solid  ${this.foreground};">
-    
-    <div style="margin-bottom:5px">
-    <i class="fa fa-barcode icon input-icons"></i>
-    <input type="text" name="ean_nr" placeholder="EAN" >
-    </div>
 
-    <fieldset style="max-width: min-content;min-width: fit-content;">
-    <legend style="font-weight: bold;">Adresse</legend>
-    <input type="text" name="company_street_name2" placeholder="C/O etc" autocomplete="nope"> <br>
-    <span>
-        <input type="text" name="company_street_name" placeholder="Gade" autocomplete="nope">
-        <input type="text" name="company_street_nr" placeholder="nr" style="width:15%" autocomplete="nope">
-    </span><br>
-    <span>
-        <input type="text" name="company_zip_code" placeholder="Postnr" style="width:25%" autocomplete="off">
-        <input type="text" name="company_city" placeholder="By" autocomplete="nope">
-    </span>
-    </fieldset>
 
-    </div>
 
-    
-</fieldset>
-<fieldset>
-<legend style="font-weight: bold;">Leveringsadresse </legend>
-<span><input type="checkbox" id="customer_collects" name="customer_collects" value="1" style="float: left;margin-right: 5px;"><label for="customer_collects" style="float: left"> Afhentes</label></span><br><br>
 
-<input type="text" id="street_name2" name="street_name2" placeholder="C/O etc" autocomplete="nope"> <br>
-<span>
-    <input type="text" id="street_name" name="street_name" placeholder="Gade" autocomplete="nope">
-    <input type="text" id="street_nr" name="street_nr" placeholder="nr" style="width:15%" autocomplete="nope">
-</span><br>
-<span>
-    <input type="text" id="zip_code" name="zip_code" placeholder="Postnr" style="width:25%" autocomplete="nope">
-    <input type="text" id="city" name="city" placeholder="By" autocomplete="nope">
-</span>
-</fieldset>
-<input type="hidden" name="bon_id"/>
-</div>      
+              <h5>Firma</h5>
+
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <i class="fa fa-industry icon input-icons"></i>
+                  </div>
+                  <div class="bon-column">
+                      <input type="text" name="company_name" placeholder="Firma navn">
+                  </div>
+              </div>
+
+
+
+
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <i class="fa fa-barcode icon input-icons"></i>
+                  </div>
+                  <div class="bon-column">
+                      <input type="text" name="ean_nr" placeholder="EAN">
+                  </div>
+              </div>
+
+              <div class="bon-row indent ">
+                  <div class="bon-column">
+                      <input type="text" id="company_street_name2" name="company_street_name2" placeholder="C/O etc"
+                          autocomplete="nope">
+                  </div>
+              </div>
+
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <input type="text" id="company_street_name" name="company_street_name" placeholder="Gade"
+                          autocomplete="nope">
+                  </div>
+                  <div class="bon-column" style="width:15%">
+                      <input type="text" id="company_street_nr" name="company_street_nr" placeholder="nr"
+                          autocomplete="nope">
+                  </div>
+
+              </div>
+
+
+              <div class="bon-row indent">
+                  <div class="bon-column" style="width:15%">
+                      <input type="text" id="company_zip_code" name="company_zip_code" placeholder="Postnr"
+                          autocomplete="nope">
+                  </div>
+                  <div class="bon-column">
+                      <input type="text" id="company_city" name="company_city" placeholder="By" autocomplete="nope">
+                  </div>
+              </div>
+
+              <h5>Kunde önsker</h5>
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <textarea name="customer_info" placeholder="Kunde Önsker" rows="2"
+                          autocomplete="nope"></textarea>
+                  </div>
+              </div>
+
+
+              <h5>Køkken info</h5>
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                     <span>
+                      <input type="checkbox" id="kitchen_selects" name="kitchen_selects" value="1"
+                          style="margin-right: 5px;"> Køkkenet vælger
+                     </span>
+                  </div>
+              </div>
+
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      Pax:
+                  </div>
+                  <div class="bon-column">
+                      <input type="text" id="nr_of_servings" name="nr_of_servings" placeholder="Pax"
+                          autocomplete="nope">
+                  </div>
+              </div>
+
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      Pris kategorie:
+                  </div>
+                  <div class="bon-column">
+                      <select name="price_category" id="price-categories"></select>
+                  </div>
+                  </div>              
+
+
+                  <div class="bon-row indent">
+                      <div class="bon-column">
+                          <textarea name="kitchen_info" id="kitchen_info" placeholder="Kökken info" rows="2"
+                              autocomplete="nope"></textarea>
+                      </div>
+                  </div>
+
+
+
+              <br>
+              <div class="bon-row indent" style="background:${this.background}">
+                  <div style="text-align: center;    padding-top: 10px;">
+                      <input class="button-primary" type="button" id="save" value="Spara">
+                      <input type="button" id="delete" value="Ta bort" class="for-update">
+                      <input type="button" id="copy" value="Kopier" class="for-update">
+                      <input type="button" id="cancel" value="Avbryt">
+                  </div>
+
+              </div>
+
+
+              <input type="hidden" name="bon_id" />
+
+          </form>
+      </div>
+      <div class="bon-column">
+      <div class="bon-container">
+        <div class="bon-row">
+        <div class="bon-column" style="background:wheat;margin-bottom:20px;float:right;margin-right:5px;"><div id="bon-strip"></div></div>
+        <div class="bon-column"><div id="items-selector" style="display:none"></div></div>
+        </div>
+        </div>
+      </div>
+  </div>
+</div>
+   
     `;
 
   itemsTab = `
@@ -272,15 +297,12 @@ class BonForm {
     let self = this;
     let form = this.myDiv.querySelector("#order");
 
-    this.myTabs = new TabsClass(this.myDiv.querySelector("#order-tabs"));
-    this.myTabs.addTab("Navn og Tid", this.customerInfoTab);
-    this.myTabs.addTab("Varer", this.itemsTab);
-    this.myTabs.addTab("Øvrig info", this.miscTab);
 
-    //this.myItems=new VertTabsClass(this.myDiv.querySelector("#items"));
-    this.myItems = new ItemsList(this.myDiv.querySelector("#items"));
 
-    this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"));
+
+   
+
+    this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"),true,false,this.myDiv.querySelector("#items-selector"));
     this.myBonStrip.updateNameOnChange(
       form.querySelector("#forename"),
       form.querySelector("#surname")
@@ -312,17 +334,7 @@ class BonForm {
       form.querySelector("#kitchen_selects")
     );
 
-    this.myItems.SetOnItemClick((item) => {
-      this.myBonStrip.configureOrder(
-        1,
-        item.name,
-        "",
-        item.id,
-        item.price,
-        item.cost_price,
-        item.category
-      );
-    });
+
 
     form.querySelector("#save").onclick = function () {
       let props = Helper.getFormProps(form);
@@ -367,21 +379,7 @@ class BonForm {
       });
     };
 
-    let expandCompanyInfo = form.querySelector("#expand-company-info");
-    let companyInfo = form.querySelector("#company-info");
-    companyInfo.style.display = "none";
 
-    expandCompanyInfo.onclick = function (e) {
-      if (expandCompanyInfo.classList.contains("fa-caret-down")) {
-        expandCompanyInfo.classList.remove("fa-caret-down");
-        expandCompanyInfo.classList.add("fa-caret-up");
-        companyInfo.style.display = "";
-      } else {
-        expandCompanyInfo.classList.remove("fa-caret-up");
-        expandCompanyInfo.classList.add("fa-caret-down");
-        companyInfo.style.display = "none";
-      }
-    };
 
     form.querySelectorAll(".status-button").forEach((e) => {
       e.onclick = (event) => {
@@ -413,14 +411,13 @@ class BonForm {
     };
 
     form.querySelector("#price-categories").onchange = function () {
-      self.updateItems();
+      let select = self.myDiv.querySelector("#price-categories");
+      self.myBonStrip.updatePricesFromCategory(select.value);
     };
   }
 
   updateItems() {
     this.updatePriceCategories();
-    let currentPrice = this.getCurrentPriceCategory();
-    this.myItems.updateItems(currentPrice);
   }
   updatePriceCategories() {
     let select = this.myDiv.querySelector("#price-categories");

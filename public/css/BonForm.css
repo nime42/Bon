@@ -1,0 +1,87 @@
+.status-button {
+    padding: 3px;
+    letter-spacing: 0;
+    border-radius: 0px;
+    border: 2px solid black;
+    padding-top: 0;
+    font-size: 9px;
+    margin-right: 3px;
+}
+
+.bon-form {
+    margin-left: 0;
+
+}
+
+.bon-form>fieldset {
+    margin-bottom: 3px;
+}
+
+.bon-form>.row {
+    margin-left: 5%;
+}
+
+.bon-form>h5 {
+    margin-bottom: 0;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: white;
+}
+
+
+.bon-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.bon-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.bon-row>.bon-column {
+    margin-left: 5px;
+}
+
+.bon-column {
+    display: flex;
+    flex-direction: column;
+}
+
+@media screen and (max-width: 600px) {
+    .bon-row {
+        flex-direction: column;
+    }
+
+    #order {
+        overflow: initial;
+        max-height: fit-content;
+    }
+
+}
+
+
+
+.indent {
+    margin-left: 15px;
+}
+
+
+input[type="date"],input[type="time"],input[type="email"], input[type="number"], input[type="search"], input[type="text"], input[type="tel"], input[type="url"], input[type="password"], textarea, select {
+    height: auto;
+    padding: 6px 10px;
+    background-color: #fff;
+    border: 1px solid #D1D1D1;
+    border-radius: 4px;
+    box-shadow: none;
+    box-sizing: border-box;
+}
+
+
+

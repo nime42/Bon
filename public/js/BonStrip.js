@@ -226,13 +226,45 @@ class BonStrip {
 
 
 
-    constructor(div) {
+    constructor(div,isEditable,instantSave,externalItemList) {
         if(typeof div==="string") {
             this.myDiv = document.querySelector(div);
         } else {
             this.myDiv=div;
         }
         this.myDiv.innerHTML = this.div;
+
+        if(isEditable) {
+            let itemslistElem;
+            if(externalItemList) {
+                itemslistElem=externalItemList;
+            } else {
+                itemslistElem = this.myDiv.querySelector("#items-list");
+            }
+            
+
+            this.myItemsList = new ItemsList(itemslistElem);
+            this.myItemsList.SetOnItemClick((item) => {
+                this.configureOrder(1, item.name, "", item.id, item.price, item.cost_price, item.category);
+            });
+            
+            this.myDiv.querySelector("#add-items").style.display="";
+            this.myDiv.querySelector("#show-items-list").onclick=() => {
+                if(itemslistElem.style.display=="none") {
+                    itemslistElem.style.display=""
+                } else {
+                    itemslistElem.style.display="none";
+                }
+            }
+
+        }
+
+        if (instantSave) {
+            this.saveOrders = () => {
+                Globals.myConfig.myRepo.updateOrders(this.bonId, this.getOrders().orders);
+
+            }
+        }
 
 
         this.myOrders=new DraggableList(this.myDiv.querySelector("#orders"),true);
@@ -354,11 +386,11 @@ class BonStrip {
         }
         this.updateTotalSum();
 
-        this._makeEditable(bon);
+        this.makeEditable(bon);
 
     }
 
-    _makeEditable(bon) {
+    makeEditable(bon) {
 
         let itemslistElem = this.myDiv.querySelector("#items-list");
 
@@ -368,9 +400,6 @@ class BonStrip {
             this.configureOrder(1, item.name, "", item.id, item.price, item.cost_price, item.category);
         });
         
-
-
-
         this.myDiv.querySelector("#add-items").style.display="";
         this.myDiv.querySelector("#show-items-list").onclick=() => {
             if(itemslistElem.style.display=="none") {
@@ -492,6 +521,7 @@ class BonStrip {
     }
 
     updatePricesFromCategory(category) {
+        this.myItemsList && this.myItemsList.updateItems(category);
         Array.from(this.myOrders.getElems()).forEach(order=>{
             let id=order.querySelector("#item-id").value;
             let quantity=order.querySelector("#quantity").textContent;

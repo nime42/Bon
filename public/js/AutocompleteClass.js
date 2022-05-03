@@ -3,12 +3,12 @@ class AutoCompleteClass {
   foreground=Globals.foreground;
   styling=`
   <style>
-  .container {
+  .mycontainer {
       display: inline-block;
       position: relative;
   }
 
-  .container input {
+  .mycontainer input {
     width: 100%;
   }
 
@@ -44,15 +44,15 @@ class AutoCompleteClass {
 
   constructor(inputDiv) {
     this.myInputDiv = inputDiv;
-    let container=document.createElement("DIV");
-    container.classList.add("container");
-    this.myInputDiv.replaceWith(container);
-    container.insertAdjacentHTML('beforebegin',this.styling);
-    container.appendChild(this.myInputDiv);
+    let mycontainer=document.createElement("DIV");
+    mycontainer.classList.add("mycontainer");
+    this.myInputDiv.replaceWith(mycontainer);
+    mycontainer.insertAdjacentHTML('beforebegin',this.styling);
+    mycontainer.appendChild(this.myInputDiv);
     this.myList = document.createElement("DIV");
     this.myList.classList.add("dropdown");
     this.myList.style.display = 'none';
-    container.appendChild(this.myList);
+    mycontainer.appendChild(this.myList);
     this.myOptions=[];
     let self = this;
 
