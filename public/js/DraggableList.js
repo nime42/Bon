@@ -74,6 +74,7 @@ class DraggableList {
 
     addElem(content) {
         let li=document.createElement("li");
+        li.style.marginBottom="0px";
         if (typeof content === "string") {
             li.innerHTML = content;
         } else {

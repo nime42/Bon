@@ -105,7 +105,13 @@
             <a href="#grocy" id="link-to-grocy"><i class="fa fa-database"> Grocy</i></a>
             <a href="#calendar" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i> Kalender</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i class="fa fa-wrench"></i> Admin</a>
-        
+            <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i class="fa fa-cutlery"></i> Kökken vy idag</a>
+
+            
+    
+
+
+
         </div>
         <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">
             <i class="fa fa-bars"></i>
@@ -256,7 +262,10 @@
         </section>
 
         <section id="admin">
-            kalendar
+        </section>
+
+        <section id="kitchen">
+            <h3>Kökken idag</h3>
         </section>
 
     </div>
@@ -269,6 +278,11 @@
         Globals.myCalender=new BonCalendar("#calendar");
 
         Globals.myConfig=new BonConfig("#admin");
+
+        Globals.myKitchenBonWall=new BonWall("#kitchen","approved",["preparing","done"],["preparing","done","delivered"]);
+        Globals.myKitchenBonWall.getBonsForToday();
+
+
 
         Globals.myLoginHandler = new LoginHandler();
         Globals.myLoginHandler.setLoginForm("#login");

@@ -4,8 +4,12 @@
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">    <script src="js/globals.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">    
+    <script src="js/globals.js"></script>
     
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+
     <link rel="stylesheet" href="css/CalendarClass.css">
     <script src="js/CalendarClass.js"></script>
     <link rel="stylesheet" href="css/ModalPopup.css">
@@ -163,7 +167,7 @@
         <a href="#calendar-tab" data-check-access="" class="nav-menu" title="Kalender" onclick="toggleMenu(this);Globals.myCalender.refresh()"><i class="fa fa-home"></i></a>
         <a href="#kitchen-tab" data-check-access="" class="nav-menu" title="Kökken vy idag" onclick="toggleMenu(this);Globals.myKitchenBonWall.getBonsForToday();"><i class="fa fa-cutlery"></i></a>
         <a href="#future-tab" data-check-access="" class="nav-menu" title="Senare" onclick="toggleMenu(this);Globals.myFutureBonWall.getFutureBons();"><i class="fa fa-sun-o"></i></a>
-        <a href="#invoice-tab" data-check-access="${ADMIN} || ${USER} " class="nav-menu" title="Fakturer" onclick="toggleMenu(this);Globals.myInvoiceBonWall.getAllBons();"><i class="fa fa-money"></i></a>
+        <a href="#invoice-tab" data-check-access="${ADMIN} || ${USER}" class="nav-menu" title="Fakturer" onclick="toggleMenu(this);Globals.myInvoiceBonWall.getAllBons();"><i class="fa fa-money"></i></a>
         <a href="#admin-tab" data-check-access="${ADMIN}" class="nav-menu" title="Admin" onclick="toggleMenu(this)"><i class="fa fa-wrench"></i></a>
 
     </nav>

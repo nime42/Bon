@@ -1,56 +1,75 @@
 <html>
 
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">    <script src="js/globals.js"></script>
+    <link rel="stylesheet" href="css/CalendarClass.css">
+    <script src="js/CalendarClass.js"></script>
+    <link rel="stylesheet" href="css/ModalPopup.css">
+    <script src="js/ModalPopup.js"></script>
     <script src="js/TabsClass.js"></script>
+    <script src="js/VertTabsClass.js"></script>
+    <script src="js/MessageBox.js"></script>
+    <script src="js/AutocompleteClass.js"></script>
+    <script src="js/BonStrip.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/BonForm.js"></script>
+    <script src="js/BonRepository.js"></script>
+    <style>
+        .nr-of {
+            font-weight: bold;
+            font-family: sans-serif;
+            width:5%;
+        }
+        .x-sign {
+            font-weight: bold;
+            font-family: sans-serif;
+            font-size:12px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        .item-name {
+            font-style: italic;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+
+        .item-info {
+            font-style: italic;
+            font-family: sans-serif;
+        }
+
+
+
+    </style>
+
 </head>
 
 <body>
-    <div id="items">
-        <style>
-            #categories {
-                width: 50%;
-                margin-right: 10px;
-            }
-
-            .category {
-                border: 0.5px solid black;  
-                padding: 3px;
-                border-radius: 6px;
-                margin: 2px;
-                background: aliceblue;
-            }
-
-            #items {
-                width: fit-content; 
-
-
-            }
-
-            .item {
-                background: greenyellow;
-
-                margin: 2px;
-                min-width: 40%;
-            }
-        </style>
-        <div style="display: flex;">
-            <div id="categories">
-                <div class="category">Sandwich</div>
-                <div class="category">Slider</div>
-                <div class="category">Kager</div>
-            </div>
-            <div id="items">
-                <button class="item">Kartoffel</button><br>
-                <button class="item">Frikadelle</button><br>
-            </div>
+    <div id="item-config">
+        <div>
+        <span><i class="fa fa-plus-square" style="font-size:20px;padding-right:4px"></i><i class="fa fa-minus-square" style="font-size:20px;padding-right:4px"></i><input type="text" class="nr-of"  name="quantity" value="1"></span>    
+        <span class="x-sign">X</span><span class="item-name">Frikadeller</span>
+        </div><br>
+        <textarea name="comment" class="item-info" placeholder="Extra info"></textarea>
+        <br>
+        <div>
+            <div style="margin-top:6px">
+                <input type="button" id="save" value="Spara">
+                <input type="button" id="delete" value="Ta bort">
+                <span>&nbsp;&nbsp;</span>
+                <input type="button" id="cancel" value="Avbryt">
         </div>
 
     </div>
-
     <script>
+        var content=`
+        <div>hello</div>
+        `
+        var myPopup=new ModalPopup();
+        //myPopup.show(content);
 
     </script>
-
 </body>
 
 </html>

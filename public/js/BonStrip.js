@@ -49,7 +49,7 @@ class BonStrip {
 
     }
     .order {
-        padding-bottom: 8px;
+        Xpadding-bottom: 8px;
         cursor: pointer;
 
     }
@@ -80,7 +80,7 @@ class BonStrip {
         margin-right: 3px;
         margin-left: 20px;
         Xborder: 1px solid black;
-        padding:2px;
+        Xpadding:2px;
         font-style: italic;
         font-weight: bold;
         font-family: sans-serif;
@@ -208,7 +208,7 @@ class BonStrip {
 
         <div id="orders"></div>
         <br>
-        <div>
+        <div id="total-sum-row">
         <span style="font-style: italic;font-weight: bold;font-family: sans-serif;">Sum:</span>
         <span id="total-sum" class="price-box">0.00 kr</span>
         </div>
@@ -386,7 +386,6 @@ class BonStrip {
         }
         this.updateTotalSum();
 
-        this.makeEditable(bon);
 
     }
 
@@ -543,6 +542,7 @@ class BonStrip {
         this.myDiv.querySelector("#orders").querySelectorAll("#total-cost").forEach(e=>{
             e.style.display="none";
         })
+        this.myDiv.querySelector("#total-sum-row").style.display="none";
     }
 
     getOrders() {
