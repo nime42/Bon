@@ -56,7 +56,6 @@ class ItemsList {
                 this.myItems.forEach(e=>{
                     e.price=price_lookup[e.id].price_categories[priceCategory];
                 })
-                console.log(this.myItems);
                 let categories={};
                 this.myItems.forEach((i)=>{
                     if(!categories[i.category]) {

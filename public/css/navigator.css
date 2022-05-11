@@ -1,7 +1,7 @@
 
 .topnav {
     overflow: hidden;
-    background-color: #333;
+    background-color: #f1e6b2;
     position: relative;
   }
   
@@ -10,7 +10,7 @@
   }
   
   .topnav a {
-    color: white;
+    color: #8e631f;
     padding: 14px 16px;
     text-decoration: none;
     font-size: 17px;
@@ -31,7 +31,7 @@
   }
   
   .menu {
-    background-color: #04AA6D;
+    background-color: #f1e6b2;
     color: white;
   }
   

@@ -431,11 +431,10 @@ class LoginHandler {
             } else {
                 let neededRoles = e.getAttribute('data-check-access');
                 let expr = neededRoles;
-                roles.forEach(r => {
+                roles && roles.forEach(r => {
                     expr = expr.replace(new RegExp("\\$\\{ *" + r + " *\\}"), true);
                 })
                 expr = expr.replaceAll(new RegExp("\\$\\{[^\\}]*\\}", "g"), false);
-                console.log("<" + expr + ">");
                 if (eval(expr == "" || expr)) {
                     e.style.display = "";
                 } else {

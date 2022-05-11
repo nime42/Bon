@@ -216,7 +216,7 @@ class BonConfig {
 
     </form> 
    `
-    constructor(div) {
+    constructor(div,callback) {
 
         this.myRepo = new BonRepository();
 
@@ -227,11 +227,6 @@ class BonConfig {
 
 
 
-        this.getItemsFromDB(()=>{
-            this.createItemsTable();
-            Globals.myCalender.myBonForm.updateItems();
-
-        });
         if(typeof div==="string") {
             div=document.querySelector(div);
         }
@@ -320,6 +315,15 @@ class BonConfig {
         self.UserAdminForm.querySelector("#cancel").onclick=function() {
             self.userInfoAdminPopup.hide();
         }
+
+
+        this.getItemsFromDB(()=>{
+            this.createItemsTable();
+            Globals.myCalender.myBonForm.updateItems();
+
+            callback && callback();
+
+        });
 
     }
 

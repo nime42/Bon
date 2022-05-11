@@ -125,7 +125,6 @@ class CalendarClass {
           dayNrCol.classList.add("disabled");
         }
         dayNrCol.id=`day-${d.getDate()}`;
-        console.log(d,d.getDate())
         dayNrCol.innerHTML=`<span class="${isToday?"circle-to-day":""} ${disabled?"not-current-month":""}" style="width: min-content;align-self: end;">${d.getDate()}</span>`;
 
         let self=this;

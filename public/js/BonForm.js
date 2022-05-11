@@ -229,23 +229,19 @@ class BonForm {
                       </div>
                   </div>
 
-
-
-              <br>
-              <div class="bon-row indent" style="background:${this.background}">
-                  <div style="text-align: center;    padding-top: 10px;">
-                      <input class="button-primary" type="button" id="save" value="Spara">
-                      <input type="button" id="delete" value="Ta bort" class="for-update">
-                      <input type="button" id="copy" value="Kopier" class="for-update">
-                      <input type="button" id="cancel" value="Avbryt">
+                  <div class="bon-row" style="position:sticky;bottom:0;background: wheat;">
+                  <div id="buttons" style="text-align: center;padding-top: 10px;">
+                  <input class="button-primary" type="button" id="save" value="Spara">
+                  <input type="button" id="delete" value="Ta bort" class="for-update">
+                  <input type="button" id="copy" value="Kopier" class="for-update">
+                  <input type="button" id="cancel" value="Avbryt">
                   </div>
-
-              </div>
+                  </div>
 
 
               <input type="hidden" name="bon_id" />
 
-          </form>
+ 
       </div>
       <div class="bon-column">
       <div class="bon-container">
@@ -256,6 +252,8 @@ class BonForm {
         </div>
       </div>
   </div>
+  </form>
+
 </div>
    
     `;
@@ -302,7 +300,7 @@ class BonForm {
 
    
 
-    this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"),true,false,this.myDiv.querySelector("#items-selector"));
+    this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"),true,this.myDiv.querySelector("#items-selector"));
     this.myBonStrip.updateNameOnChange(
       form.querySelector("#forename"),
       form.querySelector("#surname")
@@ -334,9 +332,9 @@ class BonForm {
       form.querySelector("#kitchen_selects")
     );
 
+    let buttons=this.myDiv.querySelector("#buttons");
 
-
-    form.querySelector("#save").onclick = function () {
+    buttons.querySelector("#save").onclick = function () {
       let props = Helper.getFormProps(form);
 
       let bon = self._createBon(props);
@@ -348,12 +346,12 @@ class BonForm {
       });
     };
 
-    form.querySelector("#cancel").onclick = function (e) {
+    buttons.querySelector("#cancel").onclick = function (e) {
       self.onFormClose && self.onFormClose("canceled");
       self.myPopupObj.hide();
     };
 
-    form.querySelector("#delete").onclick = function (e) {
+    buttons.querySelector("#delete").onclick = function (e) {
       MessageBox.popup("Vill du verkligen ta bort denna Bon?", {
         b1: {
           text: "Ja",
@@ -368,7 +366,7 @@ class BonForm {
       });
     };
 
-    form.querySelector("#copy").onclick = function (e) {
+    buttons.querySelector("#copy").onclick = function (e) {
       let props = Helper.getFormProps(form);
       let bon = self._createBon(props);
       bon.id = "";

@@ -1,19 +1,25 @@
+<!DOCTYPE html>
 <html>
 
 <head>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">    
-    <script src="js/globals.js"></script>
-    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/skeleton.css">
 
+    <link rel="stylesheet" href="css/navigator.css">
     <link rel="stylesheet" href="css/CalendarClass.css">
-    <script src="js/CalendarClass.js"></script>
+    <link rel="stylesheet" href="css/BonForm.css">
     <link rel="stylesheet" href="css/ModalPopup.css">
+
+    <script src="js/globals.js"></script>
+    <script src="js/CalendarClass.js"></script>
     <script src="js/ModalPopup.js"></script>
+    <script src="js/Overlay.js"></script>
     <script src="js/TabsClass.js"></script>
     <script src="js/DraggableList.js"></script>
     <script src="js/VertTabsClass.js"></script>
@@ -29,131 +35,60 @@
     <script src="js/BonWall.js"></script>
     <script src="js/loginHandler.js"></script>
 
-    <style>
-        body {
-            font-family: sans-serif;
-            font-size: 16px;
-        }
-    
-        @media screen and (max-width: 700px) {
-            body {
-                font-size: 1.5vmax;
+
+    <script>
+        function toggleMenu() {
+            var x = document.getElementById("myLinks");
+            if (x.style.display === "block") {
+                x.style.display = "none";
+            } else {
+                x.style.display = "block";
             }
         }
 
-
-        :root {
-            --primary-color: #8e631f;
-            --secondary-color: #f1e6b2;
-            --complimentary-color: #88BFB5;
-            --contrast-color: #F2E527;
-            --light-color: #D2A9D9;
-        }
-
-        .nav-container {
-            background: #191919;
-            min-height: 100vh;
-            font-family: Montserrat, sans-serif;
-        }
-
-        nav a {
-            font-size: 40px;
-            color: var(--secondary-color);
-            text-decoration: none;
-            padding: 20px;
-            text-align: center;
-        }
-
-        a.active {
-            color: var(--primary-color);
-            background: var(--secondary-color);
-
-        }
-
-        nav {
-            position: fixed;
-            left: 0;
-            z-index: 50;
-            display: flex;
-            justify-content: space-around;
-            flex-direction: column;
-            height: 100vh;
-            background: var(--primary-color);
-        }
-
-        section {
-            position: absolute;
-            top: 0;
-            height: 100vh;
-            opacity: 0;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-
-
-        /* Styles applied on trigger */
-        section:target {
-            opacity: 1;
-            left: 10%;
-            height: 100%;
-            width:90%;
-            display: flex;
-        }
-
-
-        .menu-content {
-            background: var(--secondary-color);
-        }
-
-        .form > label
-        {
-        float: left;
-        clear: right;
-        }
-
-        .form > input
-        {
-        float: right;
-        }
-
-
-
-    </style>
-    <script>
-        function toggleMenu(elem) {
-            document.querySelectorAll(".nav-menu").forEach(e=>{
-                e.classList.remove("active");
+        function gotoMenu(elem) {
+            document.querySelector("#menu-header").innerText=elem.innerText;
+            let menuId = elem.href.split("#")[1];
+            let menus = document.querySelector("#menu-elems");
+            Array.from(menus.children).forEach(m => {
+                if (m.id === menuId) {
+                    m.style.display = "";
+                    elem.classList.add("active-menu");
+                } else {
+                    m.style.display = "none";
+                    elem.classList.remove("active-menu");
+                }
             })
-            elem.classList.add("active")
+
         }
+
+
+        function logout() {
+            Globals.myLoginHandler.logout();
+            location.reload();
+            return false;
+        };
+
+
+        function updateUser() {
+            document.querySelector("#logout").style.display = "none";
+            document.querySelector("#update-user").style.display = "";
+            Globals.myLoginHandler.populateUserInfoForm("#update-user");
+
+        }
+
 
         function syncMenu() {
             let url=window.location.href;
             let m=url.match(/#.*/);
             if(m) {
                 let menuId=m[0];
-                let menuElem=document.querySelector(`a[href='${menuId}']`);
-                if(menuElem) {
-                    toggleMenu(menuElem);
-                }
+                try {
+                    document.querySelector(`a[href='${menuId}'`).onclick();
+                    toggleMenu();
+                } catch(err) {}
             }
         }
-
-        function logout() {
-                Globals.myLoginHandler.logout();
-                location.reload();
-                return false;
-        };
-
-        function updateUser() {
-            document.querySelector("#logout").style.display="none";
-            document.querySelector("#update-user").style.display="";
-            Globals.myLoginHandler.populateUserInfoForm("#update-user");
-
-        }
-
 
     </script>
 
@@ -161,152 +96,252 @@
 
 <body>
 
-    <nav>
-        <a href="#login-tab"  class="nav-menu" title="Login" onclick="toggleMenu(this)"><i class="fa fa-key"></i></a>
-        <a href="" id="link-to-grocy" class="nav-menu" title="Grocy" target="_blank"><i class="fa fa-database"></i></a>
-        <a href="#calendar-tab" data-check-access="" class="nav-menu" title="Kalender" onclick="toggleMenu(this);Globals.myCalender.refresh()"><i class="fa fa-home"></i></a>
-        <a href="#kitchen-tab" data-check-access="" class="nav-menu" title="Kökken vy idag" onclick="toggleMenu(this);Globals.myKitchenBonWall.getBonsForToday();"><i class="fa fa-cutlery"></i></a>
-        <a href="#future-tab" data-check-access="" class="nav-menu" title="Senare" onclick="toggleMenu(this);Globals.myFutureBonWall.getFutureBons();"><i class="fa fa-sun-o"></i></a>
-        <a href="#invoice-tab" data-check-access="${ADMIN} || ${USER}" class="nav-menu" title="Fakturer" onclick="toggleMenu(this);Globals.myInvoiceBonWall.getAllBons();"><i class="fa fa-money"></i></a>
-        <a href="#admin-tab" data-check-access="${ADMIN}" class="nav-menu" title="Admin" onclick="toggleMenu(this)"><i class="fa fa-wrench"></i></a>
 
-    </nav>
+    <!-- Top Navigation Menu -->
+    <div class="topnav">
+        <a href="#home" class="menu">RR &nbsp;<span id="menu-header">hej</span></a>
+        <div id="myLinks">
+            <a href="#log-in" class="active-menu" onclick="gotoMenu(this);toggleMenu()"><i class="fa fa-key">Login</i></a>
+            <a href="#grocy" id="link-to-grocy"><i class="fa fa-database"> Grocy</i></a>
+            <a href="#calendar" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i> Kalender</a>
+            <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i class="fa fa-wrench"></i> Admin</a>
+            <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i class="fa fa-cutlery"></i> Kökken vy idag</a>
+            <a href="#invoices" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myInvoiceBonWall.getBonsForInvoice();toggleMenu();"><i class="fa fa-money"></i> Fakturer</a>
+            <a href="#future" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i class="fa fa-sun-o"></i>Senare</a>
 
-    <div class='nav-container menu-content'>
-        <section id='login-tab'>
+            
+    
 
+
+
+        </div>
+        <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+
+    <div id="menu-elems" style="margin-top: 5%;">
+        <section id="log-in">
+            <div class="container">
                 <form id="login" class="login-form-style" autocomplete="off" method="post">
-                    <fieldset>
-                        <legend>Login</legend>
-                        <p id="error-msg" style="color:red"></p>
-                        <input type="text" name="username" placeholder="userid/mail" autocomplete="nope"> <br><br>
-                        <input type="password" name="password" placeholder="password" autocomplete="nope">
-                        <div style="margin-top:10px">
-                            <input type="submit" id="login-button" value="Login">
+                    <h5>Log in</h5>
+                    <div class="row">
+                        <div class="twelwe columns" id="error-msg" style="color:red"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="six columns">
+                            <label for="user-login">Username/email</label>
+                            <input name="username" class="u-full-width" type="text" placeholder="Username"
+                                id="user-login">
                         </div>
-                        <br>
-                        <a href="javascript:void(0);" style="font-size: small;" onclick="document.querySelector('#login').style.display='none';document.querySelector('#forgot-password').style.display='block';">Glömt lösenord?</a>
-        
-                    </fieldset>
-                </form>
-                <span id="logout" style="display:none"><button onclick="updateUser()">Bruger info</button><button onclick="logout()" style="margin-left:5px">Logout</button></span>
-                <form id="forgot-password" class="login-form-style" autocomplete="off" method="post" style="display:none;">
-                    <fieldset>
-                        <legend>Glömt Lösenord</legend>
-                        <p id="error-msg" style="color:red"></p>
-                        <input type="text" name="identity" placeholder="userid/mail" autocomplete="nope"> <br><br>
-                        <div style="margin-top:10px">
-                            <input type="submit" id="send" value="Send">
+                    </div>
+                    <div class="row">
+                        <div class="six columns">
+                            <label for="pwd">Password</label>
+                            <input name="password" class="u-full-width" type="password" placeholder="password"
+                                id="pwd">
                         </div>
-        
-                    </fieldset>
+                    </div>
+                    <div class="row">
+                        <div class="three columns">
+                            <input id="login-button" class="button-primary" type="submit" value="Login">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="three columns">
+                            <a href="javascript:void(0);" style="font-size: small;"
+                                onclick="document.querySelector('#login').style.display='none';document.querySelector('#forgot-password').style.display='block';">Glömt
+                                lösenord?</a>
+                        </div>
+                    </div>
                 </form>
 
-                <form id="reset-password" class="login-form-style" autocomplete="off" method="post" style="display:none;">
-                    <fieldset>
-                        <legend>Återställ Lösenord</legend>
-                        <p id="error-msg" style="color:red"></p>
-                        <input type="password" name="password" placeholder="password" autocomplete="nope">
-                        <div style="margin-top:10px">
-                            <input type="submit" id="new-password" value="Uppdatera">
+                <!--logout-->
+                <div id="logout" class="row" style="display:none">
+                    <div class="three columns">
+                        <input type="button" value="Bruger info" onclick="updateUser()">
+                    </div>
+                    <div class="three columns">
+                        <input class="button-primary" type="button" value="Logout" onclick="logout()">
+                    </div>
+                </div>
+
+                <!--Forgot password-->
+                <form id="forgot-password" autocomplete="off" method="post" style="display:none">
+                    <h5>Glömt Lösenord</h5>
+                    <div class="row">
+                        <div class="twelwe columns" id="error-msg" style="color:red"></div>
+                    </div>
+                    <div class="row">
+                        <div class="six columns">
+                            <label for="user-forgot">Email</label>
+                            <input class="u-full-width" type="text" placeholder="email" id="user-forgot"  name="identity">
                         </div>
-        
-                    </fieldset>
+                    </div> 
+                    <div class="row">
+                        <div class="three columns">
+                            <input class="button-primary" type="submit" id="send" value="Skicka">
+                        </div>
+                    </div>
                 </form>
-                
-                <form id="update-user" class="login-form-style" autocomplete="off" method="post" style="display:none;">
-                    <fieldset class="form">
-                        <legend>Uppdater bruger info</legend>
-                        <p id="error-msg" style="color:red"></p>
-                        <label for="username">Bruger-id:</label><input disabled type="text" name="username" id="username"><br>
-                        <label for="name">Navn:</label><input type="text" name="name" id="name"><br>
-                        <label for="email">Email:</label><input type="email" name="email" id="email"><br>
-                        <label for="phonenr">Telefon:</label><input type="tel" name="phonenr" id="phonenr"><br>
-                        <label for="password">Password:</label><input type="password" name="password" id="password"><br>
-                        <br><br>
-                        <div style="width:100%">
-                            <input type="submit" id="update-user" value="Uppdater">
-                            <input type="button" id="cancel" value="Avbryd" onclick="document.querySelector('#logout').style.display='';document.querySelector('#update-user').style.display='none';">
+
+                <form id="reset-password" autocomplete="off" method="post" style="display:none">
+                    <h5>Återställ lösenord</h5>
+                    <div class="row">
+                        <div class="six columns">
+                            <label for="pwd-reset">Password</label>
+                            <input name="password" class="u-full-width" type="password" placeholder="password"
+                                id="pwd-reset">
                         </div>
-        
-                    </fieldset>
-                </form> 
+                    </div>
+                    <div class="row">
+                        <div class="three columns">
+                            <input class="button-primary" type="submit" id="new-password" value="Uppdatera">
+                        </div>
+                    </div>
+                </form>
+
+
+                <form id="update-user" autocomplete="off" method="post" style="display:none;">
+                    <h5>Uppdater bruger info</h5>
+                    <div class="row">
+                        <div class="twelwe columns" id="error-msg" style="color:red"></div>
+                    </div>
+                    <div class="row">
+                        <div class="six columns">
+                            <label for="user-update">Bruger-id</label>
+                            <input name="username" class="u-full-width" type="text" placeholder="Username"
+                                id="user-update">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="six columns">
+                            <label for="name">Navn</label>
+                            <input name="name" class="u-full-width" type="text" placeholder="name" id="name">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="six columns">
+                            <label for="email">Navn</label>
+                            <input name="email" class="u-full-width" type="text" placeholder="email" id="email">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="six columns">
+                            <label for="phonenr">Navn</label>
+                            <input name="phonenr" class="u-full-width" type="text" placeholder="phonenr" id="phonenr">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="six columns">
+                            <label for="pwd-update">Password</label>
+                            <input name="password" class="u-full-width" type="password" placeholder="password"
+                                id="pwd-update">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="three columns">
+                            <input class="button-primary" type="submit"  value="Uppdater">
+                        </div>
+                        <div class="three columns">
+                            <input class="button" type="button" id="cancel" value="Avbryd"
+                                onclick="document.querySelector('#logout').style.display='';document.querySelector('#update-user').style.display='none';">
+                        </div>
+                    </div>
+
+
+
+                </form>
+            </div>
+
+
 
         </section>
+        <section id="calendar">
+            kalendar
+        </section>
 
-        <section id='calendar-tab'>
-            <div id="calendar"></div>
+        <section id="admin">
         </section>
-        <section id='kitchen-tab'>
-            <div id="kitchen"></div>
+
+        <section id="kitchen">
         </section>
-        <section id='future-tab'>
-            <div id="future"></div>
-        </section>        
-        <section id='invoice-tab'>
-            <div id="invoice"></div>
+
+        <section id="invoices">
         </section>
-        <section id='admin-tab'>
-            <div id="admin"></div>
+
+
+        <section id="future">
         </section>
+
     </div>
 
     <script>
 
-        document.querySelector("#link-to-grocy").href=Globals.grocyLink;
+
+        document.querySelector("#link-to-grocy").href = Globals.grocyLink;
 
         Globals.myCalender=new BonCalendar("#calendar");
-        Globals.myConfig=new BonConfig("#admin");
-        Globals.myKitchenBonWall=new BonWall("#kitchen","approved",["preparing","done"],["preparing","done","delivered"]);
-        Globals.myKitchenBonWall.getBonsForToday();
 
-        Globals.myInvoiceBonWall=new BonWall("#invoice","delivered",["preparing","done"],["invoiced"]);
-        Globals.myInvoiceBonWall.getAllBons();
+        Globals.myConfig=new BonConfig("#admin",()=>{
+            gotoMenu(document.querySelector(".active-menu"));
+            syncMenu();
+        });
 
-        Globals.myFutureBonWall=new BonWall("#future","new",["needInfo","approved","preparing"],[]);
-        Globals.myFutureBonWall.getFutureBons();
+        Globals.myKitchenBonWall=new BonWall("#kitchen",["approved","preparing","done"]);
+
+        Globals.myInvoiceBonWall=new BonWall("#invoices",["delivered"]);
+
+        Globals.myFutureBonWall=new BonWall("#future",["new","needInfo","approved","preparing"]);
 
         Globals.myLoginHandler = new LoginHandler();
         Globals.myLoginHandler.setLoginForm("#login");
         Globals.myLoginHandler.whenLoggedIn(() => {
-           
-            Globals.myLoginHandler.getUserInfo((userInfo)=>{
-                Globals.userInfo=userInfo;
+            Globals.myLoginHandler.getUserInfo((userInfo) => {
+                Globals.userInfo = userInfo;
+                console.log(userInfo);
                 Globals.myLoginHandler.checkAccess(Globals.userInfo?.roles);
-            });
-            
-            document.querySelector("#login").style.display="none";
-            document.querySelector("#logout").style.display="";
 
+                if(userInfo.roles.find(r=>(r==="ADMIN"))) {
+                    gotoMenu(document.querySelector('a[href="#calendar"]'));
+                } else {
+                    gotoMenu(document.querySelector('a[href="#kitchen"]'));
+                }
+
+            });
+
+            document.querySelector("#login").style.display = "none";
+            document.querySelector("#logout").style.display = "";
         })
         Globals.myLoginHandler.setForgotPasswordForm("#forgot-password");
-        Globals.myLoginHandler.whenForgotPassword(()=>{
+        Globals.myLoginHandler.whenForgotPassword(() => {
             alert("Reset mail sent");
             location.reload();
         });
 
 
         Globals.myLoginHandler.setResetPasswordForm("#reset-password");
-        Globals.myLoginHandler.whenResetPassword(()=>{
+        Globals.myLoginHandler.whenResetPassword(() => {
             alert("Password reset");
-            window.location.href=Globals.myLoginHandler.removeResetTokenFromUrl();
-;
+            window.location.href = Globals.myLoginHandler.removeResetTokenFromUrl();;
         });
 
 
         Globals.myLoginHandler.setUpdateForm("#update-user");
-        Globals.myLoginHandler.whenUpdate(()=>{
-            Globals.myLoginHandler.getUserInfo((userInfo)=>{
-                Globals.userInfo=userInfo;
+        Globals.myLoginHandler.whenUpdate(() => {
+            Globals.myLoginHandler.getUserInfo((userInfo) => {
+                Globals.userInfo = userInfo;
             });
             document.querySelector("#update-user").querySelector("#cancel").click();
 
         })
 
 
-        if(Globals.myLoginHandler.isResetRequest()) {
-            document.querySelector("#login").style.display="none";
-            document.querySelector("#reset-password").style.display="block";
+        if (Globals.myLoginHandler.isResetRequest()) {
+            document.querySelector("#login").style.display = "none";
+            document.querySelector("#reset-password").style.display = "block";
 
         }
 
@@ -314,13 +349,16 @@
 
 
         if (Globals.myLoginHandler.isLoggedIn()) {
-            Globals.myLoginHandler.onLoggedIn();    
+            Globals.myLoginHandler.onLoggedIn();
         } else {
-            window.location.href="#login-tab"
+            window.location.href = "#login-tab"
         }
-        syncMenu();
-        
-</script>
+
+        Globals.myLoginHandler.checkAccess(Globals.userInfo?.roles);
+       
+
+
+    </script>
 
 </body>
 

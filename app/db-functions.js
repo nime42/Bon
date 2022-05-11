@@ -98,7 +98,7 @@ return rows = db.prepare(sql).all(bonId);
 
 }
 
-function searchBons(searchParams,callback = console.log) {
+function searchBons(searchParams,includeOrders,callback = console.log) {
 
   let statuses=['new', 'needInfo', 'approved', 'preparing', 'done', 'delivered', 'invoiced', 'offer'];
   let statusSearchConstr;
@@ -135,9 +135,10 @@ function searchBons(searchParams,callback = console.log) {
    left join companies co on c.company_id =co.id
    left join addresses co_a on co_a.id=co.address_id
    where b.id=ifnull(@bonId,b.id) and ${statusSearchConstr} and b.status2=ifnull(@status2,b.status2)
-    and b.delivery_date>=ifnull(@afterDate,b.delivery_date) and b.delivery_date<=ifnull(@beforeDate,b.delivery_date)
+    and date(b.delivery_date)>=ifnull(@afterDate,date(b.delivery_date,'-1 day')) and date(b.delivery_date)<=ifnull(@beforeDate,date(b.delivery_date))
   order by b.delivery_date
   `;
+ 
   try {
     const rows = db.prepare(sql).all(searchParams);
 
@@ -172,6 +173,9 @@ function searchBons(searchParams,callback = console.log) {
       );
       r.customer.company.address = r.company_address;
       delete r.company_address;
+      if(includeOrders) {
+        r.orders=getOrders(r.id);
+      }
     });
 
     callback(true, rows);
@@ -478,16 +482,24 @@ function saveOrders(bonId, orders) {
   });
 }
 
-function getOrders(bonId, callback = console.log) {
+function getOrders(bonId, callback) {
   let sql = `select i.name,i.category,o.*,i.external_id from orders o 
   left join items i on o.item_id=i.id
   where bon_id=? order by sorting_order`;
 
   try {
     const rows = db.prepare(sql).all(bonId);
-    callback(true, rows);
+    if(callback) {
+        callback(true, rows);
+    } else {
+      return rows;
+    }
   } catch (err) {
-    callback(false, err);
+    if(callback) {
+      callback(false, err);
+    } else {
+      throw err;
+    }
   }
 }
 

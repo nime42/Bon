@@ -348,7 +348,7 @@ app.get("/updateDB", (req, res) => {
 });
 
 app.get("/searchBons",(req,res) => {
-    db.searchBons(req.query,function(status,items){
+    db.searchBons(req.query,req.query.includeOrders=="true",function(status,items){
         if(status) { 
             res.json(items); 
         } else {

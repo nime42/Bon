@@ -5,146 +5,98 @@ class BonWall {
 
 
     content=`
-    <div id=status-row style="padding: 10px; border: 2px solid ${this.foreground};border-radius:3px 3px">
-    $STATUSBUTTONS$
+    <div class="bon-container">
+    <div id="bons" class="bon-row">
     </div>
-    <div class="bon-item"/>
+    </div>
+
     `
         
-    constructor(div,startStatus,statusFilter,statusButtons) {
-        this._createStatusRow(statusButtons);
-        this.startStatus=startStatus;
-        this.endStatus=statusButtons[statusButtons.length-1];
-        this.statusFilter=statusFilter;
-        this.statusFilter.push(startStatus);
-        let parent;
+    constructor(div,statusFilter) {
+
         if(typeof div==="string") {
-            parent=document.querySelector(div);
+            this.myDiv = document.querySelector(div);
         } else {
-            parent=div;
+            this.myDiv=div;
         }
-
-        this.myDiv=document.createElement("div");
-        this.myDiv.classList.add("bon-wall");
-        this.myDiv.style.cssText=`display: flex;flex-wrap: wrap; background:${this.background};width:100%;height: 100%;margin-top: 10%;margin-left: 10%;` ;
-        parent.appendChild(this.myDiv);
+        this.statusFilter=statusFilter;
+        this.myDiv.innerHTML = this.content;
+        this.bonRow=this.myDiv.querySelector("#bons");
     }
 
-    _createStatusRow(statuses) {
-        let rows="";
-        statuses.forEach(s=>{
-            let row=`<button type="button" class="status-button" value="${Globals.Statuses[s].name}">${Globals.Statuses[s].label}</button>`;
-            rows+=row+"\n";
-        })
-        this.content=this.content.replace("$STATUSBUTTONS$",rows);
 
-    }
 
-    addBon(bon,orders) {
-        let div=document.createElement("div");
-        div.style.cssText="margin:10px";
-        div.innerHTML=this.content;
-        let color=Globals.Statuses[bon.status].color;
-        
-        let self=this
-        div.querySelectorAll(".status-button").forEach(e=>{
-            if(e.value===bon.status) {
-                e.classList.add("active");
-                e.style.background=color;
-            }
-            e.onclick=(evt)=>{
-                self.clickStatus(bon.id,evt.target);
-            }
-        })
-        let bonDiv=div.querySelector(".bon-item");
-
-        this.myDiv.appendChild(div);
-        let bs=new BonStrip(bonDiv);
+    addBon(bon,orders,editable) {
+        let col=document.createElement("div");
+        col.classList.add("bon-column");
+        col.style.cssText=`
+        margin-right: 10px;
+        margin-bottom: 15px;
+        `
+        let bs=new BonStrip(col,editable);
         bs.initFromBon(bon,orders);
-        bs.hidePrices();
-
-    }
-
-    clickStatus(id,elem) {
-        if(this.cancelFunction) {
-            this.cancelFunction();
-        }
-        let isActive=elem.classList.contains("active");
-        let status=elem.value;
-        let color=Globals.Statuses[status].color;
-        
-        elem.parentElement.querySelectorAll(".status-button").forEach(e=>{
-            e.classList.remove("active");
-            e.style.background="";
-        });
-        if(!isActive) {
-            elem.classList.add("active");
-            elem.style.background=color;
-        } else {
-            status=this.startStatus;
-        }
-        
-        if(status==this.endStatus) {
-            this._fadeout(elem,id,status);
-        } else {
-            Globals.myConfig.myRepo.updateBonStatus(id,status,(status)=>{});
-        }
-    }
-
-    _fadeout(elem,id,status) {
-        let parentDiv=elem.parentElement.parentElement;
-        let bonDiv=elem.parentElement.nextElementSibling;
-        let t=3;
-        let orgStyle=bonDiv.style.cssText;
-        let style=`
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0s ${t}s, opacity ${t}s linear;      
-        `;
-        bonDiv.style.cssText+=style;
-
-        let timer=setTimeout(()=>{
-            Globals.myConfig.myRepo.updateBonStatus(id,status,(status)=>{});
-            parentDiv.remove();
-        }, t*1000);
-
-        this.cancelFunction=() => {
-            clearTimeout(timer);
-            bonDiv.style.cssText=orgStyle;
-            this.cancelFunction=undefined;
-        }
-    
+        this.bonRow.appendChild(col);
+        return [bs,col];
     }
 
     getBonsForToday() {
-        this.myDiv.innerHTML="";
+        this.bonRow.innerHTML="";
         let today = new Date();
         let todayStr = today.toISOString().split('T')[0];
         let tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
         let tomorrowStr = tomorrow.toISOString().split('T')[0];
         let self = this;
-        Globals.myConfig.myRepo.searchBons({ afterDate: todayStr, beforeDate: tomorrowStr,status:this.statusFilter.join(",") }, (bons) => {
+        Globals.myConfig.myRepo.searchBons({ afterDate: todayStr, beforeDate: todayStr,status:this.statusFilter.join(","),includeOrders:true }, (bons) => {
             bons.forEach(b => {
-                Globals.myConfig.myRepo.getOrders(b.id, (orders) => {
-                    self.addBon(b, orders);
-                })
+                let [bonStrip,colElem]=self.addBon(b, b.orders,true);
+                bonStrip.setOnUpdateOrder(()=>{
+                    bonStrip.saveOrders();
+                });
+                bonStrip.hidePrices();
+                bonStrip.addStatuses(["preparing","done","delivered"],(status,onOff)=>{
+                    if(this.cancelFunction) {
+                        this.cancelFunction();
+                    }
+                    if(status=="preparing" && onOff=="off") {
+                        status="approved";
+                    }
+                    if(status=="delivered" && onOff=="on") {
+                        this._fadeout(colElem,bonStrip.bonId,"delivered");
+                    } else {
+                        Globals.myConfig.myRepo.updateBonStatus(bonStrip.bonId,status,(status)=>{});
+                    }
+                    
+                });
             })
         })
 
     }
 
-    getFutureBons() {
-        this.myDiv.innerHTML="";
 
-        let tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate()+1);        
+    getBonsForInvoice() {
+        this.bonRow.innerHTML="";
+        let today = new Date();
+        let todayStr = today.toISOString().split('T')[0];
+        let tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
         let tomorrowStr = tomorrow.toISOString().split('T')[0];
         let self = this;
-        Globals.myConfig.myRepo.searchBons({ afterDate: tomorrowStr, status:this.statusFilter.join(",") }, (bons) => {
+        Globals.myConfig.myRepo.searchBons({ afterDate: todayStr,status:this.statusFilter.join(","),includeOrders:true }, (bons) => {
             bons.forEach(b => {
-                Globals.myConfig.myRepo.getOrders(b.id, (orders) => {
-                    self.addBon(b, orders);
-                })
+                let [bonStrip,colElem]=self.addBon(b, b.orders,true);
+                bonStrip.setOnUpdateOrder(()=>{
+                    bonStrip.saveOrders();
+                });
+
+                bonStrip.addStatuses(["invoiced"],(status,onOff)=>{
+                    if(this.cancelFunction) {
+                        this.cancelFunction();
+                    }
+
+                    if(status=="invoiced" && onOff=="on") {
+                        this._fadeout(colElem,bonStrip.bonId,"invoiced");
+                    }
+                    
+                });
             })
         })
 
@@ -152,15 +104,55 @@ class BonWall {
 
 
 
-    getAllBons() {
-        this.myDiv.innerHTML="";
+    getFutureBons() {
+        this.bonRow.innerHTML="";
+        let today = new Date();
+        let todayStr = today.toISOString().split('T')[0];
+        let tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
+        let tomorrowStr = tomorrow.toISOString().split('T')[0];
         let self = this;
-        Globals.myConfig.myRepo.searchBons({status:this.statusFilter.join(",") }, (bons) => {
+        Globals.myConfig.myRepo.searchBons({ afterDate: tomorrowStr,status:this.statusFilter.join(","),includeOrders:true }, (bons) => {
             bons.forEach(b => {
-                Globals.myConfig.myRepo.getOrders(b.id, (orders) => {
-                    self.addBon(b, orders);
-                })
+                let [bonStrip,colElem]=self.addBon(b, b.orders,true);
+                bonStrip.setOnUpdateOrder(()=>{
+                    bonStrip.saveOrders();
+                });
+                bonStrip.hidePrices();
+                
             })
         })
-    }    
+
+    }
+
+
+
+    _fadeout(elem,id,status) {
+        let t=3;
+        let orgStyle=elem.style.cssText;
+        let style=`
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s ${t}s, opacity ${t}s linear;      
+        `;
+        elem.style.cssText+=style;
+
+        let timer=setTimeout(()=>{
+            Globals.myConfig.myRepo.updateBonStatus(id,status,(status)=>{});
+            elem.remove();
+        }, t*1000);
+
+        this.cancelFunction=() => {
+            clearTimeout(timer);
+            elem.style.cssText=orgStyle;
+            this.cancelFunction=undefined;
+        }
+    
+    }
+
+
+
+
+
+
+  
 }

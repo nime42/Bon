@@ -157,6 +157,8 @@ class BonStrip {
     </style>
 
     <div id="bon">
+        <div id="status-row">
+        </div>
         <fieldset>
             <legend>Bon-id <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
                 <div id="bon-id" class="bonstrip-items field-content"></div>
@@ -226,7 +228,7 @@ class BonStrip {
 
 
 
-    constructor(div,isEditable,instantSave,externalItemList) {
+    constructor(div,isEditable,externalItemList) {
         if(typeof div==="string") {
             this.myDiv = document.querySelector(div);
         } else {
@@ -259,12 +261,6 @@ class BonStrip {
 
         }
 
-        if (instantSave) {
-            this.saveOrders = () => {
-                Globals.myConfig.myRepo.updateOrders(this.bonId, this.getOrders().orders);
-
-            }
-        }
 
 
         this.myOrders=new DraggableList(this.myDiv.querySelector("#orders"),true);
@@ -344,7 +340,7 @@ class BonStrip {
             self.currentOrder=undefined;
             self.updateTotalSum();
 
-            self.saveOrders && self.saveOrders();
+            self.onUpdateOrder && self.onUpdateOrder();
         };
 
 
@@ -353,7 +349,7 @@ class BonStrip {
                 self.myOrders.removeElem(self.currentOrder);
                 self.currentOrder=undefined;
                 self.updateTotalSum();
-                self.saveOrders && self.saveOrders();
+                self.onUpdateOrder && self.onUpdateOrder();
             }
             self.orderConfigPopup.hide();
         };  
@@ -369,7 +365,57 @@ class BonStrip {
 
     }
 
- 
+    saveOrders() {
+        Globals.myConfig.myRepo.updateOrders(this.bonId, this.getOrders().orders);
+    }
+
+    setOnUpdateOrder(fun) {
+        this.onUpdateOrder=fun;
+    }
+
+    addStatuses(statuses,onclick) {
+        let statusRow=this.myDiv.querySelector("#status-row");
+        let statusStyle=`
+        float: left;
+        border: 1px solid black;
+        margin-right: 3px;
+        border-radius: 6px;
+        padding-left: 1px;
+        padding-right: 1px;
+        margin-bottom:2px;
+        margin-top:2px;
+        cursor:pointer;        
+        `
+        statuses.forEach(s=> {
+            let div=document.createElement("div");
+            div.style.cssText=statusStyle;
+            div.innerText=Globals.Statuses[s].label;
+            div.onclick=(ev)=>{
+                Array.from(statusRow.children).forEach(c => {
+                    if(c!=ev.target) {
+                        c.style.background="";
+                    }
+                })
+                if(ev.target.style.background=="") {
+                    ev.target.style.background=Globals.Statuses[s].color;
+                    onclick && onclick(s,"on");
+                } else {
+                    ev.target.style.background="";
+                    onclick && onclick(s,"off");
+                }
+            }
+            statusRow.appendChild(div);
+            if(s==this.status) {
+                div.style.background=Globals.Statuses[s].color;
+            }
+        })
+        let endDiv=document.createElement("div");
+        endDiv.style.clear="left";
+        statusRow.appendChild(endDiv);
+
+
+    }
+
     initFromBon(bon,orders) {
         this.setBonId(bon.id);
         this.setCustomerInfo(bon);
@@ -377,6 +423,7 @@ class BonStrip {
         this.setPaxAndKitchenSelects(bon);
         this.setDeliveryDate(bon.delivery_date);
         this.setKitchenInfo(bon.kitchen_info);
+        this.status=bon.status;
 
         if(orders) {
             orders.forEach(o=>{
@@ -384,36 +431,11 @@ class BonStrip {
             })
 
         }
-        this.updateTotalSum();
-
-
-    }
-
-    makeEditable(bon) {
-
-        let itemslistElem = this.myDiv.querySelector("#items-list");
-
-        this.myItemsList = new ItemsList(itemslistElem);
-        this.myItemsList.updateItems(bon.price_category);
-        this.myItemsList.SetOnItemClick((item) => {
-            this.configureOrder(1, item.name, "", item.id, item.price, item.cost_price, item.category);
-        });
-        
-        this.myDiv.querySelector("#add-items").style.display="";
-        this.myDiv.querySelector("#show-items-list").onclick=() => {
-            if(itemslistElem.style.display=="none") {
-                itemslistElem.style.display=""
-            } else {
-                itemslistElem.style.display="none";
-            }
-        }
-        this.saveOrders=()=>{
-            Globals.myConfig.myRepo.updateOrders(bon.id,this.getOrders().orders);
-
-        }
-
+        this.updatePricesFromCategory(bon.price_category);
 
     }
+
+
 
 
     addOrder(quantity,name,comment,id,price,cost_price,category) {
@@ -596,6 +618,7 @@ class BonStrip {
         } else {
             this.myDiv.querySelector("#bon-id").innerHTML="#"+bonId;
         }
+        this.bonId=bonId;
     }
 
     setCustomerInfo(bon) {

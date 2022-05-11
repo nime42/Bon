@@ -10,6 +10,7 @@ var transporter
 function init(mailconfig) {
     transporter = nodemailer.createTransport({
         service: mailconfig.service,//smtp.gmail.com  //in place of service use host...
+        host:mailconfig.host,
         secure: false,//true
         port: mailconfig.port,//465
         tls: {

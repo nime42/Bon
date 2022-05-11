@@ -108,6 +108,7 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
                         mailSender(from,to,cc,subject,text,html, function(err) {
                             if(err!==null) {
+                                console.log(err);
                                 res.sendStatus(500);
                             } else {
                                 res.sendStatus(200);          
