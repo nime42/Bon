@@ -68,7 +68,6 @@ class Helper {
   }
 
   static expandShrinkField(legend) {
-      console.log(legend);
       if(legend.classList.contains("fa-caret-down")) {
         legend.parentElement.parentElement.querySelector(".field-content").style.display="";
         legend.classList.toggle("fa-caret-down");

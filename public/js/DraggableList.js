@@ -6,7 +6,6 @@ class DraggableList {
     `;
 
     constructor(div,noBullets) {
-        console.log(div);
         if (typeof div === "string") {
             this.myDiv = document.querySelector(div);
         } else {
@@ -95,7 +94,6 @@ class DraggableList {
         this.myUl.innerHTML="";
     }
     sort(sortFun) {
-        console.log(this.myUl);
         let elems=[...this.myUl.children];
         let self=this;
         elems.sort(sortFun).forEach(e=>{

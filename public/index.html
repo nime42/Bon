@@ -301,7 +301,6 @@
         Globals.myLoginHandler.whenLoggedIn(() => {
             Globals.myLoginHandler.getUserInfo((userInfo) => {
                 Globals.userInfo = userInfo;
-                console.log(userInfo);
                 Globals.myLoginHandler.checkAccess(Globals.userInfo?.roles);
 
                 if(userInfo.roles.find(r=>(r==="ADMIN"))) {

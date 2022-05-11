@@ -80,7 +80,7 @@ class BonWall {
         let tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
         let tomorrowStr = tomorrow.toISOString().split('T')[0];
         let self = this;
-        Globals.myConfig.myRepo.searchBons({ afterDate: todayStr,status:this.statusFilter.join(","),includeOrders:true }, (bons) => {
+        Globals.myConfig.myRepo.searchBons({status:this.statusFilter.join(","),includeOrders:true }, (bons) => {
             bons.forEach(b => {
                 let [bonStrip,colElem]=self.addBon(b, b.orders,true);
                 bonStrip.setOnUpdateOrder(()=>{

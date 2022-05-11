@@ -623,7 +623,6 @@ class BonConfig {
 
     _populateUserForm(userProps) {
         Object.keys(userProps).forEach(k=>{
-            console.log(k, this.UserAdminForm.querySelector("#"+k));
             this.UserAdminForm.querySelector("#"+k).value=userProps[k];
         });
     }

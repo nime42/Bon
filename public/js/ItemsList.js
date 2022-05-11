@@ -66,7 +66,6 @@ class ItemsList {
 
                 })
 
-                console.log(categories);
                 this.insertItems(categories,currentItemTabIndex);
 
             })

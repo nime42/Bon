@@ -43,7 +43,6 @@ class BonCalendar {
 
 
                 }
-                console.log(event);
             })
             //self.myBonForm.init(eventData, eventElem);
             //self.myPopup.show(self.myBonForm.getForm());

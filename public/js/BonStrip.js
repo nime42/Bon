@@ -495,7 +495,6 @@ class BonStrip {
         Globals.BonStripOrder.forEach((e,i)=>{
             orderPos[e]=i;
         });
-        console.log(orderPos);
 
         let sortFun=(a,b) => {
             let aCategory=a.querySelector("#category").value;
