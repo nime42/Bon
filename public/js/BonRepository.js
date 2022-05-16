@@ -109,5 +109,16 @@ class BonRepository {
           });
     }
 
+    consumeBon(id,callback) {
+        let url="consumeBon/"+id;
+        $.ajax({
+            type: "PUT",
+            url: url,
+            success: callback,
+            dataType: "json",
+            contentType: "application/json"
+          });
+    }
+
 
 }

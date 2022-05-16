@@ -22,6 +22,7 @@ class BonWall {
         this.statusFilter=statusFilter;
         this.myDiv.innerHTML = this.content;
         this.bonRow=this.myDiv.querySelector("#bons");
+        this.myBonRepo=new BonRepository();
     }
 
 
@@ -61,7 +62,9 @@ class BonWall {
                         status="approved";
                     }
                     if(status=="delivered" && onOff=="on") {
-                        this._fadeout(colElem,bonStrip.bonId,"delivered");
+                        this._fadeout(colElem,bonStrip.bonId,"delivered",(id)=>{
+                            self.myBonRepo.consumeBon(bonStrip.bonId);
+                        });
                     } else {
                         Globals.myConfig.myRepo.updateBonStatus(bonStrip.bonId,status,(status)=>{});
                     }
@@ -126,7 +129,7 @@ class BonWall {
 
 
 
-    _fadeout(elem,id,status) {
+    _fadeout(elem,id,status,onfaded) {
         let t=3;
         let orgStyle=elem.style.cssText;
         let style=`
@@ -139,6 +142,7 @@ class BonWall {
         let timer=setTimeout(()=>{
             Globals.myConfig.myRepo.updateBonStatus(id,status,(status)=>{});
             elem.remove();
+            onfaded && onfaded(id);
         }, t*1000);
 
         this.cancelFunction=() => {
