@@ -47,6 +47,9 @@
         }
 
         function gotoMenu(elem) {
+            if(!elem) {
+                return;
+            }
             document.querySelector("#menu-header").innerText=elem.innerText;
             let menuId = elem.href.split("#")[1];
             let menus = document.querySelector("#menu-elems");
