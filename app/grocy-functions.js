@@ -3,7 +3,6 @@ const fetch = require('node-fetch');
 
 function getAllRecipes(callback = console.log) {
     let httpReq = config.grocy.url + "/api/objects/recipes?GROCY-API-KEY=" + config.grocy.apiKey;
-    console.log(httpReq);
 
     fetch(httpReq)
         .then(res => res.json())

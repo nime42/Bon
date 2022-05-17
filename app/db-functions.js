@@ -200,7 +200,6 @@ function delBon(bonId, callback = console.log) {
 
 function createBon(bonData, callback = console.log) {
   bonData.customer_id = createCustomer(bonData.customer);
-  console.log(bonData.orders);
   bonData.delivery_address_id = createAddress(bonData.delivery_address);
   let sql =
     "INSERT INTO bons(status, status2,customer_info, customer_id,delivery_address_id, delivery_date, nr_of_servings,kitchen_selects,customer_collects, kitchen_info, service_type, payment_type,price_category) VALUES(@status, @status2,@customer_info, @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings,@kitchen_selects,@customer_collects, @kitchen_info, @service_type, @payment_type,@price_category);";
@@ -472,7 +471,6 @@ function saveOrders(bonId, orders) {
     return o;
   });
 
-  console.log(orders);
   sql = `insert into orders(bon_id,item_id,price,cost_price,quantity,special_request,sorting_order) 
         values(@bon_id,@id,@price,@cost_price,@quantity,@comment,@sorting_order)`;
 

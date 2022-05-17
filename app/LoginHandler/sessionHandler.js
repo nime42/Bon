@@ -13,7 +13,7 @@ function addSession(req,res,userId) {
 }
 
 function getSession(req) {
-    var sessionID = req.cookies['LoginHandler-SessId'];
+    var sessionID = req.cookies?req.cookies['LoginHandler-SessId']:null;
     if(sessions[sessionID]) {
         sessions[sessionID].timestamp=new Date();
     }

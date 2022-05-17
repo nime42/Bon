@@ -4,6 +4,16 @@ var http = require('http');
 var https = require('https');
 
 var app = express();
+require('log-timestamp');
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.log('Unhandled Rejection at:', reason.stack || reason)
+  });
+
+  process.on('uncaughtException', err => {
+      console.log("unhandled Exception:", err);
+
+  })
 
 var config=require('../resources/config.js');
 
@@ -20,6 +30,27 @@ var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
+
+
+//-------------logging--------------
+var morgan = require('morgan')
+var path = require('path')
+var rfs = require('rotating-file-stream') // version 2.x
+
+morgan.token('remote-user', function (req, res) { let session=loginHandler.getSession(req); if(session) {return session.userId} else {return ""}});
+
+// create a rotating write stream
+var accessLogStream = rfs.createStream('access.log', {
+    interval: '7d', // rotate daily
+    path: path.join('log')
+  })
+  
+  // setup the logger
+  app.use(morgan('common', { stream: accessLogStream }))
+  
+
+
 
 app.use(express.static('public'));
 
@@ -166,7 +197,6 @@ app.post("/bons",(req,res) => {
 })
 
 app.put("/bons/:id",(req,res) => {
-    console.log(req);
     db.updateBon(req.params.id,req.body,function(status,msg) {
         if(status) {  
             res.json(msg);

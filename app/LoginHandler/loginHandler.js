@@ -18,7 +18,6 @@ function init(app,dbFile,mailfunc,mailTemplate) {
     app.post('/login', (req, res) => {
         var username = req.body.username;
         var password = req.body.password;
-        console.log(req.body);
         db.authenticateUser(username, password, function (status, userId) {
             if (status) {
                 sessionHandler.addSession(req, res, userId);
