@@ -454,9 +454,9 @@ class BonForm {
       bon.delivery_date.getMinutes().toString().padStart(2, "0");
     let label =
       timeStr +
-      ", #" +
+      ",#" +
       bon.id +
-      ", Pax= " +
+      ",P:" +
       (bon.nr_of_servings != "" ? bon.nr_of_servings : 0);
     return [label, statusColor];
   }
