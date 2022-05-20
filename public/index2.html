@@ -3,98 +3,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
-  .bon-container {
-    display: flex;
-    flex-direction: column;
+  .correspondence fieldset {
+    margin-bottom: 5px;
   }
-
-  .bon-row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+  .correspondence legend {
+    float: left;
+    color: #8e631f;
+    width: 100%;
+    padding: 0;
+    font-style: italic;
+    font-size: small;
+    margin-bottom: 3px;
   }
+  .outgoing legend {
+    text-align: start;
+  }  
+  fieldset.outgoing {
+    border-radius: 40px 0px 0px 40px;
+  }  
 
-  .bon-column {
-    display: flex;
-    flex-direction:column;
+  .incoming legend {
+    text-align: end;
   }
-
-  @media screen and (max-width: 600px) {
-  .bon-row {
-    flex-direction: column;
-  }
-
-  .square {
-    width: 50px;
-    height: 50px;
-    background: blue;
-    border: 1px solid black;
-    margin: 5px;
-  }
-
-
-}
-
+  fieldset.incoming {
+    border-radius: 0px 40px 40px 0px;
+  } 
 
 </style>
 
 <body>
-  <div class="bon-container">
-    <div class="bon-row">
-      <div class="bon-column">
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-      </div>
-      <div class="bon-column">
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-        <div class="square"></div>
-      </div>
-    </div>
-
-
-    <div class="bon-row">
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-      <div class="square"></div>
-    </div>
-
-
-
+  <div class="correspondence">
+    <fieldset class="outgoing">
+      <legend>bon@ristetrug.dk</legend>
+      <br>
+     <pre>
+       Hej hopp qwerty
+       halloooo q
+       tralala tralalaaaaa
+      </pre> 
+    </fieldset> 
+    <fieldset class="incoming">
+      <legend>nilsmeinhard@gmail.com</legend>
+      <br>
+     <pre>
+      hello
+      </pre> 
+    </fieldset> 
   </div>
 
 
