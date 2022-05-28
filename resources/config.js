@@ -13,16 +13,17 @@ module.exports = {
 
     grocy:{
         url:"https://grocytest.ristetrug.dk",
-        apiKey:"??"
+        apiKey:"9WEtOxgR93OYZAWf0lXS0LTwiYUjFweVA6d6gRuwtaQEitDIdE"
       },
 
     userDB:"./resources/users.db",
 
+    bonPrefix:"test",
 
     mail: {
         service: "gmail",
         user: "tipsy.nu@gmail.com",
-        passwd: "??",        
+        passwd: "s01r0s20!",        
         port:25
     },
 
