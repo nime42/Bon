@@ -4,8 +4,9 @@ class Globals {
     static background="#f1e6b2";
     static shadowColor="#446e74";
 
-    static grocyLink="${config.grocy.url}"; //this value is replaced from resources/config.js by replaceFromConfig.js
-    
+
+    static grocyLink="${config.grocy.url}"; //this values is replaced from resources/config.js by replaceFromConfig.js
+    static bonPrefix="${config.bonPrefix}";
 
     static AttributesForItems= {
         "by-?ekspressen.*": {
