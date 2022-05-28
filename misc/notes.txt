@@ -7,3 +7,11 @@ bon@ristedrug.dk
 
 https://grocytest.ristetrug.dk/
 nils/???
+
+deploy all
+./deploy.sh
+./deployCafe.sh
+./deployNordhavn.sh
+./deployTrailer.sh
+./deployHelsingor.sh
+./deployZoo.sh
