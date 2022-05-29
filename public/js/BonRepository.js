@@ -120,5 +120,32 @@ class BonRepository {
           });
     }
 
+    sendBonMail(id,to,message,callback) {
+        let url="sendBonMail/";
+        let body={
+            message:message,
+            bonId:id,
+            email:to
+        }
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(body),
+            success: function(data,status,xhr) {callback(true,data);},
+            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            contentType: "application/json"
+          });
+    }
+
+    getBonMails(bonId,callback) {
+        let url="bonMails/"+bonId;
+        $.get(url,callback);
+    } 
+
+    getUnseenBonIdMails(callback) {
+        let url="UnseenBonIdMails/";
+        $.get(url,callback);
+    } 
+
 
 }

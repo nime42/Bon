@@ -1,0 +1,84 @@
+#chat .status{
+	width:8px;
+	height:8px;
+	border-radius:50%;
+	display:inline-block;
+	margin-right:7px;
+}
+#chat .green{
+	background-color:#58b666;
+}
+
+#chat .blue{
+	background-color:#6fbced;
+	margin-right:0;
+	margin-left:7px;
+}
+
+
+#chat{
+    padding: 10px;
+    margin: auto;
+    list-style-type: none;
+    overflow-y: auto;
+    min-height: 100px;
+    border: 2px solid green;
+    border-radius: 10px;
+    max-height: 350px;
+}
+#chat li{
+	padding:10px 30px;
+}
+#chat h2,#chat h3{
+	display:inline-block;
+	font-size:13px;
+	font-weight:normal;
+}
+#chat h3{
+	color:#bbb;
+}
+#chat .header{
+	margin-bottom:-10px;
+}
+#chat .message {
+	padding:10px;
+	color:#fff;
+	line-height:25px;
+	max-width:90%;
+	display:inline-block;
+	text-align:left;
+	border-radius:5px;
+}
+#chat .right{
+	text-align:right;
+}
+#chat .left .message{
+	background-color:#58b666;
+}
+#chat .right .message{
+	background-color:#6fbced;
+}
+#chat .triangle{
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 0 10px 10px 10px;
+}
+#chat .left .triangle{
+		border-color: transparent transparent #58b666 transparent;
+		margin-left:15px;
+}
+#chat .right .triangle{
+		border-color: transparent transparent #6fbced transparent;
+		margin-left: auto;
+		margin-right: 15px;
+}
+
+#chat-input {
+    border: 2px solid green;
+    border-radius: 10px;
+    width: 97%;
+    margin: auto;
+    margin-top: 5px;
+	padding: 10px;
+}

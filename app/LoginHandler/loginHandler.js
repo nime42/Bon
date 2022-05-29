@@ -100,12 +100,13 @@ function init(app,dbFile,mailfunc,mailTemplate) {
                         let from=forgottenPasswordMailTemplate.from;
                         let to=mailAdr;
                         let cc=undefined;
+                        let bcc=undefined;
                         let subject=forgottenPasswordMailTemplate.subject;
                         let text=body;
                         let html=undefined;
 
 
-                        mailSender(from,to,cc,subject,text,html, function(err) {
+                        mailSender(from,to,cc,bcc,subject,text,html, function(err) {
                             if(err!==null) {
                                 console.log(err);
                                 res.sendStatus(500);

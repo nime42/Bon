@@ -26,11 +26,12 @@ function init(mailconfig) {
 }
 
 
-function sendMail(from,to,cc,subject,text,html, callback) {
+function sendMail(from,to,cc,bcc,subject,text,html, callback) {
     var mailOptions = {
         from: from,
         to: to,
         cc:cc,
+        bcc:bcc,
         subject: subject,
         text: text,
         html:html

@@ -153,7 +153,7 @@ class CalendarClass {
     this.init(newDate.getFullYear(), newDate.getMonth());
   }
 
-  addEvent(date, header, color, misc) {
+  addEvent(date, header, color, misc, iconClassTokens) {
     if (date.getFullYear() != this.currentYear || date.getMonth() != this.currentMonth) {
       return false;
     }
@@ -165,7 +165,17 @@ class CalendarClass {
     let eventList = dayCell.querySelector(".event-list");
     let event = document.createElement("div");
     event.classList.add("event");
+
     event.innerHTML = header;
+
+    if(iconClassTokens) {
+      let icon=document.createElement("li"); 
+      iconClassTokens.forEach(t=> {
+        icon.classList.add(t);
+      })
+      event.appendChild(icon);     
+    }
+
     event.myData = {
       eventTime: date,
       color: color,
@@ -181,7 +191,7 @@ class CalendarClass {
     }
 
     event.style.background = color;
-    event.style.color = "black";//Helper.contrastColor(color);
+    event.style.color = "black";
     event.classList.add("event");
     eventList.appendChild(event);
 
@@ -199,9 +209,9 @@ class CalendarClass {
 
 
 
-  updateEvent(eventElem, date, header, color, misc) {
+  updateEvent(eventElem, date, header, color, misc,iconClassTokens) {
     this.deleteEvent(eventElem);
-    this.addEvent(date, header, color, misc);
+    this.addEvent(date, header, color, misc,iconClassTokens);
   }
 
 
@@ -230,6 +240,10 @@ class CalendarClass {
     if (refresh) {
       this.onMonthChange(this.currentYear, this.currentMonth);
     }
+  }
+
+  getAllEvents() {
+    return [...this.myDiv.querySelectorAll(".event")].map(e=>({elem:e,data:e.myData}));
   }
 
   _createDays(year, month) {

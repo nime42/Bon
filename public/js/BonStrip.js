@@ -218,7 +218,10 @@ class BonStrip {
         <div id="add-items" style="display:none">
         <br>
         <i id="show-items-list" class="fa fa-plus-square" style="font-size:20px; color:${this.foreground}"></i>        
-        <div id="items-list" style="display:none"/>
+        <i id="show-mails" class="fa fa-envelope" style="font-size:20px; color:${this.foreground};display:none"></i>        
+
+        <div id="items-list" style="display:none"></div>
+        <div id="mail-list" style="display:none"></div>
         </div>
         
 
@@ -261,6 +264,7 @@ class BonStrip {
 
         }
 
+        this.myRepo = new BonRepository();
 
 
         this.myOrders=new DraggableList(this.myDiv.querySelector("#orders"),true);
@@ -361,6 +365,67 @@ class BonStrip {
 
 
         this.orderConfigPopup=new ModalPopup();
+
+
+    }
+
+    showMails(externalDiv) {
+        let mailElem;
+        if(externalDiv) {
+            if(typeof externalDiv==="string") {
+                mailElem = document.querySelector(externalDiv);
+            } else {
+                mailElem=externalDiv;
+            }
+        } else {
+            mailElem=this.myDiv.querySelector("#mail-list");
+        }
+
+        this.chatDiv=mailElem;
+
+        this.chat=new ChatClass(mailElem);
+        this.chat.setIdentity("Bon");
+        this.chat.onSend((message)=>{
+            let to=this.myDiv.querySelector("#email").innerHTML;
+            let bonId=this.bonId;
+
+            this.myRepo.sendBonMail(bonId,to,message,(result,data, status, xhr)=>{
+                if(!result) {
+                    alert("Kan ikke sende e-mail");
+                }
+            })
+
+            console.log("sending "+message+" to "+to+" subj:"+bonId);
+
+        })
+
+        let self=this;
+        this.myDiv.querySelector("#show-mails").style.display="";
+        this.myDiv.querySelector("#show-mails").onclick=() => {
+            if(mailElem.style.display=="none") {
+                if(!self.bonId) {
+                    alert("Gem venligst først");
+                    return;
+                }
+                if(self.myDiv.querySelector("#email").innerHTML==="") {
+                    alert("E-mailadresse mangler!"); 
+                    return;  
+                }
+                mailElem.style.display=""
+                this.chat.clear();
+                let p=MessageBox.popup("Henter mails...");
+                this.myRepo.getBonMails(self.bonId,(mails)=>{
+                    p.hide();
+                    mails.forEach(m=>{   
+                        this.chat.addMessage(m.subject.startsWith("SENT:")?"right":"left",m.from,new Date(m.date),m.message);
+                    })
+                    Globals.myCalender.mailSeen(self.bonId);
+                });
+            } else {
+                mailElem.style.display="none";
+            }
+        }
+
 
 
     }
@@ -758,6 +823,10 @@ class BonStrip {
         })
         this.myOrders.clear();
         this.updateTotalSum();
+        if(this.chatDiv) {
+            this.chatDiv.style.display="none";
+
+        }
     }
 
 

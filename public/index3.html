@@ -1,347 +1,185 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/skeleton.css">
-
-    <link rel="stylesheet" href="css/navigator.css">
-    <link rel="stylesheet" href="css/CalendarClass.css">
-    <link rel="stylesheet" href="css/BonForm.css">
-    <link rel="stylesheet" href="css/ModalPopup.css">
-
-    <script src="js/globals.js"></script>
-    <script src="js/CalendarClass.js"></script>
-    <script src="js/ModalPopup.js"></script>
-    <script src="js/Overlay.js"></script>
-    <script src="js/TabsClass.js"></script>
-    <script src="js/DraggableList.js"></script>
-    <script src="js/VertTabsClass.js"></script>
-    <script src="js/MessageBox.js"></script>
-    <script src="js/AutocompleteClass.js"></script>
-    <script src="js/BonCalendar.js"></script>
-    <script src="js/BonStrip.js"></script>
-    <script src="js/helpers.js"></script>
-    <script src="js/ItemsList.js"></script>     
-    <script src="js/BonForm.js"></script>
-    <script src="js/BonRepository.js"></script>
-    <script src="js/BonConfig.js"></script>
-    <script src="js/BonWall.js"></script>
-    <script src="js/loginHandler.js"></script>
+<style>
 
 
-    <script>
-        function toggleMenu() {
-            var x = document.getElementById("myLinks");
-            if (x.style.display === "block") {
-                x.style.display = "none";
+#chat .status{
+	width:8px;
+	height:8px;
+	border-radius:50%;
+	display:inline-block;
+	margin-right:7px;
+}
+#chat .green{
+	background-color:#58b666;
+}
+
+#chat .blue{
+	background-color:#6fbced;
+	margin-right:0;
+	margin-left:7px;
+}
+
+
+#chat{
+    padding: 10px;
+    margin: auto;
+    list-style-type: none;
+    overflow-y: auto;
+    min-height: 100px;
+    border: 2px solid green;
+    border-radius: 10px;
+    max-height: 450px;
+}
+#chat li{
+	padding:10px 30px;
+}
+#chat h2,#chat h3{
+	display:inline-block;
+	font-size:13px;
+	font-weight:normal;
+}
+#chat h3{
+	color:#bbb;
+}
+#chat .header{
+	margin-bottom:-10px;
+}
+#chat .message {
+	padding:10px;
+	color:#fff;
+	line-height:25px;
+	max-width:90%;
+	display:inline-block;
+	text-align:left;
+	border-radius:5px;
+}
+#chat .right{
+	text-align:right;
+}
+#chat .left .message{
+	background-color:#58b666;
+}
+#chat .right .message{
+	background-color:#6fbced;
+}
+#chat .triangle{
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 0 10px 10px 10px;
+}
+#chat .left .triangle{
+		border-color: transparent transparent #58b666 transparent;
+		margin-left:15px;
+}
+#chat .right .triangle{
+		border-color: transparent transparent #6fbced transparent;
+		margin-left: auto;
+		margin-right: 15px;
+}
+
+#chat-input {
+    border: 2px solid green;
+    border-radius: 10px;
+    width: 97%;
+    margin: auto;
+    margin-top: 5px;
+	padding: 10px;
+}
+</style>
+<script>
+    class Chat {
+        chatContent=`
+        <ul id="chat">
+        </ul>
+		<div>
+			  <textarea id="chat-input" rows="4"></textarea>
+		</div>
+		<div style="width:95%">
+		    <button type="button" id="send-message" >Send</button>
+		    <button type="button" style="float: right;">Insätt Bon(uden pris)</button>
+		    <button type="button" style="float: right;margin-right:5px">Insätt Bon</button>
+		</div>         
+        `;
+        messageLeftRow=`
+				<div class="header">
+					<span class="status green"></span>
+					<h2 class="name"></h2>
+					<h3 class="when"></h3>
+				</div>
+				<div class="triangle"></div>
+                <div>
+				<pre class="message" style="margin: 0;"></pre>
+                </div> 
+        `;
+        messageRightRow=`
+				<div class="header">
+					<span class="status blue"></span>
+					<h3 class="when"></h3>
+					<h2 class="name"></h2>
+				</div>
+				<div class="triangle"></div>
+                <div>
+				<pre class="message" style="margin: 0;"></pre>
+                </div> 
+        `;
+
+
+        constructor(div) {
+            if(typeof div==="string") {
+                this.myDiv = document.querySelector(div);
             } else {
-                x.style.display = "block";
+                this.myDiv=div;
+            }
+            this.myDiv.innerHTML=this.chatContent;
+            let self=this;
+            let textInput=this.myDiv.querySelector("#chat-input");
+            this.myDiv.querySelector("#send-message").onclick=()=>{
+                let message=textInput.value;
+                self.addMessage("right",this.identity,new Date(),message);
+                textInput.value="";
             }
         }
+        addMessage(leftRight,name,date,message) {
+            let row=document.createElement("li");
+            row.classList.add(leftRight);
+            row.innerHTML=leftRight=="left"?this.messageLeftRow:this.messageRightRow;
+            row.querySelector(".name").innerHTML=name;
+            row.querySelector(".when").innerHTML=this._formatDate(date);
+            row.querySelector(".message").innerHTML=message;
+            this.myDiv.querySelector("#chat").appendChild(row);
+            this.myDiv.querySelector("#chat").scrollTo(0, this.myDiv.querySelector("#chat").scrollHeight);
+        }
+        _formatDate(date) {
+            return date.toLocaleTimeString("default", { hour: '2-digit', minute: '2-digit',hour12: false  })+" "+date.toLocaleDateString("default",{day:"numeric",month:"short",year:"numeric"})
+        }
 
-        function gotoMenu(elem) {
-
-            let menuId = elem.href.split("#")[1];
-            let menus = document.querySelector("#menu-elems");
-            Array.from(menus.children).forEach(m => {
-                if (m.id === menuId) {
-                    m.style.display = "";
-                    elem.classList.add("active-menu");
-                } else {
-                    m.style.display = "none";
-                    elem.classList.remove("active-menu");
-                }
-            })
-
+        setIdentity(name) {
+            this.identity=name;
         }
 
 
-        function logout() {
-            Globals.myLoginHandler.logout();
-            location.reload();
-            return false;
-        };
+    }
 
 
-        function updateUser() {
-            document.querySelector("#logout").style.display = "none";
-            document.querySelector("#update-user").style.display = "";
-            Globals.myLoginHandler.populateUserInfoForm("#update-user");
-
-        }
-
-
-        function syncMenu() {
-            let url=window.location.href;
-            let m=url.match(/#.*/);
-            if(m) {
-                let menuId=m[0];
-                let menuElem=document.querySelector(`a[href='${menuId}']`);
-                if(menuElem) {
-                    gotoMenu(menuElem);
-                }
-            }
-        }
-
-    </script>
-
+</script>
 </head>
-
 <body>
+    <div id="test"></div>
 
 
-    <!-- Top Navigation Menu -->
-    <div class="topnav">
-        <a href="#home" class="menu">Logo</a>
-        <div id="myLinks">
-            <a href="#log-in" class="active-menu" onclick="gotoMenu(this);toggleMenu()"><i class="fa fa-key">Login</i></a>
-            <a href="#grocy" id="link-to-grocy"><i class="fa fa-database"> Grocy</i></a>
-            <a href="#calendar" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i> Kalender</a>
-            <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i class="fa fa-wrench"></i> Admin</a>
-            <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i class="fa fa-cutlery"></i> Kökken vy idag</a>
+<script>
+let c=new Chat("#test");
+c.setIdentity("Nils");
+c.addMessage("left","chat",new Date(),"Hello,how are you");
+c.addMessage("right","me",new Date(),"Hello, I'm fine");
 
-            
-    
-
-
-
-        </div>
-        <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">
-            <i class="fa fa-bars"></i>
-        </a>
-    </div>
-
-    <div id="menu-elems" style="margin-top: 5%;">
-        <section id="log-in">
-            <div class="container">
-                <form id="login" class="login-form-style" autocomplete="off" method="post">
-                    <h5>Log in</h5>
-                    <div class="row">
-                        <div class="twelwe columns" id="error-msg" style="color:red"></div>
-                    </div>
-
-                    <div class="row">
-                        <div class="six columns">
-                            <label for="exampleuser">Username/email</label>
-                            <input name="username" class="u-full-width" type="text" placeholder="Username"
-                                id="exampleuser">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="six columns">
-                            <label for="examplepwd">Password</label>
-                            <input name="password" class="u-full-width" type="password" placeholder="password"
-                                id="examplepwd">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="three columns">
-                            <input id="login-button" class="button-primary" type="submit" value="Login">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="three columns">
-                            <a href="javascript:void(0);" style="font-size: small;"
-                                onclick="document.querySelector('#login').style.display='none';document.querySelector('#forgot-password').style.display='block';">Glömt
-                                lösenord?</a>
-                        </div>
-                    </div>
-                </form>
-
-                <!--logout-->
-                <div id="logout" class="row" style="display:none">
-                    <div class="three columns">
-                        <input type="button" value="Bruger info" onclick="updateUser()">
-                    </div>
-                    <div class="three columns">
-                        <input class="button-primary" type="button" value="Logout" onclick="logout()">
-                    </div>
-                </div>
-
-                <!--Forgot password-->
-                <form id="forgot-password" autocomplete="off" method="post" style="display:none">
-                    <h5>Glömt Lösenord</h5>
-                    <div class="row">
-                        <div class="twelwe columns" id="error-msg" style="color:red"></div>
-                    </div>
-                    <div class="row">
-                        <div class="six columns">
-                            <label for="exampleuser">Email</label>
-                            <input class="u-full-width" type="text" placeholder="email" id="exampleuser"  name="identity">
-                        </div>
-                    </div> 
-                    <div class="row">
-                        <div class="three columns">
-                            <input class="button-primary" type="submit" id="send" value="Skicka">
-                        </div>
-                    </div>
-                </form>
-
-                <form id="reset-password" autocomplete="off" method="post" style="display:none">
-                    <h5>Återställ lösenord</h5>
-                    <div class="row">
-                        <div class="six columns">
-                            <label for="examplepwd">Password</label>
-                            <input name="password" class="u-full-width" type="password" placeholder="password"
-                                id="examplepwd">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="three columns">
-                            <input class="button-primary" type="submit" id="new-password" value="Uppdatera">
-                        </div>
-                    </div>
-                </form>
-
-
-                <form id="update-user" autocomplete="off" method="post" style="display:none;">
-                    <h5>Uppdater bruger info</h5>
-                    <div class="row">
-                        <div class="twelwe columns" id="error-msg" style="color:red"></div>
-                    </div>
-                    <div class="row">
-                        <div class="six columns">
-                            <label for="exampleuser">Bruger-id</label>
-                            <input name="username" class="u-full-width" type="text" placeholder="Username"
-                                id="exampleuser">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="six columns">
-                            <label for="name">Navn</label>
-                            <input name="name" class="u-full-width" type="text" placeholder="name" id="name">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="six columns">
-                            <label for="email">Navn</label>
-                            <input name="email" class="u-full-width" type="text" placeholder="email" id="email">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="six columns">
-                            <label for="phonenr">Navn</label>
-                            <input name="phonenr" class="u-full-width" type="text" placeholder="phonenr" id="phonenr">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="six columns">
-                            <label for="examplepwd">Password</label>
-                            <input name="password" class="u-full-width" type="password" placeholder="password"
-                                id="examplepwd">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="three columns">
-                            <input class="button-primary" type="submit" id="update-user" value="Uppdater">
-                        </div>
-                        <div class="three columns">
-                            <input class="button" type="button" id="cancel" value="Avbryd"
-                                onclick="document.querySelector('#logout').style.display='';document.querySelector('#update-user').style.display='none';">
-                        </div>
-                    </div>
-
-
-
-                </form>
-            </div>
-
-
-
-        </section>
-        <section id="calendar">
-            kalendar
-        </section>
-
-        <section id="admin">
-        </section>
-
-        <section id="kitchen">
-            <h3>Kökken idag</h3>
-        </section>
-
-    </div>
-
-    <script>
-        gotoMenu(document.querySelector(".active-menu"));
-
-        document.querySelector("#link-to-grocy").href = Globals.grocyLink;
-
-        Globals.myCalender=new BonCalendar("#calendar");
-
-        Globals.myConfig=new BonConfig("#admin");
-
-        Globals.myKitchenBonWall=new BonWall("#kitchen","approved",["preparing","done"],["preparing","done","delivered"]);
-        Globals.myKitchenBonWall.getBonsForToday();
-
-
-
-        Globals.myLoginHandler = new LoginHandler();
-        Globals.myLoginHandler.setLoginForm("#login");
-        Globals.myLoginHandler.whenLoggedIn(() => {
-
-            Globals.myLoginHandler.getUserInfo((userInfo) => {
-                Globals.userInfo = userInfo;
-                Globals.myLoginHandler.checkAccess(Globals.userInfo?.roles);
-            });
-
-            document.querySelector("#login").style.display = "none";
-            document.querySelector("#logout").style.display = "";
-
-        })
-        Globals.myLoginHandler.setForgotPasswordForm("#forgot-password");
-        Globals.myLoginHandler.whenForgotPassword(() => {
-            alert("Reset mail sent");
-            location.reload();
-        });
-
-
-        Globals.myLoginHandler.setResetPasswordForm("#reset-password");
-        Globals.myLoginHandler.whenResetPassword(() => {
-            alert("Password reset");
-            window.location.href = Globals.myLoginHandler.removeResetTokenFromUrl();;
-        });
-
-
-        Globals.myLoginHandler.setUpdateForm("#update-user");
-        Globals.myLoginHandler.whenUpdate(() => {
-            Globals.myLoginHandler.getUserInfo((userInfo) => {
-                Globals.userInfo = userInfo;
-            });
-            document.querySelector("#update-user").querySelector("#cancel").click();
-
-        })
-
-
-        if (Globals.myLoginHandler.isResetRequest()) {
-            document.querySelector("#login").style.display = "none";
-            document.querySelector("#reset-password").style.display = "block";
-
-        }
-
-
-
-
-        if (Globals.myLoginHandler.isLoggedIn()) {
-            Globals.myLoginHandler.onLoggedIn();
-        } else {
-            window.location.href = "#login-tab"
-        }
-
-        Globals.myLoginHandler.checkAccess(Globals.userInfo?.roles);
-        syncMenu();
-
-
-    </script>
-
+</script>
 </body>
 
 </html>

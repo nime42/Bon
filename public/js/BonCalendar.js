@@ -25,20 +25,25 @@ class BonCalendar {
 
         this.myCalendar.setOnEventClick((eventElem, eventData) => {
             self.myBonForm.initFromBonId(eventData.misc.id,(event,arg1,arg2,arg3) => {
-                let bon,label,statusColor;
+                let label,statusColor,mailIcon;
+                let bon=arg1?arg1:eventData.misc;
+                if(self.haveUnSeenMail(bon.id)) {
+                    mailIcon=["fa","fa-envelope"];
+                }
                 switch(event) {
                     case "saved":
-                        bon=arg1;
+                    case "canceled":
                         [label,statusColor]=self.myBonForm.createBonLabelAndcolor(bon);
-                        self.myCalendar.updateEvent(eventElem,bon.delivery_date,label,statusColor,bon);
+                        self.myCalendar.updateEvent(eventElem,bon.delivery_date,label,statusColor,bon,mailIcon);
                         break;
                     case "copied":
-                        bon=arg1;
                         [label,statusColor]=self.myBonForm.createBonLabelAndcolor(bon);
                         self.myCalendar.addEvent(bon.delivery_date,label,statusColor,bon);
                         break;
                     case "deleted":
                         self.myCalendar.deleteEvent(eventElem);
+                        break;
+
 
 
 
@@ -58,6 +63,7 @@ class BonCalendar {
                     self.myCalendar.addEvent(b.delivery_date, label, statusColor, b);
 
                 });
+                self.UpdateUnseenIds();
             });
 
         }, true);
@@ -68,5 +74,34 @@ class BonCalendar {
     }
     refresh() {
         this.myCalendar.changeMonth(0);
+    }
+
+    haveUnSeenMail(bonId) {
+        let unseen=Globals?.unSeenMailIds.find(e=>(e==bonId));
+        return unseen?true:false;
+    }
+
+    mailSeen(bonId) {
+        Globals.unSeenMailIds = Globals?.unSeenMailIds.filter(function(item) {
+            return item != bonId
+        })
+    }
+
+    UpdateUnseenIds() {
+        this.myRepo.getUnseenBonIdMails((ids)=>{
+            Globals.unSeenMailIds=ids;
+            ids.forEach(i=>{
+                let event=this.getAllEvents().find(e=>(e.data.misc.id==i))
+                if(event) {
+                    this.myCalendar.updateEvent(event.elem,event.data.eventTime,event.data.header,event.data.color,event.data.misc,["fa","fa-envelope"]);
+                }
+            });
+        })
+
+
+    }
+
+    getAllEvents() {
+        return this.myCalendar.getAllEvents();
     }
 }

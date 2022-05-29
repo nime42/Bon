@@ -71,6 +71,9 @@ var grocy=require('./grocy-functions.js');
 var mailSender=require("./mailSender.js");
 mailSender.init(config.mail);
 
+var mailManager=require("./MailManager");
+
+
 var loginHandler=require("./LoginHandler/loginHandler");
 
 loginHandler.init(app,config.userDB,mailSender.sendMail,config.forgotPasswordMailTemplate);
@@ -390,7 +393,68 @@ app.get("/searchBons",(req,res) => {
 })
 
 
+app.post("/sendBonMail/",(req,res) => {
+    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+        res.sendStatus(401);
+        return;
+    }
 
+    let message=req.body.message;
+    let subject="#Bon:"+config.bonPrefix+"-"+req.body.bonId+":";
+    let to=req.body.email;
 
+    mailSender.sendMail(config.mail.user,to,undefined,undefined,subject,message,undefined, function(err) {
+        if(err!==null) {
+            console.log(err);
+            res.sendStatus(500);
+        } else {
+            
+            mailSender.sendMail(config.mail.user,config.mail.user,undefined,undefined,"SENT:"+subject,message,undefined, function(err) {
+                if(err!==null) {
+                    console.log(err);
+                    res.sendStatus(500);
+                } else {
+                    res.sendStatus(200);
+                }
+            });          
+        }
+    });
 
+})
 
+app.get("/bonMails/:id",(req,res) => {
+    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+        res.sendStatus(401);
+        return;
+    }
+    let id=req.params.id;
+    let markAsRead=true;
+    mailManager.getBonMails(config.bonPrefix,id,markAsRead,(status,mails)=>{
+        if(status) { 
+            res.json(mails); 
+        } else {
+            console.log("get BonMails",mails);
+            res.sendStatus(500);  
+
+        }        
+    })
+})
+
+app.get("/UnseenBonIdMails",(req,res) => {
+    /*
+    if (!loginHandler.haveRoles(req, [], "ALL")) {
+        res.sendStatus(401);
+        return;
+    }*/
+
+    mailManager.getUnseenMails(config.bonPrefix,(status,mails) => {
+        if(status) { 
+            res.json(mailManager.getBonIds(mails)); 
+        } else {
+            console.log("getUnseenMails",mails);
+            res.sendStatus(500);  
+
+        }        
+    });
+
+})

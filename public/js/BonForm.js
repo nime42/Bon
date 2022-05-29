@@ -247,7 +247,11 @@ class BonForm {
       <div class="bon-container">
         <div class="bon-row">
         <div class="bon-column" style="background:wheat;margin-bottom:20px;float:right;margin-right:5px;"><div id="bon-strip"></div></div>
-        <div class="bon-column"><div id="items-selector" style="display:none"></div></div>
+        <div class="bon-column">
+          <div id="items-selector" style="display:none"></div>
+          <div id="mail-conversation" style="display:none;width:550px;padding:5px;margin-top:5px;box-shadow: 5px 5px 5px grey; background:${this.background}"></div>
+
+          </div>
         </div>
         </div>
       </div>
@@ -301,6 +305,8 @@ class BonForm {
    
 
     this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"),true,this.myDiv.querySelector("#items-selector"));
+    this.myBonStrip.showMails(this.myDiv.querySelector("#mail-conversation"));
+
     this.myBonStrip.updateNameOnChange(
       form.querySelector("#forename"),
       form.querySelector("#surname")
@@ -458,8 +464,11 @@ class BonForm {
       bon.id +
       ",P:" +
       (bon.nr_of_servings != "" ? bon.nr_of_servings : 0);
-    return [label, statusColor];
+    
+
+      return [label, statusColor];
   }
+
 
   _getStatus() {
     let form = this.myDiv.querySelector("#order");
