@@ -286,22 +286,23 @@
 
         document.querySelector("#link-to-grocy").href = Globals.grocyLink;
 
-        Globals.myCalender=new BonCalendar("#calendar");
-
-        Globals.myConfig=new BonConfig("#admin",()=>{
-            gotoMenu(document.querySelector(".active-menu"));
-            syncMenu();
-        });
-
-        Globals.myKitchenBonWall=new BonWall("#kitchen",["approved","preparing","done"]);
-
-        Globals.myInvoiceBonWall=new BonWall("#invoices",["delivered"]);
-
-        Globals.myFutureBonWall=new BonWall("#future",["new","needInfo","approved","preparing"]);
-
+ 
         Globals.myLoginHandler = new LoginHandler();
         Globals.myLoginHandler.setLoginForm("#login");
         Globals.myLoginHandler.whenLoggedIn(() => {
+
+            Globals.myCalender=new BonCalendar("#calendar");
+
+            Globals.myConfig=new BonConfig("#admin");
+
+            Globals.myKitchenBonWall=new BonWall("#kitchen",["approved","preparing","done"]);
+
+            Globals.myInvoiceBonWall=new BonWall("#invoices",["delivered"]);
+
+            Globals.myFutureBonWall=new BonWall("#future",["new","needInfo","approved","preparing"]);
+
+
+
             Globals.myLoginHandler.getUserInfo((userInfo) => {
                 Globals.userInfo = userInfo;
                 Globals.myLoginHandler.checkAccess(Globals.userInfo?.roles);
