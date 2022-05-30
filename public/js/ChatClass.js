@@ -83,5 +83,29 @@ class ChatClass {
         this.myDiv.querySelector("#chat").innerHTML="";
     }
 
-}
+    getHistory() {
+        let history=[...this.myDiv.querySelector("#chat").childNodes].map(e=>{
+            let name=e.querySelector(".name").innerHTML;
+            let when=e.querySelector(".when").innerHTML;
+            let message=e.querySelector(".message").innerHTML;
+            return {name:name,when:when,message:message};
+        });
+        return history;
+    }
+
+    getQoutedHistory(reverse,start=0,end=undefined) {
+        let history=this.getHistory();
+        if(reverse) {
+            history=history.reverse();
+        }
+        history=history.slice(start,end);
+        let qoutedMessages="";
+        history.forEach(h=>{
+            let r=`${h.when}| ${h.name}:\n${h.message.replace(/^/gm,"\t") }`;
+            qoutedMessages+=r+"\n";
+        })
+        return qoutedMessages.replace(/^/gm,">");
+    }   
+
+}   
 

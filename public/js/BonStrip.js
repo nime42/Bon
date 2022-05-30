@@ -389,6 +389,7 @@ class BonStrip {
             let to=this.myDiv.querySelector("#email").innerHTML;
             let bonId=this.bonId;
 
+            message+="\n\n"+this.chat.getQoutedHistory(true,1);
             this.myRepo.sendBonMail(bonId,to,message,(result,data, status, xhr)=>{
                 if(!result) {
                     alert("Kan ikke sende e-mail");

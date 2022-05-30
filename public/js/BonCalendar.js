@@ -77,12 +77,12 @@ class BonCalendar {
     }
 
     haveUnSeenMail(bonId) {
-        let unseen=Globals?.unSeenMailIds.find(e=>(e==bonId));
+        let unseen=Globals?.unSeenMailIds?.find(e=>(e==bonId));
         return unseen?true:false;
     }
 
     mailSeen(bonId) {
-        Globals.unSeenMailIds = Globals?.unSeenMailIds.filter(function(item) {
+        Globals.unSeenMailIds = Globals?.unSeenMailIds?.filter(function(item) {
             return item != bonId
         })
     }
