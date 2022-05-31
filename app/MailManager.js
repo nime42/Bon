@@ -2,9 +2,11 @@ const Imap = require("imap");
 const { simpleParser } = require("mailparser");
 const { mail } = require("../resources/config.js");
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 1;
 
 var config = require("../resources/config.js");
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = config.mailManager.rejectUnauthorized!==undefined?config.mailManager.rejectUnauthorized:1;
+
 
 function getMails(mailBox, searchCriterias,markAsRead, callback = console.log) {
   let res = [];
@@ -57,6 +59,7 @@ function getMails(mailBox, searchCriterias,markAsRead, callback = console.log) {
 
           });
           f && f.once("error", (ex) => {
+            console.log("f once",ex);
             return Promise.reject(ex);
           });
           f && f.once("end", () => {
@@ -70,14 +73,18 @@ function getMails(mailBox, searchCriterias,markAsRead, callback = console.log) {
     });
 
     imap.once("error", (err) => {
-      callback(false, err);
+      if(err.code!=='ECONNRESET') {
+        console.log("imap once",err);
+        callback(false, err);
+      }
     });
 
 
 
     imap.connect();
   } catch (ex) {
-    callback(false, ex);
+    console.log("Catch", ex)
+    //callback(false, ex);
   }
 }
 
