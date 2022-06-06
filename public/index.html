@@ -103,7 +103,7 @@
 
     <!-- Top Navigation Menu -->
     <div class="topnav">
-        <a href="#home" class="menu" onclick="toggleMenu()">RR &nbsp;<span id="menu-header"></span></a>
+        <a href="#home" class="menu" onclick="toggleMenu()">RR &nbsp;<span id="menu-header"></span><span id="bon-instance" style="float: right;margin-right: 50%;margin-bottom: 0;font-weight: bold;">Hej</span></a>
         <div id="myLinks">
             <a href="#calendar" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i> Kalender</a>
             <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i class="fa fa-cutlery"></i> Kökken vy idag</a>
@@ -123,7 +123,6 @@
             <i class="fa fa-bars"></i>
         </a>
     </div>
-
     <div id="menu-elems" style="margin-top: 5%;">
         <section id="log-in">
             <div class="container">
@@ -285,6 +284,7 @@
 
 
         document.querySelector("#link-to-grocy").href = Globals.grocyLink;
+        document.querySelector("#bon-instance").innerHTML = Globals.bonInstance;
 
  
         Globals.myLoginHandler = new LoginHandler();
