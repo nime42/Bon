@@ -111,7 +111,7 @@ class BonWall {
         this.bonRow.innerHTML="";
         let today = new Date();
         let todayStr = today.toISOString().split('T')[0];
-        let tomorrow = new Date(); tomorrow.setDate(today.getDate() + 1);
+        let tomorrow = new Date(); tomorrow.setDate(today.getDate() + 0);
         let tomorrowStr = tomorrow.toISOString().split('T')[0];
         let self = this;
         Globals.myConfig.myRepo.searchBons({ afterDate: tomorrowStr,status:this.statusFilter.join(","),includeOrders:true }, (bons) => {
