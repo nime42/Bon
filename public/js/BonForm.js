@@ -376,6 +376,7 @@ class BonForm {
       let props = Helper.getFormProps(form);
       let bon = self._createBon(props);
       bon.id = "";
+      bon.status="new";
       self.myRepoObj.saveBon(bon, function (bonId) {
         bon.id = bonId;
         self.onFormClose && self.onFormClose("copied", bon);
