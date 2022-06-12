@@ -109,7 +109,7 @@
             <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i class="fa fa-cutlery"></i> Kökken vy idag</a>
             <a href="#future" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i class="fa fa-sun-o"></i>Senare</a>
             <a href="#grocy" id="link-to-grocy"><i class="fa fa-database"> Grocy</i></a>
-            <a href="#invoices" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myInvoiceBonWall.getBonsForInvoice();toggleMenu();"><i class="fa fa-money"></i> Fakturer</a>
+            <a href="#invoices" data-check-access="${ADMIN}" onclick="gotoMenu(this);Globals.myInvoiceBonWall.getBonsForInvoice();toggleMenu();"><i class="fa fa-money"></i> Fakturer</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i class="fa fa-wrench"></i> Admin</a>
             <a href="#log-in" class="active-menu" onclick="gotoMenu(this);toggleMenu()"><i class="fa fa-key">Login</i></a>
 
