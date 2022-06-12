@@ -237,6 +237,10 @@ function buildBon(entries) {
   bon.price_category="Catering";
   bon.delivery_date=parseDeliveryDate(entries);
   bon.delivery_address.street_name2=getFromEntry(entries,"delivery_address");
+
+  if(bon.delivery_date===undefined) {
+    bon.customer_info="BEMÆRK, dato kunne ikke læses. Tjek email.";
+  }
   return bon;
 }
 
@@ -244,6 +248,7 @@ function parseDeliveryDate(entries) {
   let date=getFromEntry(entries,"delivery_date");
   let time=getFromEntry(entries,"delivery_time");
   let dateValue=undefined;
+  console.log(date);
   if(date && date.match(/.* \d{1,2},\d{2,4}/)) {
     dateValue=new Date(date)+1; //need to add one day if date is on format "Month day, Year" 
   } else {
@@ -254,10 +259,10 @@ function parseDeliveryDate(entries) {
   if(dateValue===undefined) {
     return undefined;
   }
+  console.log("dateValue",dateValue);
   if (time) {
     let groups = time.match(/(?<hour>\d{1,2}) *[.:] *(?<min>\d{1,2})/i)?.groups;
     if (groups) {
-      console.log(groups["hour"], groups["min"]);
       dateValue.setHours(groups["hour"], groups["min"]);
     }
   }
