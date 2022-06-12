@@ -248,7 +248,6 @@ function parseDeliveryDate(entries) {
   let date=getFromEntry(entries,"delivery_date");
   let time=getFromEntry(entries,"delivery_time");
   let dateValue=undefined;
-  console.log(date);
   if(date && date.match(/.* \d{1,2},\d{2,4}/)) {
     dateValue=new Date(date)+1; //need to add one day if date is on format "Month day, Year" 
   } else {
@@ -259,14 +258,13 @@ function parseDeliveryDate(entries) {
   if(dateValue===undefined) {
     return undefined;
   }
-  console.log("dateValue",dateValue);
   if (time) {
     let groups = time.match(/(?<hour>\d{1,2}) *[.:] *(?<min>\d{1,2})/i)?.groups;
     if (groups) {
       dateValue.setHours(groups["hour"], groups["min"]);
     }
   }
-  return dateValue.toLocaleString();
+  return dateValue.toISOString();
 
 }
 
