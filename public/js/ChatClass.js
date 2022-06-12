@@ -10,8 +10,8 @@ class ChatClass {
     </div>
     <div style="width:95%">
         <button type="button" id="send-message" class="button-primary" >Send</button>
-        <button type="button" style="float: right;">Insätt Bon(uden pris)</button>
-        <button type="button" style="float: right;margin-right:5px">Insätt Bon</button>
+        <button type="button" id="add-bon-no-price" style="float: right;">Insätt Bon(uden pris)</button>
+        <button type="button" id="add-bon" style="float: right;margin-right:5px">Insätt Bon</button>
     </div>         
     `;
     messageLeftRow=`
@@ -56,6 +56,24 @@ class ChatClass {
             textInput.value="";
             self.onSend && self.onSend(message);
         }
+
+        this.myDiv.querySelector("#add-bon").onclick=()=>{
+            if(self.onAddBon) {
+                let text=self.onAddBon();
+                Helper.typeInTextarea(text,textInput);
+            }
+        }
+
+        this.myDiv.querySelector("#add-bon-no-price").onclick=()=>{
+            if(self.onAddBon) {
+                let text=self.onAddBonNoPrice();
+                Helper.typeInTextarea(text,textInput);
+
+            }
+        }
+
+
+
     }
     addMessage(leftRight,name,date,message) {
         let row=document.createElement("li");
@@ -74,6 +92,16 @@ class ChatClass {
     onSend(fun) {
         this.onSend=fun;
     }
+
+    onAddBon(fun) {
+        this.onAddBon=fun;
+    }
+
+    onAddBonNoPrice(fun) {
+        this.onAddBonNoPrice=fun;
+    }
+
+
 
     setIdentity(name) {
         this.identity=name;
@@ -99,6 +127,9 @@ class ChatClass {
             history=history.reverse();
         }
         history=history.slice(start,end);
+        if(history.length===0) {
+            return "";
+        }
         let qoutedMessages="";
         history.forEach(h=>{
             let r=`${h.when}| ${h.name}:\n${h.message.replace(/^/gm,"\t") }`;

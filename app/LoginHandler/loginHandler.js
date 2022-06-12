@@ -302,6 +302,9 @@ function getSession(req, roles) {
     return sessionHandler.getSession(req);
 }
 
+function isLoggedIn(req) {
+    return sessionHandler.getSession(req)!==undefined?true:false;
+}
 
 function haveRoles(req, roles, anyOrAll) {
 
@@ -349,5 +352,6 @@ function haveRoles(req, roles, anyOrAll) {
 module.exports = {
     init: init,
     getSession: getSession,
-    haveRoles: haveRoles
+    haveRoles: haveRoles,
+    isLoggedIn:isLoggedIn
 }

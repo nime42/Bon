@@ -76,6 +76,7 @@ var mailManager=require("./MailManager");
 
 var loginHandler=require("./LoginHandler/loginHandler");
 
+
 loginHandler.init(app,config.userDB,mailSender.sendMail,config.forgotPasswordMailTemplate);
 
 
@@ -440,21 +441,73 @@ app.get("/bonMails/:id",(req,res) => {
     })
 })
 
-app.get("/UnseenBonIdMails",(req,res) => {
-    /*
-    if (!loginHandler.haveRoles(req, [], "ALL")) {
+
+function mailIncomingOrders(orders,callback) {
+    if(orders.length===0) {
+        callback(true);
+        return;
+    }
+    let order=orders.shift();
+    let subject="#Bon:"+config.bonPrefix+"-"+order.bonId+":";
+    let message=order.orgMessage;
+
+    mailSender.sendMail(config.mail.user,config.mail.user,undefined,undefined,"INCOMING:"+subject,message,undefined, function(err) {
+        if(err!==null) {
+            console.log("mailIncomingOrders",err);
+            callback(false,err)
+        } else {
+            mailIncomingOrders(orders,callback)
+        }
+    });          
+}
+
+
+function manageIncomingOrders(callback) {
+    if(config.mailManager.incomingMails) {
+        mailManager.getIncomingOrders(config.mailManager.incomingMails.subjectContains,(status,orders)=>{
+            if(status) {
+                let mailOrders=[];
+                orders.forEach(o=>{
+                    let bonId=db.createBon(o.bon,null);
+                    mailOrders.push({bonId:bonId,orgMessage:o.orgMessage});
+                })
+                mailIncomingOrders(mailOrders,callback);
+            } else {
+                callback(status);
+            }
+        });
+    }
+}
+
+app.get("/checkIncomingOrders",(req,res)=> {
+    if (!loginHandler.isLoggedIn) {
         res.sendStatus(401);
         return;
-    }*/
+    }
+    manageIncomingOrders((status,err)=>{
+        if(!status) {
+           console.log("checkIncomingOrders",err);
+        }
+        res.sendStatus(200);
+    })
 
-    mailManager.getUnseenMails(config.bonPrefix,(status,mails) => {
-        if(status) { 
-            res.json(mailManager.getBonIds(mails)); 
-        } else {
-            console.log("getUnseenMails",mails);
-            res.sendStatus(500);  
 
-        }        
-    });
+})
 
+
+app.get("/UnseenBonIdMails",(req,res) => {
+    if (!loginHandler.isLoggedIn) {
+        res.sendStatus(401);
+        return;
+    }
+
+        mailManager.getUnseenMails(config.bonPrefix,(status,mails) => {
+            if(status) { 
+                res.json(mailManager.getBonIds(mails)); 
+            } else {
+                console.log("getUnseenMails",mails);
+                res.sendStatus(500);  
+    
+            }        
+        });
 })

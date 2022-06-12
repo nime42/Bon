@@ -147,5 +147,10 @@ class BonRepository {
         $.get(url,callback);
     } 
 
+    checkIncomingOrders(callback) {
+        let url="checkIncomingOrders/";
+        $.get(url,callback);
+    } 
+
 
 }

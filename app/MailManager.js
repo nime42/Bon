@@ -12,6 +12,10 @@ if(!config.mailManager.keepAlive) {
 }
 
 
+
+
+
+
 function getMails(mailBox, searchCriterias,markAsRead, callback = console.log) {
   let res = [];
   try {
@@ -19,6 +23,12 @@ function getMails(mailBox, searchCriterias,markAsRead, callback = console.log) {
     imap.once("ready", () => {
       imap.openBox(mailBox, false, () => {
         imap.search(searchCriterias, (err, results) => {
+          if(results.length===0) {
+            imap.end();
+            callback(true,res);
+            return;
+
+          }
           let f;
           try {
             f = imap.fetch(results, { bodies: "" });
@@ -135,8 +145,150 @@ function getBonIds(mails,prefix) {
   return Object.keys(res);
 }
 
+let incomingMailHelper= {
+  entries:[
+    "(?<attr>.*):\\n?(?<value>.*)",
+    "(?<attr>Email):\\n?(?<value>.*)"
+
+  ],
+  bonAttribMap:{
+    forename:"Fornavn",
+    surname:"Efternavn",
+    email:"Email",
+    phone_nr:"Telefon nummer",
+    delivery_date:"Leveringsdato",
+    delivery_time:"Tidspunkt for levering",
+    delivery_address:"Leveringsadresse",
+    nr_of_servings:"Antal Personer",
+    kitchen_selects:"Ristet Rug vælger",
+    company_name:"Firmanavn",
+    ean_nr:"EAN/faktura info",
+    customer_info:"Øvrig kommentarer"
+  }
+}
+
+
+function getIncomingOrders(subjectContains,callback) {
+    getMails("INBOX",['UNSEEN',['SUBJECT',subjectContains]],true, (status,data) => {
+      if(status) {
+        let regExps=incomingMailHelper.entries.map(e=>(new RegExp(e,'g')));
+        let bons=data.map(m=>({orgMessage:m.message, bon:buildBon(parseIncomingMessage(m.message,regExps))}));
+        callback(true,bons);
+      } else {
+        callback(false,data);
+      }
+    })
+}
+
+function getEmptyBon() {
+  let bon={
+    "id": "",
+    "delivery_date": "",
+    "status": "",
+    "status2": "",
+    "nr_of_servings": "",
+    "kitchen_selects": 0,
+    "customer_collects": 0,
+    "price_category": "",
+    "payment_type": "",
+    "customer_info": "",
+    "kitchen_info": "",
+    "service_type": null,
+    "customer": {
+      "forename": "",
+      "surname": "",
+      "email": "",
+      "phone_nr": "",
+      "company": {
+        "name": "",
+        "ean_nr": "",
+        "address": {
+          "street_name": "",
+          "street_name2": "",
+          "street_nr": "",
+          "city": "",
+          "zip_code": ""
+        }
+      }
+    },
+    "delivery_address": {
+      "street_name": "",
+      "street_name2": "",
+      "street_nr": "",
+      "city": "",
+      "zip_code": ""
+    },
+    "orders": []
+  }
+  return bon;
+}
+
+function buildBon(entries) {
+  let bon=getEmptyBon();
+  bon.status="new";
+  bon.customer.forename=getFromEntry(entries,"forename");
+  bon.customer.surname=getFromEntry(entries,"surname");
+  bon.customer.email=getFromEntry(entries,"email");
+  bon.customer.phone_nr=getFromEntry(entries,"phone_nr");
+  bon.customer.company.name=getFromEntry(entries,"company_name");
+  bon.customer.company.ean_nr=getFromEntry(entries,"ean_nr");
+  bon.nr_of_servings=getFromEntry(entries,"nr_of_servings");
+  bon.kitchen_selects=1;
+  bon.price_category="Catering";
+  bon.delivery_date=parseDeliveryDate(entries);
+  bon.delivery_address.street_name2=getFromEntry(entries,"delivery_address");
+  return bon;
+}
+
+function parseDeliveryDate(entries) {
+  let date=getFromEntry(entries,"delivery_date");
+  let time=getFromEntry(entries,"delivery_time");
+  let dateValue=undefined;
+  if(date && date.match(/.* \d{1,2},\d{2,4}/)) {
+    dateValue=new Date(date)+1; //need to add one day if date is on format "Month day, Year" 
+  } else {
+    try {
+      dateValue=new Date(date);
+    } catch(err) {}
+  }
+  if(dateValue===undefined) {
+    return undefined;
+  }
+  if (time) {
+    let groups = time.match(/(?<hour>\d{1,2}) *[.:] *(?<min>\d{1,2})/i)?.groups;
+    if (groups) {
+      console.log(groups["hour"], groups["min"]);
+      dateValue.setHours(groups["hour"], groups["min"]);
+    }
+  }
+  return dateValue.toLocaleString();
+
+}
+
+function getFromEntry(entries,attr) {
+  let val=entries[incomingMailHelper.bonAttribMap[attr]];
+  return val!==undefined?val:"";
+}
+
+function parseIncomingMessage(mess, regExps) {
+  let entries = {};
+  regExps.forEach(r => {
+    mess.match(r)?.forEach(m => {
+      regExps.forEach(s => {
+        let groups=m.match(new RegExp(s.source))?.groups;
+        if(groups) {
+          entries[groups.attr]=groups.value
+        }
+      })
+    })
+  })
+  return entries;
+}
+
+
 module.exports = {
   getBonMails: getBonMails,
   getUnseenMails:getUnseenMails,
-  getBonIds:getBonIds
+  getBonIds:getBonIds,
+  getIncomingOrders:getIncomingOrders
 };

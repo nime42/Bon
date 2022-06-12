@@ -198,6 +198,14 @@ function delBon(bonId, callback = console.log) {
   }
 }
 
+/**
+ * Create and store a bon in DB
+ * @param {*} bonData 
+ * @param {*} callback fun(status,bonId)
+ *                      status {boolean} true if all went ok,fals otherways
+ *                      bonId {integer} the new bon-id or an error object if status is false.
+ * @returns bonId {integer} (if callback=null)
+ */
 function createBon(bonData, callback = console.log) {
   bonData.customer_id = createCustomer(bonData.customer);
   bonData.delivery_address_id = createAddress(bonData.delivery_address);
@@ -208,9 +216,17 @@ function createBon(bonData, callback = console.log) {
     let newBonId = res.lastInsertRowid;
     saveOrders(newBonId, bonData.orders);
 
-    callback(true, newBonId);
+    if(callback===null) {
+      return newBonId;
+    } else {
+      callback(true, newBonId);
+    }
   } catch (err) {
-    callback(false, err);
+    if(callback===null) {
+      throw err;
+    } else {
+      callback(false, err);
+    }
   }
 }
 

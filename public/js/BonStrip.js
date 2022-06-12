@@ -400,6 +400,14 @@ class BonStrip {
 
         })
 
+        this.chat.onAddBon(()=>{
+            return this.bonToText(true);
+        });
+        this.chat.onAddBonNoPrice(()=>{
+            return this.bonToText(false);
+        });
+
+
         let self=this;
         this.myDiv.querySelector("#show-mails").style.display="";
         this.myDiv.querySelector("#show-mails").onclick=() => {
@@ -426,6 +434,39 @@ class BonStrip {
                 mailElem.style.display="none";
             }
         }
+
+
+
+    }
+
+    bonToText(withPrices) {  
+        let orderList=this.getOrders(); 
+        let orders; 
+        if(withPrices) {        
+            orders=orderList.orders.map(o=>(`${o.quantity} X ${o.name}\t\t\t${o.price} kr${o.comment!==""?"  \n\t"+o.comment:""}`));
+        } else {
+            orders=orderList.orders.map(o=>(`${o.quantity} X ${o.name}${o.comment!==""?"  \n\t"+o.comment:""}`));
+        }
+        let orderText=orders.join("\n");
+        let totSum=`Sum:${orderList.totPrice} kr`;
+        let deliveryDate=`${this.myDiv.querySelector("#date").innerHTML} ${this.myDiv.querySelector("#time").innerHTML}`;
+        let deliveryAdr=this.myDiv.querySelector("#address").innerText;
+
+        let text="----------------------";
+        text+="\n"+"Tidspunkt:";
+        text+="\n "+deliveryDate;
+        text+="\n\n"+"Leveringsadresse:";
+        text+="\n"+deliveryAdr;
+        text+="\n\n"+"Bestilling:";
+        text+="\n"+orderText;
+        text+="\n"+totSum;
+        text+="\n";
+        text+="----------------------";
+        text+="\n";
+        return text;
+
+
+        
 
 
 
@@ -639,8 +680,8 @@ class BonStrip {
             let costPrice=order.querySelector("#cost_price").value;
             let price=order.querySelector("#price").value;
 
-            totCostPrice+=costPrice!=undefined?costPrice:0;
-            totPrice+=price!=undefined?price:0;
+            totCostPrice+=costPrice!=undefined?Number(costPrice):0;
+            totPrice+=price!=undefined?Number(price):0;
            return {
             quantity:order.querySelector("#quantity").innerText,
             name:order.querySelector("#order-name").innerText,
@@ -652,8 +693,8 @@ class BonStrip {
         })
         return {
             orders:orders,
-            totPrice:totPrice,
-            totCostPrice:totCostPrice
+            totPrice:totPrice.toFixed(2),
+            totCostPrice:totCostPrice.toFixed(2)
         }
 
     }

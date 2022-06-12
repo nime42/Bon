@@ -56,15 +56,20 @@ class BonCalendar {
 
 
         this.myCalendar.setOnMonthChange((year, month) => {
-            self.myRepo.getBons(year, month + 1, (bons) => {
-                bons.forEach(b => {
-                    b.delivery_date = new Date(b.delivery_date);
-                    let [label, statusColor] = self.myBonForm.createBonLabelAndcolor(b);
-                    self.myCalendar.addEvent(b.delivery_date, label, statusColor, b);
-
+            let p=MessageBox.popup("Henter Bons...");
+            self.myRepo.checkIncomingOrders(()=>{
+                self.myRepo.getBons(year, month + 1, (bons) => {
+                    bons.forEach(b => {
+                        b.delivery_date = new Date(b.delivery_date);
+                        let [label, statusColor] = self.myBonForm.createBonLabelAndcolor(b);
+                        self.myCalendar.addEvent(b.delivery_date, label, statusColor, b);
+    
+                    });
+                    p.hide();
+                    self.UpdateUnseenIds();
                 });
-                self.UpdateUnseenIds();
-            });
+
+            })
 
         }, true);
         

@@ -80,6 +80,11 @@ class Helper {
       
   }
 
+  static typeInTextarea(newText, el = document.activeElement) {
+    const [start, end] = [el.selectionStart, el.selectionEnd];
+    el.setRangeText(newText, start, end, 'select');
+  }
+
 }
 
 
