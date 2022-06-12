@@ -7,6 +7,10 @@ var config = require("../resources/config.js");
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = config.mailManager.rejectUnauthorized!==undefined?config.mailManager.rejectUnauthorized:1;
 
+if(!config.mailManager.keepAlive) {
+  config.mailManager.keepAlive=false;
+}
+
 
 function getMails(mailBox, searchCriterias,markAsRead, callback = console.log) {
   let res = [];
