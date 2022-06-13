@@ -315,7 +315,7 @@ function parseIncomingMessage(mess, regExps) {
     dateWithoutSec.setSeconds(0,0);
     let local=new Date(dateWithoutSec.toLocaleString("default",{timeZone:timeZone}));
     local.setSeconds(0,0);
-    return dateWithoutSec-local;
+    return local-dateWithoutSec;
 
 
   }
