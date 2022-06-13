@@ -476,6 +476,8 @@ function manageIncomingOrders(callback) {
                 callback(status);
             }
         });
+    } else {
+        callback(true);
     }
 }
 
