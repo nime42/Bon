@@ -244,6 +244,12 @@ function buildBon(entries) {
   return bon;
 }
 
+
+
+
+
+
+
 function parseDeliveryDate(entries) {
   let date=getFromEntry(entries,"delivery_date");
   let time=getFromEntry(entries,"delivery_time");
@@ -264,6 +270,12 @@ function parseDeliveryDate(entries) {
       dateValue.setHours(groups["hour"], groups["min"]);
     }
   }
+
+  if(config.mailManager.incomingMails.fromTimeZone) {
+    let tz=config.mailManager.incomingMails.fromTimeZone;
+    dateValue.setTime(dateValue-getLocalTimeOffsetDiff(dateValue,tz));
+  }
+
   return dateValue.toISOString();
 
 }
@@ -287,6 +299,27 @@ function parseIncomingMessage(mess, regExps) {
   })
   return entries;
 }
+
+  /**
+   * Get the time difference between a local date and another timezone.
+   * 
+   * Could be usefull if you get date as a string without timezone but you know what timezone it come from
+   * let d=new Date(dateString);
+   * d.setTime(d-Helper.getLocalTimeOffsetDiff(d,"Europe/Copenhagen"));
+   * @param {Date} date 
+   * @param {String} timeZone - A TZ database name (see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+   * @returns {Integer} difference in milliseconds
+   */
+   function getLocalTimeOffsetDiff(date,timeZone) {
+    let dateWithoutSec=new Date(date);
+    dateWithoutSec.setSeconds(0,0);
+    let local=new Date(dateWithoutSec.toLocaleString("default",{timeZone:timeZone}));
+    local.setSeconds(0,0);
+    return dateWithoutSec-local;
+
+
+  }
+
 
 
 module.exports = {
