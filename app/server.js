@@ -92,8 +92,8 @@ app.use((req,res,next)=>{
 
 
 app.get("/shutdown",(req,res) => {
-    console.log(req.socket.remoteAddress);
-    var isLocal = (req.socket.remoteAddress.match(/.*127.0.0.1/)); //not sure this always work when going through nginx
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    var isLocal = (req.socket.remoteAddress.match(/(.*127.0.0.1)|::1/)); //not sure this always work when going through nginx
     if(isLocal) {
         loginHandler.saveSessions();
         console.log("Shutting down!");
