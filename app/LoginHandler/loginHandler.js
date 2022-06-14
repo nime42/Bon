@@ -346,12 +346,19 @@ function haveRoles(req, roles, anyOrAll) {
 }
 
 
+function saveSessions() {
+    sessionHandler.saveSessions(db.getDbInstance());
+}
 
-
+function resumeSessions() {
+    sessionHandler.resumeSessions(db.getDbInstance());
+}
 
 module.exports = {
     init: init,
     getSession: getSession,
     haveRoles: haveRoles,
-    isLoggedIn:isLoggedIn
+    isLoggedIn:isLoggedIn,
+    saveSessions:saveSessions,
+    resumeSessions:resumeSessions
 }

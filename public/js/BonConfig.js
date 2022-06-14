@@ -185,7 +185,7 @@ class BonConfig {
     <table id="bons-table">
     </table>
     </div>
-    <a href="bonSummaryFile">Download</a>
+    <a href="api/bonSummaryFile">Download</a>
 
     </div>
     </div>

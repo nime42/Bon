@@ -41,7 +41,7 @@ function setPurgeIntervall(seconds) {
 
 var saveSql="insert into saved_sessions(key,timestamp,userid) values(@key,@timestamp,@userId)";
 
-function saveSessions(db,callback) {
+function saveSessions(db) {
     let stmt=db.prepare(saveSql);
     Object.keys(sessions).forEach(k=>{
         let o=sessions[k];
@@ -49,7 +49,6 @@ function saveSessions(db,callback) {
         o["timestamp"]=o["timestamp"].toISOString();
         stmt.run(o);
     });
-    callback(null);
 }
 
 var getSql="select key,timestamp,userId from saved_sessions";

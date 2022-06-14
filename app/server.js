@@ -79,10 +79,22 @@ var loginHandler=require("./LoginHandler/loginHandler");
 
 loginHandler.init(app,config.userDB,mailSender.sendMail,config.forgotPasswordMailTemplate);
 
+loginHandler.resumeSessions();
+
+
+app.use((req,res,next)=>{
+    if(!loginHandler.isLoggedIn(req) && req.url.startsWith("/api")) {
+        res.sendStatus(401);
+    } else {
+        next();
+    }
+})
+
 
 app.get("/shutdown",(req,res) => {
     var isLocal = (req.connection.localAddress === req.connection.remoteAddress);
     if(isLocal) {
+        loginHandler.saveSessions();
         console.log("Shutting down!");
         res.sendStatus(200);
         process.exit();
@@ -91,7 +103,7 @@ app.get("/shutdown",(req,res) => {
 })
 
 
-app.get("/bons",(req,res) => {
+app.get("/api/bons",(req,res) => {
     let year=req.query.year;
     let month=req.query.month;
     db.getBons(year,month,function(status,bons){
@@ -106,7 +118,7 @@ app.get("/bons",(req,res) => {
 })
 
 
-app.get("/bonSummary",(req,res) => {
+app.get("/api/bonSummary",(req,res) => {
     if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
         res.sendStatus(401);
         return;
@@ -116,7 +128,7 @@ app.get("/bonSummary",(req,res) => {
 })
 
 
-app.get("/bonSummary/:id",(req,res) => {
+app.get("/api/bonSummary/:id",(req,res) => {
     if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
         res.sendStatus(401);
         return;
@@ -126,7 +138,7 @@ app.get("/bonSummary/:id",(req,res) => {
 })
 
 
-app.get("/bonSummaryFile",(req,res) => {
+app.get("/api/bonSummaryFile",(req,res) => {
     /*if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
         res.sendStatus(401);
         return;
@@ -187,7 +199,7 @@ app.get("/bonSummaryFile",(req,res) => {
 
 
 
-app.post("/bons",(req,res) => {
+app.post("/api/bons",(req,res) => {
     db.createBon(req.body,function(status,msg) {
         if(status) {  
             res.json(msg);
@@ -200,7 +212,7 @@ app.post("/bons",(req,res) => {
     });
 })
 
-app.put("/bons/:id",(req,res) => {
+app.put("/api/bons/:id",(req,res) => {
     db.updateBon(req.params.id,req.body,function(status,msg) {
         if(status) {  
             res.json(msg);
@@ -213,7 +225,7 @@ app.put("/bons/:id",(req,res) => {
     });
 })
 
-app.put("/bonStatus/:id",(req,res) => {
+app.put("/api/bonStatus/:id",(req,res) => {
     db.updateBonStatus(req.params.id,req.body.status,function(status,msg) {
         if(status) {  
             res.sendStatus(200);
@@ -226,7 +238,7 @@ app.put("/bonStatus/:id",(req,res) => {
     });
 })
 
-app.delete("/bons/:id",(req,res) => {
+app.delete("/api/bons/:id",(req,res) => {
 
     db.delBon(req.params.id,function(status,err){
         if(status) { 
@@ -242,7 +254,7 @@ app.delete("/bons/:id",(req,res) => {
 })
 
 
-app.put("/consumeBon/:id",(req,res) => {
+app.put("/api/consumeBon/:id",(req,res) => {
     consumeBon(req.params.id);
     res.sendStatus(200);  
 
@@ -258,7 +270,7 @@ function consumeBon(id) {
 }
 
 
-app.get("/customers",(req,res) => {
+app.get("/api/customers",(req,res) => {
     let email=req.query.email;
     db.getCustomers(email,function(status,customers){
         if(status) { 
@@ -271,7 +283,7 @@ app.get("/customers",(req,res) => {
     })   
 })
 
-app.get("/getGrocyRecipes",(req,res) => {
+app.get("/api/getGrocyRecipes",(req,res) => {
     grocy.getAllRecipes(function(status,recipes){
         if(status) { 
             res.json(recipes); 
@@ -284,7 +296,7 @@ app.get("/getGrocyRecipes",(req,res) => {
 })
 
 
-app.get("/items",(req,res) => {
+app.get("/api/items",(req,res) => {
 
     db.getItems(function(status,items){
         if(status) { 
@@ -298,7 +310,7 @@ app.get("/items",(req,res) => {
 })
 
 
-app.get("/items_prices",(req,res) => {
+app.get("/api/items_prices",(req,res) => {
 
     db.getItemPrices(function(status,items){
         if(status) { 
@@ -312,7 +324,7 @@ app.get("/items_prices",(req,res) => {
 })
 
 
-app.get("/orders/:id",(req,res) => {
+app.get("/api/orders/:id",(req,res) => {
 
     db.getOrders(req.params.id,function(status,items){
         if(status) { 
@@ -325,13 +337,13 @@ app.get("/orders/:id",(req,res) => {
     })   
 })
 
-app.put("/orders/:id",(req,res) => {
+app.put("/api/orders/:id",(req,res) => {
     db.saveOrders(req.params.id,req.body);
     res.sendStatus(200);
 })
 
 
-app.put("/items",(req,res) => {
+app.put("/api/items",(req,res) => {
     let items=req.body;
     db.updateItems(items,function(status,err){
         if(status) { 
@@ -345,7 +357,7 @@ app.put("/items",(req,res) => {
     })  
 })
 
-app.delete("/items/:id",(req,res) => {
+app.delete("/api/items/:id",(req,res) => {
     db.deleteItems(req.params.id,function(status,err){
         if(status) { 
             res.sendStatus(200);  
@@ -358,7 +370,7 @@ app.delete("/items/:id",(req,res) => {
     })  
 })
 
-app.get("/updateDB", (req, res) => {
+app.get("/api/updateDB", (req, res) => {
     if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
         res.sendStatus(401);
         return;
@@ -381,7 +393,7 @@ app.get("/updateDB", (req, res) => {
     });
 });
 
-app.get("/searchBons",(req,res) => {
+app.get("/api/searchBons",(req,res) => {
     db.searchBons(req.query,req.query.includeOrders=="true",function(status,items){
         if(status) { 
             res.json(items); 
@@ -394,7 +406,7 @@ app.get("/searchBons",(req,res) => {
 })
 
 
-app.post("/sendBonMail/",(req,res) => {
+app.post("/api/sendBonMail/",(req,res) => {
     if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
         res.sendStatus(401);
         return;
@@ -423,7 +435,7 @@ app.post("/sendBonMail/",(req,res) => {
 
 })
 
-app.get("/bonMails/:id",(req,res) => {
+app.get("/api/bonMails/:id",(req,res) => {
     if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
         res.sendStatus(401);
         return;
@@ -481,7 +493,7 @@ function manageIncomingOrders(callback) {
     }
 }
 
-app.get("/checkIncomingOrders",(req,res)=> {
+app.get("/api/checkIncomingOrders",(req,res)=> {
     if (!loginHandler.isLoggedIn) {
         res.sendStatus(401);
         return;
@@ -497,7 +509,7 @@ app.get("/checkIncomingOrders",(req,res)=> {
 })
 
 
-app.get("/UnseenBonIdMails",(req,res) => {
+app.get("/api/UnseenBonIdMails",(req,res) => {
     if (!loginHandler.isLoggedIn) {
         res.sendStatus(401);
         return;
