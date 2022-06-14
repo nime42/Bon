@@ -443,7 +443,7 @@ class BonStrip {
         let orderList=this.getOrders(); 
         let orders; 
         if(withPrices) {        
-            orders=orderList.orders.map(o=>(`${o.quantity} X ${o.name}\t\t\t${o.price} kr${o.comment!==""?"  \n\t"+o.comment:""}`));
+            orders=orderList.orders.map(o=>(`${o.quantity} X ${o.name}\t\t\t${o.price*o.quantity} kr${o.comment!==""?"  \n\t"+o.comment:""}`));
         } else {
             orders=orderList.orders.map(o=>(`${o.quantity} X ${o.name}${o.comment!==""?"  \n\t"+o.comment:""}`));
         }
@@ -678,10 +678,14 @@ class BonStrip {
         let totPrice=0;
         let orders=Array.from(this.myOrders.getElems()).map(order=>{
             let costPrice=order.querySelector("#cost_price").value;
+            costPrice!=undefined?Number(costPrice):0;
             let price=order.querySelector("#price").value;
+            price!=undefined?Number(price):0;
 
-            totCostPrice+=costPrice!=undefined?Number(costPrice):0;
-            totPrice+=price!=undefined?Number(price):0;
+            let quantity=order.querySelector("#quantity").innerText;
+            quantity=quantity!=undefined?Number(quantity):1;
+            totCostPrice+=costPrice*quantity;
+            totPrice+=price*quantity;
            return {
             quantity:order.querySelector("#quantity").innerText,
             name:order.querySelector("#order-name").innerText,
