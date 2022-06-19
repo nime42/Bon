@@ -85,6 +85,21 @@ class Helper {
     el.setRangeText(newText, start, end, 'select');
   }
 
+
+  static expandCollapse(caret,collapsibleId) {
+    let collapsElem=document.querySelector(collapsibleId);
+    if(caret.classList.contains("fa-caret-down")) {
+      collapsElem.style.display="";
+      caret.classList.toggle("fa-caret-down");
+      caret.classList.toggle("fa-caret-up");
+    } else {
+      collapsElem.style.display="none";
+      caret.classList.toggle("fa-caret-down");
+      caret.classList.toggle("fa-caret-up");
+    }
+
+  }
+
 }
 
 

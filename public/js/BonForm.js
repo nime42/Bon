@@ -55,7 +55,8 @@ class BonForm {
               </div>
 
 
-              <h5>Kunde</h5>
+              <h5>Kunde <i class="fa fa-caret-up" aria-hidden="true" onclick="Helper.expandCollapse(this,'#collapse-customer')"></i></h5>
+              <div id="collapse-customer">
               <div class="bon-row indent">
                   <div class="bon-column">
                       <i class="fa fa-envelope icon input-icons"></i>
@@ -85,10 +86,11 @@ class BonForm {
                       <input id="phone_nr" type="tel" name="phone_nr" placeholder="Telefon">
                   </div>
               </div>
+              </div>
 
 
-
-              <h5>Leveringsadresse </h5>
+              <h5>Leveringsadresse <i class="fa fa-caret-up" aria-hidden="true" onclick="Helper.expandCollapse(this,'#collapse-delivery-address')"></i></h5>
+              <div id="collapse-delivery-address">
               <div class="bon-row indent">
                   <div class="bon-column">
                       <span>
@@ -123,15 +125,15 @@ class BonForm {
                       <input type="text" id="city" name="city" placeholder="By" autocomplete="nope">
                   </div>
               </div>
+              </div>
 
 
 
 
 
 
-
-              <h5>Firma</h5>
-
+              <h5>Firma <i class="fa fa-caret-up" aria-hidden="true" onclick="Helper.expandCollapse(this,'#collapse-company')"></i></h5>
+              <div id="collapse-company">
               <div class="bon-row indent">
                   <div class="bon-column">
                       <i class="fa fa-industry icon input-icons"></i>
@@ -181,6 +183,7 @@ class BonForm {
                   <div class="bon-column">
                       <input type="text" id="company_city" name="company_city" placeholder="By" autocomplete="nope">
                   </div>
+              </div>
               </div>
 
               <h5>Kunde önsker</h5>
