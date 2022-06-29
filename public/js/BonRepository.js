@@ -143,14 +143,35 @@ class BonRepository {
     } 
 
     getUnseenBonIdMails(callback) {
-        let url="api/UnseenBonIdMails/";
+        let url="api/unseenBonIdMails/";
         $.get(url,callback);
     } 
 
-    checkIncomingOrders(callback) {
-        let url="api/checkIncomingOrders/";
+
+    getAllUnseenBonIdMails(callback) {
+        let url="api/allUnseenBonIdMails/";
         $.get(url,callback);
     } 
 
+
+
+
+    getBonsForWeek(monday,callback) {
+        let url="api/getBonsForWeek?monday="+monday.toISOString();
+        $.get(url,callback);
+    }
+
+    checkBonStock(callback) {
+        let url="api/checkStock";
+
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function(data,status,xhr) {callback(true,data);},
+            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            contentType: "application/json"
+          });
+
+    }
 
 }

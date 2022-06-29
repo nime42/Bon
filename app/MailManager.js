@@ -124,21 +124,28 @@ function getBonMails(prefix,id,markAsRead,callback=console.log) {
 }
 
 function getUnseenMails(prefix,callback=console.log) {
-  let searchSubject="#Bon:"+prefix+"-";
+  let searchSubject;
+  if(prefix==="*") {
+    searchSubject="#Bon:";
+  } else {
+    searchSubject="#Bon:"+prefix+"-";
+  }
   getMails("INBOX",['UNSEEN',['SUBJECT', searchSubject]],false,(status,data) => {
     callback(status,data);
   });
 }
 
-function getBonIds(mails,prefix) {
+function getBonIds(mails,withPrefix) {
   let res={}
   mails.forEach(m=>{
     if(!m.subject.startsWith("SENT")) {
        let match=m.subject.match(/#Bon:(.*)-(\d+)/);
        if(match) {
-         if(!prefix || prefix===match[1]) {
-           res[match[2]]=1;
-         }
+          if(withPrefix) {
+            res[match[1]+"-"+match[2]]=1
+          } else {
+            res[match[2]]=1; 
+          }
        }
     }
   });

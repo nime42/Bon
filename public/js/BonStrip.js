@@ -215,9 +215,9 @@ class BonStrip {
         <span id="total-sum" class="price-box">0.00 kr</span>
         </div>
 
-        <div id="add-items" style="display:none">
+        <div id="add-items">
         <br>
-        <i id="show-items-list" class="fa fa-plus-square" style="font-size:20px; color:${this.foreground}"></i>        
+        <i id="show-items-list" class="fa fa-plus-square" style="font-size:20px; color:${this.foreground};display:none"></i>        
         <i id="show-mails" class="fa fa-envelope" style="font-size:20px; color:${this.foreground};display:none"></i>        
 
         <div id="items-list" style="display:none"></div>
@@ -253,7 +253,7 @@ class BonStrip {
                 this.configureOrder(1, item.name, "", item.id, item.price, item.cost_price, item.category);
             });
             
-            this.myDiv.querySelector("#add-items").style.display="";
+            this.myDiv.querySelector("#show-items-list").style.display="";
             this.myDiv.querySelector("#show-items-list").onclick=() => {
                 if(itemslistElem.style.display=="none") {
                     itemslistElem.style.display=""
@@ -263,6 +263,7 @@ class BonStrip {
             }
 
         }
+        this.isEditable=isEditable;
 
         this.myRepo = new BonRepository();
 
@@ -428,7 +429,7 @@ class BonStrip {
                     mails.forEach(m=>{   
                         this.chat.addMessage(m.subject.startsWith("SENT:")?"right":"left",m.from,new Date(m.date),m.message);
                     })
-                    Globals.myCalender.mailSeen(self.bonId);
+                    this.onMailSeen && this.onMailSeen(this.bonId);
                 });
             } else {
                 mailElem.style.display="none";
@@ -437,6 +438,10 @@ class BonStrip {
 
 
 
+    }
+
+    setOnMailSeen(fun) {
+        this.onMailSeen=fun;
     }
 
     bonToText(withPrices) {  
@@ -524,6 +529,7 @@ class BonStrip {
     }
 
     initFromBon(bon,orders) {
+        this.clear();
         this.setBonId(bon.id);
         this.setCustomerInfo(bon);
         this.setDeliveryAddr(bon);
@@ -536,10 +542,12 @@ class BonStrip {
             orders.forEach(o=>{
                 this.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price,o.cost_price,o.category);
             })
-
+            this.updateTotalSum();
         }
-        this.updatePricesFromCategory(bon.price_category);
+        this.myItemsList && this.myItemsList.updateItems(bon.price_category);
 
+
+  
     }
 
 
@@ -564,28 +572,30 @@ class BonStrip {
         }
 
         let self=this;
-        order.onclick=() => {
+        if (this.isEditable) {
+            order.onclick = () => {
 
-            this.orderConfig.querySelector("#quantity").value=order.querySelector("#quantity").innerText;
-            this.orderConfig.querySelector("#order-name").innerHTML=order.querySelector("#order-name").innerText;
-            this.orderConfig.querySelector("#comment").value=order.querySelector("#comment").innerText;
-            this.orderConfig.querySelector("#item-id").value=order.querySelector("#item-id").value;
-            this.orderConfig.querySelector("#price").value=order.querySelector("#price").value;
-            this.orderConfig.querySelector("#cost_price").value=order.querySelector("#cost_price").value;
-            this.orderConfig.querySelector("#category").value=order.querySelector("#category").value;
+                this.orderConfig.querySelector("#quantity").value = order.querySelector("#quantity").innerText;
+                this.orderConfig.querySelector("#order-name").innerHTML = order.querySelector("#order-name").innerText;
+                this.orderConfig.querySelector("#comment").value = order.querySelector("#comment").innerText;
+                this.orderConfig.querySelector("#item-id").value = order.querySelector("#item-id").value;
+                this.orderConfig.querySelector("#price").value = order.querySelector("#price").value;
+                this.orderConfig.querySelector("#cost_price").value = order.querySelector("#cost_price").value;
+                this.orderConfig.querySelector("#category").value = order.querySelector("#category").value;
 
-            let extra=this._getExtraAttributes(order.querySelector("#order-name").innerText);
-            if(extra && extra.link) {
-                this.orderConfig.querySelector("#extra-link").style.display="";
-                this.orderConfig.querySelector("#extra-link").setAttribute("href",extra.link.url);
-                this.orderConfig.querySelector("#extra-link").innerHtml=extra.link.label;
-                this.orderConfig.querySelector("#extra-link").onclick=this.orderConfig.querySelector("#save").onclick;
-            } else {
-                this.orderConfig.querySelector("#extra-link").style.display="none";
-            }          
+                let extra = this._getExtraAttributes(order.querySelector("#order-name").innerText);
+                if (extra && extra.link) {
+                    this.orderConfig.querySelector("#extra-link").style.display = "";
+                    this.orderConfig.querySelector("#extra-link").setAttribute("href", extra.link.url);
+                    this.orderConfig.querySelector("#extra-link").innerHtml = extra.link.label;
+                    this.orderConfig.querySelector("#extra-link").onclick = this.orderConfig.querySelector("#save").onclick;
+                } else {
+                    this.orderConfig.querySelector("#extra-link").style.display = "none";
+                }
 
-            self.orderConfigPopup.show(self.orderConfig);
-            self.currentOrder=order;
+                self.orderConfigPopup.show(self.orderConfig);
+                self.currentOrder = order;
+            }
         }
 
         if(comment==="") {

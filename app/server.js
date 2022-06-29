@@ -64,15 +64,19 @@ if(config.app.https) {
     httpsServer.listen(config.app.https,() => console.log('App listening at https://localhost:'+config.app.https));
 }
 
-var db=require('./db-functions.js');
+var DBClass=require('./DBClass.js');
+var DB=new DBClass('./resources/bon.db');
 
-var grocy=require('./grocy-functions.js');
+var GrocyFunctionsClass=require('./grocyFunctionsClass.js');
+grocy=new GrocyFunctionsClass(config);
 
 var mailSender=require("./mailSender.js");
 mailSender.init(config.mail);
 
 var mailManager=require("./MailManager");
 
+var OtherBonsHandler=require('./OtherBonsHandler');
+var allBonInstances=new OtherBonsHandler(config,DB);
 
 var loginHandler=require("./LoginHandler/loginHandler");
 
@@ -109,7 +113,7 @@ app.get("/shutdown",(req,res) => {
 app.get("/api/bons",(req,res) => {
     let year=req.query.year;
     let month=req.query.month;
-    db.getBons(year,month,function(status,bons){
+    DB.getBons(year,month,function(status,bons){
         if(status) { 
             res.json(bons); 
         } else {
@@ -127,7 +131,7 @@ app.get("/api/bonSummary",(req,res) => {
         return;
     }
 
-    res.json(db.getBonSummary());
+    res.json(DB.getBonSummary());
 })
 
 
@@ -137,7 +141,7 @@ app.get("/api/bonSummary/:id",(req,res) => {
         return;
     }
     let bonId=req.params.id;
-    res.json(db.getBonSummary(bonId));
+    res.json(DB.getBonSummary(bonId));
 })
 
 
@@ -167,7 +171,7 @@ app.get("/api/bonSummaryFile",(req,res) => {
         "Pris"
     ];
     rows.push("\""+headers.join('";"')+"\"");
-    let bons=db.getBonSummary();
+    let bons=DB.getBonSummary();
     bons.forEach(b=>{
         let r=[
             "#"+b.id,
@@ -203,7 +207,7 @@ app.get("/api/bonSummaryFile",(req,res) => {
 
 
 app.post("/api/bons",(req,res) => {
-    db.createBon(req.body,function(status,msg) {
+    DB.createBon(req.body,function(status,msg) {
         if(status) {  
             res.json(msg);
  
@@ -216,7 +220,7 @@ app.post("/api/bons",(req,res) => {
 })
 
 app.put("/api/bons/:id",(req,res) => {
-    db.updateBon(req.params.id,req.body,function(status,msg) {
+    DB.updateBon(req.params.id,req.body,function(status,msg) {
         if(status) {  
             res.json(msg);
  
@@ -229,7 +233,7 @@ app.put("/api/bons/:id",(req,res) => {
 })
 
 app.put("/api/bonStatus/:id",(req,res) => {
-    db.updateBonStatus(req.params.id,req.body.status,function(status,msg) {
+    DB.updateBonStatus(req.params.id,req.body.status,function(status,msg) {
         if(status) {  
             res.sendStatus(200);
  
@@ -243,7 +247,7 @@ app.put("/api/bonStatus/:id",(req,res) => {
 
 app.delete("/api/bons/:id",(req,res) => {
 
-    db.delBon(req.params.id,function(status,err){
+    DB.delBon(req.params.id,function(status,err){
         if(status) { 
             res.sendStatus(200);  
  
@@ -264,7 +268,7 @@ app.put("/api/consumeBon/:id",(req,res) => {
 })
 
 function consumeBon(id) {
-    db.getOrders(id,function(status,items){
+    DB.getOrders(id,function(status,items){
         items.forEach(i => {
             grocy.consumeItem(i.quantity,i.external_id);
             
@@ -273,9 +277,10 @@ function consumeBon(id) {
 }
 
 
+
 app.get("/api/customers",(req,res) => {
     let email=req.query.email;
-    db.getCustomers(email,function(status,customers){
+    DB.getCustomers(email,function(status,customers){
         if(status) { 
             res.json(customers); 
         } else {
@@ -301,7 +306,7 @@ app.get("/api/getGrocyRecipes",(req,res) => {
 
 app.get("/api/items",(req,res) => {
 
-    db.getItems(function(status,items){
+    DB.getItems(function(status,items){
         if(status) { 
             res.json(items); 
         } else {
@@ -315,7 +320,7 @@ app.get("/api/items",(req,res) => {
 
 app.get("/api/items_prices",(req,res) => {
 
-    db.getItemPrices(function(status,items){
+    DB.getItemPrices(function(status,items){
         if(status) { 
             res.json(items); 
         } else {
@@ -329,7 +334,7 @@ app.get("/api/items_prices",(req,res) => {
 
 app.get("/api/orders/:id",(req,res) => {
 
-    db.getOrders(req.params.id,function(status,items){
+    DB.getOrders(req.params.id,function(status,items){
         if(status) { 
             res.json(items); 
         } else {
@@ -341,14 +346,14 @@ app.get("/api/orders/:id",(req,res) => {
 })
 
 app.put("/api/orders/:id",(req,res) => {
-    db.saveOrders(req.params.id,req.body);
+    DB.saveOrders(req.params.id,req.body);
     res.sendStatus(200);
 })
 
 
 app.put("/api/items",(req,res) => {
     let items=req.body;
-    db.updateItems(items,function(status,err){
+    DB.updateItems(items,function(status,err){
         if(status) { 
             res.sendStatus(200);  
  
@@ -361,7 +366,7 @@ app.put("/api/items",(req,res) => {
 })
 
 app.delete("/api/items/:id",(req,res) => {
-    db.deleteItems(req.params.id,function(status,err){
+    DB.deleteItems(req.params.id,function(status,err){
         if(status) { 
             res.sendStatus(200);  
  
@@ -380,7 +385,7 @@ app.get("/api/updateDB", (req, res) => {
     }
     grocy.getAllRecipes((status, data) => {
         if (status) {
-            db.updateItems(data, function (status2, err) {
+            DB.updateItems(data, function (status2, err) {
                 if (status2) {
                     res.sendStatus(200);
                 } else {
@@ -397,7 +402,7 @@ app.get("/api/updateDB", (req, res) => {
 });
 
 app.get("/api/searchBons",(req,res) => {
-    db.searchBons(req.query,req.query.includeOrders=="true",function(status,items){
+    DB.searchBons(req.query,req.query.includeOrders=="true",function(status,items){
         if(status) { 
             res.json(items); 
         } else {
@@ -444,8 +449,12 @@ app.get("/api/bonMails/:id",(req,res) => {
         return;
     }
     let id=req.params.id;
+    let prefix=config.bonPrefix;
+    if(id.match(/.+-\d+/)) {
+        [prefix,id]=id.split("-");
+    }
     let markAsRead=true;
-    mailManager.getBonMails(config.bonPrefix,id,markAsRead,(status,mails)=>{
+    mailManager.getBonMails(prefix,id,markAsRead,(status,mails)=>{
         if(status) { 
             res.json(mails); 
         } else {
@@ -483,7 +492,7 @@ function manageIncomingOrders(callback) {
             if(status) {
                 let mailOrders=[];
                 orders.forEach(o=>{
-                    let bonId=db.createBon(o.bon,null);
+                    let bonId=DB.createBon(o.bon,null);
                     mailOrders.push({bonId:bonId,orgMessage:o.orgMessage});
                 })
                 mailIncomingOrders(mailOrders,callback);
@@ -496,23 +505,26 @@ function manageIncomingOrders(callback) {
     }
 }
 
-app.get("/api/checkIncomingOrders",(req,res)=> {
-    if (!loginHandler.isLoggedIn) {
-        res.sendStatus(401);
-        return;
+if(config.mailManager.incomingMails) {
+
+    let checkPeriod=parseInt(config.mailManager.incomingMails.checkPeriodic);
+    if(!Number.isInteger(checkPeriod)) {
+        console.error("Can't check incoming mails: config.mailManager.incomingMails.checkperiodic is not a number or is missing!");
     }
-    manageIncomingOrders((status,err)=>{
-        if(!status) {
-           console.log("checkIncomingOrders",err);
-        }
-        res.sendStatus(200);
-    })
+    manageIncomingOrders((status)=>{
+        console.log("checking incoming mails,status:"+status);
+    });
+
+    
+    setInterval(()=>{
+        manageIncomingOrders((status)=>{
+            console.log("checking incoming mails,status:"+status);
+        })
+    },checkPeriod*1000*60);
+}
 
 
-})
-
-
-app.get("/api/UnseenBonIdMails",(req,res) => {
+app.get("/api/unseenBonIdMails",(req,res) => {
     if (!loginHandler.isLoggedIn) {
         res.sendStatus(401);
         return;
@@ -527,4 +539,60 @@ app.get("/api/UnseenBonIdMails",(req,res) => {
     
             }        
         });
+})
+
+
+app.get("/api/allUnseenBonIdMails",(req,res) => {
+    if (!loginHandler.isLoggedIn) {
+        res.sendStatus(401);
+        return;
+    }
+
+        mailManager.getUnseenMails("*",(status,mails) => {
+            if(status) { 
+                res.json(mailManager.getBonIds(mails,true)); 
+            } else {
+                console.log("getUnseenMails",mails);
+                res.sendStatus(500);  
+    
+            }        
+        });
+})
+
+
+app.get("/api/getBonsForWeek",(req,res)=>{
+    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+        res.sendStatus(401);
+        return;
+    }
+    let monday=new Date(req.query.monday);
+    try {
+        let bons=allBonInstances.getBonsForWeek(monday,null);
+        res.json(bons);
+    } catch(err) {
+        console.log("getBonsForWeek",err);
+        res.sendStatus(500);  
+    }
+
+})
+
+app.get("/api/checkStock",(req,res)=>{
+    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+        res.sendStatus(401);
+        return;
+    }
+
+
+    allBonInstances.checkStock((status,bons) =>{
+        if(status) {
+            res.json(bons);
+        } else {
+            console.log("checkStock",bons);
+            res.sendStatus(500);  
+    
+        }
+
+    })
+
+
 })

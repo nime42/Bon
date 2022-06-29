@@ -309,6 +309,9 @@ class BonForm {
 
     this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"),true,this.myDiv.querySelector("#items-selector"));
     this.myBonStrip.showMails(this.myDiv.querySelector("#mail-conversation"));
+    this.myBonStrip.setOnMailSeen((bonId)=>{
+      Globals.myCalender.mailSeen(bonId)
+    })
 
     this.myBonStrip.updateNameOnChange(
       form.querySelector("#forename"),
@@ -706,8 +709,8 @@ class BonForm {
 
     this.myBonStrip.setBonId(bon.id);
 
-    this.myRepoObj.getOrders(bon.id, (orders) => {
-      orders.forEach((o) => {
+    if (bon.orders) {
+      bon.orders.forEach((o) => {
         this.myBonStrip.addOrder(
           o.quantity,
           o.name,
@@ -719,7 +722,23 @@ class BonForm {
         );
       });
       this.myBonStrip.updateTotalSum();
-    });
+    } else {
+
+      this.myRepoObj.getOrders(bon.id, (orders) => {
+        orders.forEach((o) => {
+          this.myBonStrip.addOrder(
+            o.quantity,
+            o.name,
+            o.special_request,
+            o.item_id,
+            o.price,
+            o.cost_price,
+            o.category
+          );
+        });
+        this.myBonStrip.updateTotalSum();
+      });
+    }
   }
 
   _setFormDate(date, formDiv) {
@@ -763,18 +782,22 @@ class BonForm {
   }
 
   initFromBonId(id, onClose) {
-    this._clear();
-    this.onFormClose = onClose;
-    this.currentId = id;
 
     this.myRepoObj.searchBons({ bonId: id }, (bons) => {
       let bonData = bons[0];
-      this._bonToForm(bonData, "#order");
-      this.myDiv.querySelectorAll(".for-update").forEach((e) => {
-        e.style.display = "";
-      });
-      this.myPopupObj.show(this.getForm());
+      this.initFromBonData(bonData,onClose);
     });
+  }
+
+  initFromBonData(bon,onClose) {
+    this._clear();
+    this.onFormClose = onClose;
+    this.currentId = bon.id;
+    this._bonToForm(bon, "#order");
+    this.myDiv.querySelectorAll(".for-update").forEach((e) => {
+      e.style.display = "";
+    });
+    this.myPopupObj.show(this.getForm());
   }
 
   initFromDate(date, onClose) {

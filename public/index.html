@@ -36,6 +36,7 @@
     <script src="js/BonWall.js"></script>
     <script src="js/loginHandler.js"></script>
     <script src="js/ChatClass.js"></script>
+    <script src="js/WeekView.js"></script>
 
     <script>
         function toggleMenu() {
@@ -105,7 +106,8 @@
     <div class="topnav">
         <a href="#home" class="menu" onclick="toggleMenu()">RR &nbsp;<span id="menu-header"></span><span id="bon-instance" style="float: right;margin-right: 50%;margin-bottom: 0;font-weight: bold;">Hej</span></a>
         <div id="myLinks">
-            <a href="#calendar" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i> Kalender</a>
+            <a href="#calendar" data-check-access="${ADMIN} || ${USER}" onclick="console.log('calendar');gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i> Kalender</a>
+            <a href="#week" data-check-access="${ADMIN}" onclick="console.log('week');gotoMenu(this);Globals.myWeekWiew.refresh();toggleMenu();"><i class="fa fa-home"></i> Ugeoversigt</a>
             <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i class="fa fa-cutlery"></i> Kökken vy idag</a>
             <a href="#future" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i class="fa fa-sun-o"></i>Senare</a>
             <a href="#grocy" id="link-to-grocy"><i class="fa fa-database"> Grocy</i></a>
@@ -263,7 +265,8 @@
 
         </section>
         <section id="calendar" style="display:none">
-            kalendar
+        </section>
+        <section id="week" style="display:none">
         </section>
 
         <section id="admin" style="display:none">
@@ -310,18 +313,28 @@
 
             Globals.myFutureBonWall=new BonWall("#future",["new","needInfo","approved","preparing"]);
 
+            
+            Globals.myWeekWiew=new WeekView("#week");
+            Globals.myWeekWiew.setOnChange(Globals.myWeekWiew.fetchBons);
+
 
 
             Globals.myLoginHandler.getUserInfo((userInfo) => {
                 Globals.userInfo = userInfo;
                 Globals.myLoginHandler.checkAccess(Globals.userInfo?.roles);
 
-                if(userInfo.roles.find(r=>(r==="ADMIN"))) {
-                    gotoMenu(document.querySelector('a[href="#calendar"]'));
+                if(window.location.href.match(/#.*/) && !window.location.href.match("#login-tab")) {
+                    syncMenu();
                 } else {
-                    gotoMenu(document.querySelector('a[href="#kitchen"]'));
-                }
 
+                    if(userInfo.roles.find(r=>(r==="ADMIN"))) {
+                        document.querySelector('a[href="#calendar"]').onclick();
+                        toggleMenu();
+                    } else {
+                        document.querySelector('a[href="#kitchen"]').onclick();
+                        toggleMenu();
+                    }
+                }
             });
 
             document.querySelector("#login").style.display = "none";
@@ -367,7 +380,7 @@
         }
 
         Globals.myLoginHandler.checkAccess(Globals.userInfo?.roles);
-       
+
 
 
     </script>
