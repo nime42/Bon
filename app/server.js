@@ -67,7 +67,7 @@ if(config.app.https) {
 var DBClass=require('./DBClass.js');
 var DB=new DBClass('./resources/bon.db');
 
-var GrocyFunctionsClass=require('./grocyFunctionsClass.js');
+var GrocyFunctionsClass=require('./GrocyFunctionsClass.js');
 grocy=new GrocyFunctionsClass(config);
 
 var mailSender=require("./mailSender.js");
@@ -75,7 +75,7 @@ mailSender.init(config.mail);
 
 var mailManager=require("./MailManager");
 
-var OtherBonsHandler=require('./OtherBonsHandler');
+var OtherBonsHandler=require('./OtherBonsHandler.js');
 var allBonInstances=new OtherBonsHandler(config,DB);
 
 var loginHandler=require("./LoginHandler/loginHandler");
