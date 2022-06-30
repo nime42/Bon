@@ -114,7 +114,12 @@
             <a href="#invoices" data-check-access="${ADMIN}" onclick="gotoMenu(this);Globals.myInvoiceBonWall.getBonsForInvoice();toggleMenu();"><i class="fa fa-money"></i> Fakturer</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i class="fa fa-wrench"></i> Admin</a>
             <a href="#log-in" class="active-menu" onclick="gotoMenu(this);toggleMenu()"><i class="fa fa-key">Login</i></a>
-
+            <span id="version" style="
+                margin-left: 15px;
+                font-size: smaller;
+                font-weight: bold;
+                font-style: italic;
+            ">%{version}%</span> <!--This will be set from deploy.sh-->
             
     
 
@@ -295,7 +300,7 @@
 
         document.querySelector("#link-to-grocy").href = Globals.grocyLink;
         document.querySelector("#bon-instance").innerHTML = Globals.bonInstance;
-
+        document.querySelector("#version").style.color=Globals.foreground;
 
 
  
