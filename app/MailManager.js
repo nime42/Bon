@@ -166,6 +166,7 @@ let incomingMailHelper= {
     delivery_date:"Leveringsdato",
     delivery_time:"Tidspunkt for levering",
     delivery_address:"Leveringsadresse",
+    delivery_zipcode:"Postnummer",
     nr_of_servings:"Antal Personer",
     kitchen_selects:"Ristet Rug vælger",
     company_name:"Firmanavn",
@@ -244,6 +245,7 @@ function buildBon(entries) {
   bon.price_category="Catering";
   bon.delivery_date=parseDeliveryDate(entries);
   bon.delivery_address.street_name2=getFromEntry(entries,"delivery_address");
+  bon.delivery_address.zip_code=getFromEntry(entries,"delivery_zipcode");
 
   if(bon.delivery_date===undefined) {
     bon.customer_info="BEMÆRK, dato kunne ikke læses. Tjek email.";
