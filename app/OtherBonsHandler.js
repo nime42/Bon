@@ -31,7 +31,7 @@ module.exports = class OtherBonsHandler {
 
     getBonsForWeek(mondayDate) {
         let before=new Date();
-        before.setDate(mondayDate.getDate()+6);
+        before.setTime(mondayDate.getTime()+6*(24*3600*1000));
         let searchParams={
             afterDate:mondayDate.toISOString().split('T')[0],
             beforeDate:before.toISOString().split('T')[0]
