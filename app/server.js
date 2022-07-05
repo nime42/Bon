@@ -126,9 +126,9 @@ app.get("/api/bons",(req,res) => {
 
 
 app.get("/api/bonSummary",(req,res) => {
-    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
         res.sendStatus(401);
-        return;
+        return;        
     }
 
     res.json(DB.getBonSummary());
@@ -136,9 +136,9 @@ app.get("/api/bonSummary",(req,res) => {
 
 
 app.get("/api/bonSummary/:id",(req,res) => {
-    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
         res.sendStatus(401);
-        return;
+        return;        
     }
     let bonId=req.params.id;
     res.json(DB.getBonSummary(bonId));
@@ -146,10 +146,10 @@ app.get("/api/bonSummary/:id",(req,res) => {
 
 
 app.get("/api/bonSummaryFile",(req,res) => {
-    /*if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
         res.sendStatus(401);
-        return;
-    }*/
+        return;        
+    }
 
 
     let rows=[];
@@ -379,9 +379,9 @@ app.delete("/api/items/:id",(req,res) => {
 })
 
 app.get("/api/updateDB", (req, res) => {
-    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
         res.sendStatus(401);
-        return;
+        return;        
     }
     grocy.getAllRecipes((status, data) => {
         if (status) {
@@ -415,9 +415,9 @@ app.get("/api/searchBons",(req,res) => {
 
 
 app.post("/api/sendBonMail/",(req,res) => {
-    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
         res.sendStatus(401);
-        return;
+        return;        
     }
 
     let message=req.body.message;
@@ -444,9 +444,9 @@ app.post("/api/sendBonMail/",(req,res) => {
 })
 
 app.get("/api/bonMails/:id",(req,res) => {
-    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
         res.sendStatus(401);
-        return;
+        return;        
     }
     let id=req.params.id;
     let prefix=config.bonPrefix;
@@ -561,9 +561,9 @@ app.get("/api/allUnseenBonIdMails",(req,res) => {
 
 
 app.get("/api/getBonsForWeek",(req,res)=>{
-    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
         res.sendStatus(401);
-        return;
+        return;        
     }
     let monday=new Date(req.query.monday);
     try {
@@ -577,9 +577,9 @@ app.get("/api/getBonsForWeek",(req,res)=>{
 })
 
 app.get("/api/checkStock",(req,res)=>{
-    if (!loginHandler.haveRoles(req, ["ADMIN"], "ALL")) {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
         res.sendStatus(401);
-        return;
+        return;        
     }
 
 

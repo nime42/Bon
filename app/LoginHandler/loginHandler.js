@@ -35,9 +35,9 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
     app.post('/register', (req, res) => {
 
-        if (!haveRoles(req, ["ADMIN"], "ALL")) {
+        if(!checkRoles(req,"${ADMIN}")) {
             res.sendStatus(401);
-            return;
+            return;        
         }
 
         var username = req.body.username;
@@ -182,9 +182,9 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
         if(req.body.userid) {
             if(req.body.userid!==userId) {
-                if (!haveRoles(req, ["ADMIN"], "ALL")) {
+                if(!checkRoles(req,"${ADMIN}")) {
                     res.sendStatus(401);
-                    return;
+                    return;        
                 } else {
                     userId=req.body.userid;  
                 }
@@ -204,22 +204,20 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
 
 
-    app.get('/roles/:id', (req, res) => {
-        if (!haveRoles(req, ["ADMIN"], "ALL")) {
-            res.sendStatus(401);
-            return;
-        }
-
-        let roles=dbFunctions.getRoles(req.params.id);
-        res.json(roles);
-
-    })
+    app.get("/roles/:id", (req, res) => {
+      if (!checkRoles(req, "${ADMIN}")) {
+        res.sendStatus(401);
+        return;
+      }
+      let roles = dbFunctions.getRoles(req.params.id);
+      res.json(roles);
+    });
     
 
     app.put('/updateRoles/:id', (req, res) => {
-        if (!haveRoles(req, ["ADMIN"], "ALL")) {
+        if(!checkRoles(req,"${ADMIN}")) {
             res.sendStatus(401);
-            return;
+            return;        
         }
         let userId=req.params.id;
         let roles=req.body.roles;
@@ -238,9 +236,9 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
 
     app.get('/getUsers', (req, res) => {
-        if (!haveRoles(req, ["ADMIN"], "ALL")) {
+        if(!checkRoles(req,"${ADMIN}")) {
             res.sendStatus(401);
-            return;
+            return;        
         }
         db.getUsers(function (status, rows) {
             if (status) {
@@ -256,9 +254,9 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
 
     app.get('/getAllRoles', (req, res) => {
-        if (!haveRoles(req, ["ADMIN"], "ALL")) {
+        if(!checkRoles(req,"${ADMIN}")) {
             res.sendStatus(401);
-            return;
+            return;        
         }
         db.getAllRoles(function (status, rows) {
             if (status) {
@@ -275,9 +273,9 @@ function init(app,dbFile,mailfunc,mailTemplate) {
     app.delete("/user/:id",(req,res) => {
 
         
-        if (!haveRoles(req, ["ADMIN"], "ALL")) {
+        if(!checkRoles(req,"${ADMIN}")) {
             res.sendStatus(401);
-            return;
+            return;        
         }
 
         db.deleteUser(req.params.id,function(status,err){
@@ -306,8 +304,8 @@ function isLoggedIn(req) {
     return sessionHandler.getSession(req)!==undefined?true:false;
 }
 
-function haveRoles(req, roles, anyOrAll) {
 
+function checkRoles(req,roleExpr) {
     var session = sessionHandler.getSession(req);
     if (!session) {
         return false;
@@ -319,31 +317,18 @@ function haveRoles(req, roles, anyOrAll) {
     }
  
     let userRoles=sessionHandler.getSession(req).roles;
-    let match = {};
 
-    userRoles.forEach(r => {
-        match[r.roleid.toUpperCase()] = 1;
-    });
+    let expr = roleExpr;
+    userRoles && userRoles.forEach(r => {
+        expr = expr.replace(new RegExp("\\$\\{ *" + r.roleid + " *\\}"), true);
+    })
+    expr = expr.replaceAll(new RegExp("\\$\\{[^\\}]*\\}", "g"), false);
+    
+    return !!(eval(expr == "" || expr));
 
-    for (i in roles) {
-        let role = roles[i].toUpperCase();
-        if (anyOrAll.toUpperCase() === "ALL") {
-            if (match[role] === undefined) {
-                return false;
-            }
-        } else {
-            if (match[role] !== undefined) {
-                return true;
-            }
-        }
-    }
-    if (anyOrAll.toUpperCase() === "ALL") {
-        return true;
-    } else {
-        return false;
-    }
- 
+
 }
+
 
 
 function saveSessions() {
@@ -357,7 +342,7 @@ function resumeSessions() {
 module.exports = {
     init: init,
     getSession: getSession,
-    haveRoles: haveRoles,
+    checkRoles:checkRoles,
     isLoggedIn:isLoggedIn,
     saveSessions:saveSessions,
     resumeSessions:resumeSessions
