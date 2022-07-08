@@ -124,14 +124,14 @@ class BonConfig {
         text-overflow: ellips;
         white-space: nowrap;
         overflow:hidden;
-        max-width:80px;
+        
       }
       
-      .tableFixHead          { 
+      .tableFixHead { 
           overflow: auto; 
           height: 300px; 
       }
-        }
+
       .tableFixHead thead th { 
           position: sticky; 
           top: 0; 
@@ -439,6 +439,7 @@ class BonConfig {
 
         })
         this.myItemsTable.append(tableRows);
+        TableEnhancer.sortable(this.myItemsTable);
     }
 
     createUsersTable(users) {
@@ -539,6 +540,7 @@ class BonConfig {
         tableRows.append(row);
         })
         this.myUsersTable.append(tableRows);
+        TableEnhancer.sortable(this.myUsersTable);
 
 
     }
@@ -576,13 +578,16 @@ class BonConfig {
             tableRows.append(row);
         });
         this.myBonTable.append(tableRows);
+
+        TableEnhancer.sortable(this.myBonTable);
+
     }
 
      _createTableRow(b) {
         
         return `
         <td><a href="javascript:void(0);"  onclick="Globals.myConfig.showBonForm(${b.id},this.parentNode.parentNode);">#${b.id}</a></td>
-        <td>${new Date(b.delivery_date).toLocaleString()}</td>
+        <td>${new Date(b.delivery_date).toLocaleDateString("sv-SE")} ${new Date(b.delivery_date).toLocaleTimeString("sv-SE",{hour: '2-digit', minute:'2-digit'})}</td>
         <td style="background-color:${Globals.Statuses[b.status].color};color:${Helper.contrastColor(Globals.Statuses[b.status].color)}">${Globals.Statuses[b.status].label}</td>
         <td>${b.nr_of_servings}</td>
         <td>${b.kitchen_selects?"Ja":"Nej"}</td>

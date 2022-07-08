@@ -170,34 +170,45 @@ app.get("/api/bonSummaryFile",(req,res) => {
         "Købspris",
         "Pris"
     ];
-    rows.push("\""+headers.join('";"')+"\"");
+
+    const excel = require('excel4node');
+    const workbook = new excel.Workbook({
+        dateFormat: 'YYYY-MM-DD hh:mm'
+    });
+    let headerStyle = workbook.createStyle({
+        font: {
+          bold: true
+        }
+      });
+    const worksheet = workbook.addWorksheet('Sheet 1');
+    worksheet.column(2).setWidth(18);
+    let row=1;
+    let col=1;
+    headers.forEach(h => {
+        worksheet.cell(row, col++).string(h).style(headerStyle);
+    });
+
     let bons=DB.getBonSummary();
     bons.forEach(b=>{
-        let r=[
-            "#"+b.id,
-            new Date(b.delivery_date).toLocaleString(),
-            b.status,
-            b.nr_of_servings,
-            b.kitchen_selects?"Ja":"Nej",
-            b.customer_collects?"Afhentes":b.delivery_adr,
-            b.name,
-            b.email,
-            b.phone_nr,
-            b.company,
-            b.ean_nr,
-            b.payment_type,
-            b.price_category,
-            b.cost_price?b.cost_price.toFixed(2):0,
-            b.price?b.price.toFixed(2):0
-        ]
-        rows.push("\""+r.join('";"')+"\"");
+        col=1;
+        row++;
+        worksheet.cell(row, col++).string("#"+config.bonPrefix+"-"+b.id);
+        worksheet.cell(row, col++).date(new Date(b.delivery_date));
+        worksheet.cell(row, col++).string(b.status);
+        worksheet.cell(row, col++).number(b.nr_of_servings?b.nr_of_servings:0);
+        worksheet.cell(row, col++).string(b.kitchen_selects?"Ja":"Nej");
+        worksheet.cell(row, col++).string(b.customer_collects?"Afhentes":b.delivery_adr);
+        worksheet.cell(row, col++).string(b.name);
+        worksheet.cell(row, col++).string(b.email);
+        worksheet.cell(row, col++).string(b.phone_nr);
+        worksheet.cell(row, col++).string(b.company);
+        worksheet.cell(row, col++).string(b.ean_nr);
+        worksheet.cell(row, col++).string(b.payment_type!=null?b.payment_type:'');
+        worksheet.cell(row, col++).string(b.price_category);
+        worksheet.cell(row, col++).number(b.cost_price?(Math.round(b.cost_price*100)/100):0);
+        worksheet.cell(row, col++).number(b.price?(Math.round(b.price*100)/100):0);
    })
-   res.header('Content-Type', 'text/csv');
-   res.header('Content-Encoding: utf-8');
-   res.charset = 'utf-8';
-
-
-   res.send(rows.join("\n"));
+   workbook.write('bons.xlsx',res);
 })
 
 
@@ -394,7 +405,7 @@ app.get("/api/updateDB", (req, res) => {
                 }
             });
         } else {
-            console.log("updateDB getAllRecepies", err);
+            console.log("updateDB getAllRecepies", data);
             res.sendStatus(500);
 
         }
