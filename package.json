@@ -6,6 +6,7 @@
   "dependencies": {
     "better-sqlite3": "^7.4.6",
     "cookie-parser": "^1.4.6",
+    "excel4node": "^1.7.2",
     "express": "^4.17.2",
     "fs": "0.0.1-security",
     "imap": "^0.8.19",
