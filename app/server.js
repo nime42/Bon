@@ -87,22 +87,11 @@ loginHandler.resumeSessions();
 
 var iZettleFunctions=require("./IzettleFunctionsClass.js");
 
-var IZettleHandler=new iZettleFunctions(config);
-IZettleHandler.getProducts();
+var IZettleHandler=new iZettleFunctions(config,'./resources/bon.db');
+//IZettleHandler.getProducts();
 
-/*IZettleHandler.getPurchaseList("2022-07-30T09:00",(status,list)=>{
-    IZettleHandler.processAllPurchases(list,(status,list)=>{
-        console.log(list);
-    });
-});*/
+IZettleHandler.getPurchaseList(console.log);
 
-
-/*IZettleHandler.getPurchaseList("2022-07-30T15:00");
-return;
-*/
-
-let token='eyJraWQiOiIxNjU5MTkwNjc5NzMyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJpWmV0dGxlIiwiYXVkIjoiQVBJIiwiZXhwIjoxNjU5MjcwMzMyLCJzdWIiOiIyZTMwNDBkMS05MzJkLTQyZjQtOTcxYS0xMjE1Y2RkZThmNjMiLCJpYXQiOjE2NTkyNjMxMzIsImNsaWVudF9pZCI6ImI1NjdmYjQ1LTBmZmUtMTFlZC05OTU5LTdkZDQ1YTBkOTNlNyIsInJlbmV3ZWQiOmZhbHNlLCJzY29wZSI6WyJSRUFEOlBST0RVQ1QiLCJSRUFEOlBVUkNIQVNFIl0sInVzZXIiOnsidXNlclR5cGUiOiJVU0VSIiwidXVpZCI6IjJlMzA0MGQxLTkzMmQtNDJmNC05NzFhLTEyMTVjZGRlOGY2MyIsIm9yZ1V1aWQiOiI1Mjg2NzAzMS1lZDg0LTQwNDMtYjAwZS1mYWNjODU0ZWE0M2EiLCJ1c2VyUm9sZSI6Ik9XTkVSIn19.m05v23aybAM0KKSOBuihplttlrfZWCNfy2Hqb5pxhkrrrPnuCu6wdH_h_woaOod66QcON4FaWs3aLhnO97yncC2FJCimVhWn9Gd33QEzvHwZ0Ib4ls_638KxK7DLwvM6-ex08RaN6KKLoHZZTFkJpmdzHBl1IacbYGO3kRNNtgdK8aykHa4vLPAUKLvSNicaqb62zKxmQTtxAaW5etx7v-yqGyZeco8WXK451Qb2eUepouD-P4g7EAlpNbhP6rbFPMxeoElYBkm9wDvmkFMEkeRmRirkQ3_cK5ypr8lCEO0YB--JYaHdC9wV9bzjUhSAwL7BtngGNpm0MD-OsRAz4g';
-//IZettleHandler.getPurchase(token,'BUQJNgdUEe2jr-p_uhEmbg');
 
 app.use((req,res,next)=>{
     if(!loginHandler.isLoggedIn(req) && req.url.startsWith("/api")) {
