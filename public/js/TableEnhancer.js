@@ -35,9 +35,10 @@ class TableEnhancer {
   /**
    * Make a table sortable by clicking on its header columns.
    * @param {table-element} table
+   * @param {Object{colNr:function}} valuefunctions a function(td-element) thats extract the value from a table column
    * @returns
    */
-  static sortable(table) {
+  static sortable(table,valueFunctions={}) {
     let headers = table.querySelectorAll("th");
 
     let tableBody = table.querySelector("tbody");
@@ -47,13 +48,16 @@ class TableEnhancer {
     }
 
     headers.forEach((h) => {
-      let i = document.createElement("i");
-      i.classList.add("fa", "fa-caret-down");
-      i.style.display = "none";
-      h.appendChild(i);
+      let arrow = document.createElement("i");
+      arrow.classList.add("fa", "fa-caret-down");
+      arrow.style.display = "none";
+      h.appendChild(arrow);
       h.style.cursor = "pointer";
 
-      h.onclick = () => {
+      h.onclick = (event) => {
+        if(!(event.target==h || event.target==arrow)) {
+          return;
+        }
         headers.forEach((th) => {
           if (th !== h) {
             th.querySelector("i").style.display = "none";
@@ -77,15 +81,27 @@ class TableEnhancer {
         }
 
         let rows = Array.from(tableBody.querySelectorAll("tr"));
-        rows.sort((a, b) => {
-          let aVal = a.querySelector(qs).textContent;
-          let bVal = b.querySelector(qs).textContent;
-          if (sort == "A") {
-            return TableEnhancer._compare(aVal, bVal);
-          } else {
-            return TableEnhancer._compare(bVal, aVal);
-          }
-        });
+        if (valueFunctions[colIndex]) {
+          rows.sort((a, b) => {
+            let aVal = valueFunctions[colIndex](a.querySelector(qs));
+            let bVal = valueFunctions[colIndex](b.querySelector(qs));
+            if (sort == "A") {
+              return TableEnhancer._compare(aVal, bVal);
+            } else {
+              return TableEnhancer._compare(bVal, aVal);
+            }
+          });
+        } else {
+          rows.sort((a, b) => {
+            let aVal = a.querySelector(qs).textContent;
+            let bVal = b.querySelector(qs).textContent;
+            if (sort == "A") {
+              return TableEnhancer._compare(aVal, bVal);
+            } else {
+              return TableEnhancer._compare(bVal, aVal);
+            }
+          });
+        }
 
         rows.forEach((r) => tableBody.appendChild(r));
       };
@@ -101,6 +117,9 @@ class TableEnhancer {
       return a - b;
     }
 
+    if(a) a=a.toLowerCase();
+    if(b) b=b.toLowerCase();
+
     if (a < b) {
       return -1;
     } else if (a > b) {
@@ -109,4 +128,77 @@ class TableEnhancer {
       return 0;
     }
   }
+
+  static filterable(table,valueFunctions={},excludeCols=[]) {
+    let header = table.querySelector("thead");
+    let headerRow=header.querySelector("tr");
+
+    let tableBody = table.querySelector("tbody");
+    if (!tableBody) {
+      console.warn("The table need to have a tbody element!");
+      return;
+    }
+
+    let nrOfCols=headerRow.children.length;
+    for(let c=0;c<nrOfCols;c++) {
+      headerRow.children[c].appendChild(document.createElement("br"));
+
+      let filterInput=document.createElement("input");
+      filterInput.classList.add("filter");
+      filterInput.type = "text";
+      filterInput.value = "";
+      filterInput.placeholder="filter..."
+      filterInput.style.maxWidth="10ch"; 
+      filterInput.style.height="20px";
+      filterInput.onkeyup=()=>{
+        let rows = Array.from(tableBody.querySelectorAll("tr"));
+        let filters=headerRow.querySelectorAll(".filter");
+        rows.forEach(r=>{
+          let cols=r.children;
+          r.style.display="";
+          for(let f=0;f<r.children.length;f++) {
+            let filter=filters[f].value;
+            let value=valueFunctions[f]?valueFunctions[f](cols[f]):cols[f].textContent.toLowerCase();
+            if(!this._filterMatch(value,filter)) {
+              r.style.display="none";
+            }
+          }
+        })
+      }
+      headerRow.children[c].appendChild(filterInput);
+      if(excludeCols.find((e)=>(e==c))) {
+        filterInput.style.display="none";
+      }
+    }
+
+  }
+
+  static _filterMatch(value,filter) {
+    if(filter.startsWith("<=")) {
+      filter=filter.replace("<=","");
+      return value <= filter;
+    }
+    if(filter.startsWith("<")) {
+      filter=filter.replace("<","");
+      return value < filter;
+    }
+
+    if(filter.startsWith(">=")) {
+      filter=filter.replace(">=","");
+      return value >= filter;
+    }
+    if(filter.startsWith(">")) {
+      filter=filter.replace(">","");
+      return value > filter;
+    }
+
+    if(filter.startsWith("!")) {
+      filter=filter.replace("!","");
+      return !value.startsWith(filter);
+    }
+
+    return value.startsWith(filter);
+
+  }
+
 }

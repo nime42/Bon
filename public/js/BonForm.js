@@ -718,7 +718,8 @@ class BonForm {
           o.item_id,
           o.price,
           o.cost_price,
-          o.category
+          o.category,
+          o.izettle_product_id
         );
       });
       this.myBonStrip.updateTotalSum();
@@ -733,7 +734,8 @@ class BonForm {
             o.item_id,
             o.price,
             o.cost_price,
-            o.category
+            o.category,
+            o.izettle_product_id
           );
         });
         this.myBonStrip.updateTotalSum();

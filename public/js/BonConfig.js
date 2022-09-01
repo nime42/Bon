@@ -114,7 +114,6 @@ class BonConfig {
 
     .config-style table {
         border-collapse: collapse;
-        width: 100%;
       }
       
       .config-style td, .config-style th {
@@ -140,6 +139,28 @@ class BonConfig {
           background: ${this.shadowColor};
         }
 
+
+        #izettle-products-table thead th {  
+            color: ${this.foreground};
+            background: ${this.background};
+          }
+
+        #izettle-products-table tbody td, #izettle-products-table thead th {
+            border: 0px solid ${this.foreground};
+            padding: 2px;
+            color: ${this.foreground};
+            text-overflow: ellips;
+            white-space: nowrap;
+            overflow:hidden;
+            vertical-align: top;
+            
+          }
+
+          #izettle-products-table {
+            width:70%;
+          }
+
+
     `;
 
 
@@ -159,6 +180,22 @@ class BonConfig {
         </div>
         </div>
     `;
+
+    izettleProducts=`
+    <div>
+    <style>
+        ${this.style}
+    </style>
+    <div class="config-style">
+    <datalist id="grocy-items-data-list"></datalist>
+    <div class="tableFixHead">
+    <table id="izettle-products-table">
+    </table>
+    </div>
+
+    </div>
+    </div>
+`;
 
     users=`
     <div>
@@ -222,6 +259,7 @@ class BonConfig {
 
         this.myTabs=new TabsClass(div);
         this.myTabs.addTab("Varer",this.items);
+        this.myTabs.addTab("Izettle produkter",this.izettleProducts,()=>{this.getIzettleProducts()});
         this.myTabs.addTab("Bruger",this.users,()=>{this.getUsers()});
         this.myTabs.addTab("Bons",this.bons,()=>{this.getBons()});
 
@@ -236,6 +274,8 @@ class BonConfig {
         this.myUsersTable=div.querySelector("#users-table");
         this.myAddUser=div.querySelector("#add-user");
         this.myBonTable=div.querySelector("#bons-table");
+        this.myIZettleProductTable=div.querySelector("#izettle-products-table");
+        this.myGrocyItemsDatalist=div.querySelector("#grocy-items-data-list");
         
         let self=this;
         this.myRefreshDB.onclick=function() {
@@ -356,6 +396,13 @@ class BonConfig {
 
     }
 
+    getIzettleProducts() {
+        let self=this;
+        this.myRepo.getIZettleProducts((products)=>{
+            self.createIzettleTable(products);
+        });
+
+    }
 
     getAllRoles() {
         let rolesElem=this.UserAdminForm.querySelector("#roles");
@@ -442,6 +489,92 @@ class BonConfig {
         TableEnhancer.sortable(this.myItemsTable);
     }
 
+    createIzettleTable(products) {
+        this.myGrocyItemsDatalist.innerHTML="";
+        let option=document.createElement("option");
+        option.value="-";
+        this.myGrocyItemsDatalist.append(option);
+        this.myItems.forEach(i=>{
+            let option=document.createElement("option");
+            option.value=i.category+":"+i.name;
+            this.myGrocyItemsDatalist.append(option);
+        })
+
+        this.myIZettleProductTable.innerHTML="";
+        let headers=`
+        <tr>
+        <th style="width:40%">iZettle Produkt</th>
+        <th style="width:5%"></th>
+        <th style="width:50%">Grocy Vare</th>
+        <th style="width:5%">Antal</th>
+        </tr>
+        `;
+        let headerRow=document.createElement("thead");
+        headerRow.innerHTML=headers;
+        this.myIZettleProductTable.append(headerRow);
+        let tableRows=document.createElement("tbody");
+
+        products.forEach(p=>{
+            let grocy_val="";
+            if (p.connectable) {
+              let grocy = this.myItems.find((e) => e.id == p.grocy_id);
+              if (grocy) {
+                grocy_val = grocy.category + ":" + grocy.name;
+              }
+            } else {
+                grocy_val="-";
+            } 
+
+            let cols=`
+                <td>${p.name}</td>
+                <td><i class="fa fa-arrow-right"></i></td>
+                <td><input list="grocy-items-data-list" id="grocy-item" style="width:100%;margin-bottom: 0px;" value="${grocy_val}"></td>
+                <td><input type="number" id="quantity" name="quantity" min="1" style="width:70px; padding-bottom: 0px;margin-bottom: 0px;margin-left: 2px" value="${p.quantity}"></td>
+            `; 
+
+            let row=document.createElement("tr");
+            row.innerHTML=cols;
+
+            let onchangeF=() =>{
+                let grocy_val=row.querySelector("#grocy-item").value;
+                let grocy_id=null;
+                let connectable=1;
+
+                if(grocy_val=="-") {
+                    grocy_id=-1;
+                    connectable=0;
+                } else {
+                    let grocy=this.myItems.find(e=>(e.category+":"+e.name==grocy_val));
+
+                    grocy && (grocy_id=grocy.id);
+                }
+                
+
+                
+            
+                let q=row.querySelector("#quantity").value;
+                this.myRepo.updateIZettleProduct(p.id,grocy_id,q,connectable);
+                row.querySelector("#grocy-item").setSelectionRange(0, 0);
+                row.querySelector("#grocy-item").focus();
+
+            }
+
+            row.querySelector("#grocy-item").onchange=onchangeF;
+            row.querySelector("#quantity").onchange=onchangeF;
+
+            tableRows.append(row);
+
+
+        });
+
+        this.myIZettleProductTable.append(tableRows);
+        TableEnhancer.sortable(this.myIZettleProductTable,{2:(td)=>(td.querySelector("input").value),3:(td)=>(td.querySelector("input").value)});
+        TableEnhancer.filterable(this.myIZettleProductTable,{2:(td)=>(td.querySelector("input").value),3:(td)=>(td.querySelector("input").value)},[1]);
+
+
+
+
+    }
     createUsersTable(users) {
         this.myUsersTable.innerHTML="";
         
@@ -580,7 +713,7 @@ class BonConfig {
         this.myBonTable.append(tableRows);
 
         TableEnhancer.sortable(this.myBonTable);
-
+        TableEnhancer.filterable(this.myBonTable);
     }
 
      _createTableRow(b) {

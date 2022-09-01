@@ -1,5 +1,3 @@
---https://app.dbdesigner.net/designer/schema/486863
-
 -- addresses definition
 
 CREATE TABLE addresses (
@@ -30,6 +28,7 @@ CREATE TABLE items (
 );
 
 CREATE UNIQUE INDEX items_external_id_IDX ON items (external_id);
+CREATE UNIQUE INDEX items_name_IDX ON items (name);
 
 
 -- companies definition
@@ -64,6 +63,18 @@ CREATE TABLE customers (
 CREATE UNIQUE INDEX customers_u_idx on customers( 
 	email COLLATE NOCASE 
 
+);
+
+
+-- izettle_products definition
+
+CREATE TABLE izettle_products (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT,
+	grocy_item_id,
+	quantity integer default 1, connectable INTEGER DEFAULT 1,
+	CONSTRAINT FK_izettle_products_items FOREIGN KEY (grocy_item_id) REFERENCES items(id) on delete set null,
+	 UNIQUE (name) --UNIQUE (name COLLATE NOCASE)
 );
 
 
@@ -102,6 +113,20 @@ CREATE TABLE bons (
 );
 
 
+-- izettle_purchases definition
+
+CREATE TABLE izettle_purchases (
+	type text NOT NULL CHECK (type IN ('purchase', 'lastPurchaseHash')),
+	purchaseUUID TEXT UNIQUE,
+	purchase_nr INTEGER,
+	userDisplayName TEXT,
+	created DATETIME,
+	bon_id integer,
+	purchase_data TEXT,
+	CONSTRAINT FK_izettle_bons FOREIGN KEY (bon_id) REFERENCES bons(id) ON DELETE CASCADE
+);
+
+
 -- orders definition
 
 CREATE TABLE orders (
@@ -110,7 +135,7 @@ CREATE TABLE orders (
 	price numeric,
 	quantity integer,
 	special_request text,
-	sorting_order integer, cost_price NUMERIC,
+	sorting_order integer, cost_price NUMERIC, izettle_product_id INTEGER,
 	FOREIGN KEY (
         bon_id
     )

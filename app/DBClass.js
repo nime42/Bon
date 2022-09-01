@@ -5,6 +5,9 @@ module.exports = class DB {
         this.db.pragma("foreign_keys = ON");
     }
 
+    getDbHandler() {
+        return this.db;
+    }
 
     getBons(year, month, callback = console.log) {
         let yearMonth = "%";
@@ -489,7 +492,7 @@ module.exports = class DB {
     }
 
     saveOrders(bonId, orders) {
-        let sql = "delete from orders where bon_id=?";
+        let sql = "delete from orders where bon_id=? and izettle_product_id is null";
         this.db.prepare(sql).run(bonId);
         let sortOrder = 0;
         let preparedOrders = orders.map((o) => {
@@ -498,19 +501,22 @@ module.exports = class DB {
             return o;
         });
 
-        sql = `insert into orders(bon_id,item_id,price,cost_price,quantity,special_request,sorting_order) 
-            values(@bon_id,@id,@price,@cost_price,@quantity,@comment,@sorting_order)`;
+        sql = `insert into orders(bon_id,item_id,price,cost_price,quantity,special_request,izettle_product_id,sorting_order) 
+            values(@bon_id,@id,@price,@cost_price,@quantity,@comment,@izettle_product_id,@sorting_order)`;
 
         let ps = this.db.prepare(sql);
         preparedOrders.forEach((o) => {
-            ps.run(o);
+            if(o.izettle_product_id!=null) {
+                ps.run(o);
+            }
         });
     }
 
     getOrders(bonId, callback) {
-        let sql = `select i.name,i.category,o.*,i.external_id from orders o 
-      left join items i on o.item_id=i.id
-      where bon_id=? order by sorting_order`;
+        let sql = `select coalesce(i.name,ip.name) as name,coalesce(i.category,ip.category) as category,o.*,i.external_id from orders o 
+        left join items i on o.item_id=i.id
+        left join (select *,'izettle' as category from izettle_products) ip on o.izettle_product_id = ip.id
+        where bon_id=? order by sorting_order`;
 
         try {
             const rows = this.db.prepare(sql).all(bonId);

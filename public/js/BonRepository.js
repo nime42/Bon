@@ -72,6 +72,26 @@ class BonRepository {
         })
     }
 
+    getIZettleProducts(callback) {
+        let url="api/iZettleProducts";
+        $.get(url,callback);
+    }
+
+
+    updateIZettleProduct(id,grocy_id,quantity,connectable) {
+        let url="api/izettleProduct/"+id;
+        $.ajax({
+            type: "PUT",
+            url: url,
+            data: JSON.stringify({grocy_id:grocy_id,quantity:quantity,connectable:connectable}),
+            dataType: "json",
+            contentType: "application/json"
+          });
+    }
+
+
+
+
     updateDB(callback) {
         let url="api/updateDB/";
         $.get(url,callback);

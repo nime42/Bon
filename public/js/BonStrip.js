@@ -322,6 +322,8 @@ class BonStrip {
             let price=self.orderConfig.querySelector("#price").value;
             let cost_price=self.orderConfig.querySelector("#cost_price").value;
             let category=self.orderConfig.querySelector("#category").value;
+            let izettle_product_id=self.orderConfig.querySelector("#izettle-product-id").value;
+            if(izettle_product_id=="null") {izettle_product_id=null;}
             if(self.currentOrder) {
                 self.currentOrder.querySelector("#quantity").innerText=quantity;
                 self.currentOrder.querySelector("#total-cost").innerText=(quantity*price)+" kr";
@@ -338,7 +340,7 @@ class BonStrip {
             
 
             } else {
-                self.addOrder(quantity,orderName,comment,id,price,cost_price,category);
+                self.addOrder(quantity,orderName,comment,id,price,cost_price,category,izettle_product_id);
             }
 
             self.orderConfigPopup.hide();
@@ -540,7 +542,7 @@ class BonStrip {
 
         if(orders) {
             orders.forEach(o=>{
-                this.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price,o.cost_price,o.category);
+                this.addOrder(o.quantity,o.name,o.special_request,o.item_id,o.price,o.cost_price,o.category,o.izettle_product_id);
             })
             this.updateTotalSum();
         }
@@ -553,12 +555,14 @@ class BonStrip {
 
 
 
-    addOrder(quantity,name,comment,id,price,cost_price,category) {
+    addOrder(quantity,name,comment,id,price,cost_price,category,izettle_product_id) {
         let totalCost=(quantity*price).toFixed(2);
         let tmp=`
         <span id="quantity" class="nr-of">${quantity}</span><span class="x-sign">X</span><span id="order-name" class="order-name">${name}</span><span id="total-cost" class="price-box">${totalCost} kr</span><br>
         <span id="comment" class="order-info">${comment}</span>
-        <input type="hidden" id="item-id" value="${id}">
+        <input type="hidden" id="item-id" value="${id}">'
+        <input type="hidden" id="izettle-product-id" value="${izettle_product_id}">
+        
         <input type="hidden" id="price" value="${price}">
         <input type="hidden" id="cost_price" value="${cost_price}">
         <input type="hidden" id="category" value="${category}">
@@ -701,6 +705,7 @@ class BonStrip {
             name:order.querySelector("#order-name").innerText,
             comment:order.querySelector("#comment").innerText,
             id:order.querySelector("#item-id").value,
+            izettle_product_id:order.querySelector("#izettle-product-id").value,
             price:price,
             cost_price:costPrice
             }

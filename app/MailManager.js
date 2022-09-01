@@ -1,6 +1,7 @@
 const Imap = require("imap");
 const { simpleParser } = require("mailparser");
 const { mail } = require("../resources/config.js");
+const bonUtils =require("./BonUtils.js");
 
 
 var config = require("../resources/config.js");
@@ -188,51 +189,9 @@ function getIncomingOrders(subjectContains,callback) {
     })
 }
 
-function getEmptyBon() {
-  let bon={
-    "id": "",
-    "delivery_date": "",
-    "status": "",
-    "status2": "",
-    "nr_of_servings": "",
-    "kitchen_selects": 0,
-    "customer_collects": 0,
-    "price_category": "",
-    "payment_type": "",
-    "customer_info": "",
-    "kitchen_info": "",
-    "service_type": null,
-    "customer": {
-      "forename": "",
-      "surname": "",
-      "email": "",
-      "phone_nr": "",
-      "company": {
-        "name": "",
-        "ean_nr": "",
-        "address": {
-          "street_name": "",
-          "street_name2": "",
-          "street_nr": "",
-          "city": "",
-          "zip_code": ""
-        }
-      }
-    },
-    "delivery_address": {
-      "street_name": "",
-      "street_name2": "",
-      "street_nr": "",
-      "city": "",
-      "zip_code": ""
-    },
-    "orders": []
-  }
-  return bon;
-}
 
 function buildBon(entries) {
-  let bon=getEmptyBon();
+  let bon=bonUtils.getEmptyBon();
   bon.status="new";
   bon.customer.forename=getFromEntry(entries,"forename");
   bon.customer.surname=getFromEntry(entries,"surname");

@@ -87,10 +87,11 @@ loginHandler.resumeSessions();
 
 var iZettleFunctions=require("./IzettleFunctionsClass.js");
 
-var IZettleHandler=new iZettleFunctions(config,'./resources/bon.db');
-//IZettleHandler.getProducts();
+var IZettleHandler=new iZettleFunctions(config,DB);
 
-IZettleHandler.getPurchaseList(console.log);
+IZettleHandler.updateProducts(null);
+
+IZettleHandler.getPurchaseList(console.log,10);
 
 
 app.use((req,res,next)=>{
@@ -333,6 +334,28 @@ app.get("/api/items",(req,res) => {
 
         }
     })   
+})
+
+app.get("/api/iZettleProducts",(req,res) => {
+
+    IZettleHandler.getProductList(function(status,items){
+        if(status) { 
+            res.json(items); 
+        } else {
+            console.log("getProductList",items);
+            res.sendStatus(404);  
+        }
+    })   
+})
+
+app.put("/api/izettleProduct/:id",(req,res)=>{
+    let product_id=req.params.id;
+    let grocy_id=req.body.grocy_id;
+    let quantity=req.body.quantity;
+    let connectable=req.body.connectable;
+    IZettleHandler.updateProduct(product_id,grocy_id,quantity,connectable);
+    res.sendStatus(200);
+
 })
 
 
