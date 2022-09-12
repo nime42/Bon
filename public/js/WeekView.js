@@ -75,22 +75,6 @@ class WeekView {
         }
 
 
-        #week-table .status-filter {
-            padding: 3px;
-            letter-spacing: 0;
-            border-radius: 0px;
-            border: 2px solid black;
-            padding-top: 0;
-            font-size: 9px;
-            margin-right: 3px;
-            color:black;
-            box-shadow: 5px 5px 5px grey;
-        }
-
-        #week-table .filtered {
-            opacity:0.3;
-            box-shadow: none;
-        }
 
         #week-table .today {
             text-decoration: underline;
@@ -101,7 +85,11 @@ class WeekView {
     </style>
     <div id="week-table">
     <table>
-    <caption><i id="prev-week" class="fa fa-caret-left" aria-hidden="true" style="font-size: larger;color:${this.foreground};cursor: pointer;"></i><span id="current-week" style="margin-left: 20px;margin-right: 20px;color:${this.foreground};font-weight: bold;">Uge 23, 2022</span> <i id="next-week" class="fa fa-caret-right" aria-hidden="true" style="font-size: larger;color:${this.foreground};cursor: pointer;"></i></caption>
+    <caption>
+    <div id="status-filter"></div>
+    <br>
+    <i id="prev-week" class="fa fa-caret-left" aria-hidden="true" style="font-size: larger;color:${this.foreground};cursor: pointer;"></i><span id="current-week" style="margin-left: 20px;margin-right: 20px;color:${this.foreground};font-weight: bold;">Uge 23, 2022</span> <i id="next-week" class="fa fa-caret-right" aria-hidden="true" style="font-size: larger;color:${this.foreground};cursor: pointer;"></i>
+    </caption>
     <thead>
     <tr>
       <th></th>
@@ -115,27 +103,8 @@ class WeekView {
     </tr>
     </thead>
     <tbody>
-    <tr>
-      <td>Cafe</td>
-      <td></td>
-    </tr>
     </tbody>
   </table>
-
-  <span>Filter:</span>
-  <div class="bon-row">
-      <button type="button" id="${Globals.Statuses["new"].name}" class="status-filter" style="float:left;background:${Globals.Statuses["new"].color}">${Globals.Statuses["new"].label}</button>
-      <button type="button" id="${Globals.Statuses["needInfo"].name}" class="status-filter" style="float:left;background:${Globals.Statuses["needInfo"].color}">${Globals.Statuses["needInfo"].label}</button>
-      <button type="button" id="${Globals.Statuses["approved"].name}" class="status-filter" style="float:left;background:${Globals.Statuses["approved"].color}">${Globals.Statuses["approved"].label}</button>
-      <button type="button" id="${Globals.Statuses["preparing"].name}" class="status-filter" style="float:left;background:${Globals.Statuses["preparing"].color}">${Globals.Statuses["preparing"].label}</button>
-      <button type="button" id="${Globals.Statuses["done"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["done"].color}">${Globals.Statuses["done"].label}</button>
-      <button type="button" id="${Globals.Statuses["delivered"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["delivered"].color}">${Globals.Statuses["delivered"].label}</button>
-      <button type="button" id="${Globals.Statuses["invoiced"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["invoiced"].color}">${Globals.Statuses["invoiced"].label}</button>
-      <button type="button" id="${Globals.Statuses["closed"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["closed"].color}">${Globals.Statuses["closed"].label}</button>
-      <button type="button" id="${Globals.Statuses["offer"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["offer"].color}">${Globals.Statuses["offer"].label}</button>
-
-  </div>
-
 
 
   </div>
@@ -187,46 +156,39 @@ class WeekView {
             }
         })
 
-        this.myDiv.querySelectorAll(".status-filter").forEach(e=>{
-            e.onclick=()=> {
-                let show;
-                if(e.classList.contains("filtered")) {
-                    e.classList.remove("filtered");
-                    show=true;
-                } else {
-                    e.classList.add("filtered");
-                    show=false;
-                }
-                self.myDiv.querySelectorAll(".status-"+e.id).forEach((e)=>{
-                    if(show) {
-                        e.style.display="";
-                    } else {
-                        e.style.display="none";
-                    }
-                })
+        this.myStatusFilter=new BonStatusFilter(this.myDiv.querySelector("#status-filter"));
+        this.myStatusFilter.setOnStatusChange((changedStatus, statusValues)=>{
+            let show=statusValues[changedStatus];
 
-            }
-        })
-    }
-
-    _filter() {
-        this.myDiv.querySelectorAll(".status-filter").forEach(e=>{
-            let show;
-            if(e.classList.contains("filtered")) {
-                show=false;
-            } else {
-                show=true;
-            }          
-            this.myDiv.querySelectorAll(".status-"+e.id).forEach((e)=>{
+            self.myDiv.querySelectorAll(".status-"+changedStatus).forEach((e)=>{
                 if(show) {
                     e.style.display="";
                 } else {
                     e.style.display="none";
                 }
             })
+        });
 
-        })          
     }
+
+    _filter() {
+        let self=this;
+        let statuses=this.myStatusFilter.getStatuses();
+        Object.keys(statuses).forEach(k => {
+            let statusName=k;
+            let active=statuses[k];
+
+            self.myDiv.querySelectorAll(".status-"+statusName).forEach((e)=>{
+                if(active) {
+                    e.style.display="";
+                } else {
+                    e.style.display="none";
+                }
+            })
+
+        })
+    }
+
 
     initWeek(date) {
         let year=date.getFullYear();

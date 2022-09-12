@@ -43,8 +43,22 @@ function getMails(mailBox, searchCriterias,markAsRead, callback = console.log) {
           }
           let messagesToParse = results.length;
           f && f.on("message", (msg) => {
+            let messageInfo={};
             msg.on("body", (stream) => {
-              simpleParser(stream, async (err, parsed) => {
+              messageInfo.stream=stream;
+            });
+
+            msg.once('attributes', attrs => {
+              messageInfo.attrs=attrs;
+              if (markAsRead) {
+                const { uid } = attrs;
+                imap.addFlags(uid, ['\\Seen'], () => {
+                });
+              }
+            });
+
+            msg.once('end', function() {
+              simpleParser(messageInfo.stream, async (err, parsed) => {
                 let minfo = {
                   date: parsed.date,
                   from: parsed.from.text,
@@ -52,7 +66,11 @@ function getMails(mailBox, searchCriterias,markAsRead, callback = console.log) {
                   subject: parsed.subject,
                   message: parsed.text,
                   attachments: parsed.attachments,
-                };
+                  unread:true
+                };              
+                if(messageInfo?.attrs?.flags?.find(e=>(e==='\\Seen'))) {
+                  minfo.unread=false;
+                }
                 res.push(minfo);
                 messagesToParse--;
                 if (messagesToParse === 0) {
@@ -61,15 +79,6 @@ function getMails(mailBox, searchCriterias,markAsRead, callback = console.log) {
                 }
               });
             });
-
-            if(markAsRead) {
-              msg.once('attributes', attrs => {
-                const {uid} = attrs;
-                imap.addFlags(uid, ['\\Seen'], () => {
-                });
-              });
-            }
-
 
 
           });
@@ -136,18 +145,62 @@ function getUnseenMails(prefix,callback=console.log) {
   });
 }
 
+function getBonWithMails(prefix,callBack=console.log) {
+  let searchSubject;
+  if(prefix==="*") {
+    searchSubject="#Bon:";
+  } else {
+    searchSubject="#Bon:"+prefix+"-";
+  }
+  getMails("INBOX",['ALL',['SUBJECT', searchSubject]],false,(status,data) => {
+    incomingMails=data.filter((m)=>(!m.subject.startsWith("SENT")));
+    let mails={};
+    incomingMails.forEach(m=>{
+      const b=getBonId(m.subject);
+      const key=b.prefix+"-"+b.bonId;
+      if(!mails[key]) {
+        mails[key]={
+          prefix:b.prefix,
+          bonId:b.bonId,
+          mail:m
+        }
+      } else {
+        if( mails[key].mail.date<m.date) {
+          mails[key].mail=m;
+        }
+      }
+    });
+
+    let res=Object.values(mails).sort((a,b)=>(b.mail.date.getTime()-a.mail.date.getTime()));
+    callBack(status,res);
+  });
+
+
+}
+
+
+function getBonId(subject) {
+  let res={};
+  let match=subject.match(/#Bon:(.*)-(\d+)/);
+  if(match) {
+    res.prefix=match[1];
+    res.bonId=match[2];
+  }
+  return res; 
+}
+
 function getBonIds(mails,withPrefix) {
   let res={}
   mails.forEach(m=>{
     if(!m.subject.startsWith("SENT")) {
-       let match=m.subject.match(/#Bon:(.*)-(\d+)/);
-       if(match) {
-          if(withPrefix) {
-            res[match[1]+"-"+match[2]]=1
-          } else {
-            res[match[2]]=1; 
-          }
-       }
+      const bon=getBonId(m.subject);
+      if(bon.bonId!=undefined) {
+        if(withPrefix) {
+          res[bon.prefix+"-"+bon.bonId]=1;
+        } else {
+          res[bon.bonId]=1; 
+        }
+      }
     }
   });
   return Object.keys(res);
@@ -294,5 +347,6 @@ module.exports = {
   getBonMails: getBonMails,
   getUnseenMails:getUnseenMails,
   getBonIds:getBonIds,
-  getIncomingOrders:getIncomingOrders
+  getIncomingOrders:getIncomingOrders,
+  getBonWithMails:getBonWithMails
 };

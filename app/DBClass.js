@@ -492,11 +492,13 @@ module.exports = class DB {
     }
 
     saveOrders(bonId, orders) {
-        let sql = "delete from orders where bon_id=? and izettle_product_id is null";
+        let sql = "delete from orders where bon_id=?";
         this.db.prepare(sql).run(bonId);
         let sortOrder = 0;
         let preparedOrders = orders.map((o) => {
             o.bon_id = bonId;
+            o.id=o.id=='null'?null:o.id;
+            o.izettle_product_id=o.izettle_product_id=='null'?null:o.izettle_product_id;
             o.sorting_order = sortOrder++;
             return o;
         });
@@ -506,9 +508,7 @@ module.exports = class DB {
 
         let ps = this.db.prepare(sql);
         preparedOrders.forEach((o) => {
-            if(o.izettle_product_id!=null) {
-                ps.run(o);
-            }
+            ps.run(o);
         });
     }
 

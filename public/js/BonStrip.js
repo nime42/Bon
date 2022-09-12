@@ -279,6 +279,7 @@ class BonStrip {
             <textarea name="comment" placeholder="Extra info" id="comment" ></textarea>
             <a id="extra-link" style="padding-left" href="https://by-expressen.dk/" target="_blank">By-Expressen</a>
             <input type="hidden" id="item-id" value="-1">
+            <input type="hidden" id="izettle-product-id" value="">
             <input type="hidden" id="price" value="0">
             <input type="hidden" id="cost_price" value="0">
             <input type="hidden" id="category" value="">
@@ -560,7 +561,7 @@ class BonStrip {
         let tmp=`
         <span id="quantity" class="nr-of">${quantity}</span><span class="x-sign">X</span><span id="order-name" class="order-name">${name}</span><span id="total-cost" class="price-box">${totalCost} kr</span><br>
         <span id="comment" class="order-info">${comment}</span>
-        <input type="hidden" id="item-id" value="${id}">'
+        <input type="hidden" id="item-id" value="${id}">
         <input type="hidden" id="izettle-product-id" value="${izettle_product_id}">
         
         <input type="hidden" id="price" value="${price}">

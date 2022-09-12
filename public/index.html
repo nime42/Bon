@@ -36,6 +36,7 @@
     <script src="js/BonWall.js"></script>
     <script src="js/loginHandler.js"></script>
     <script src="js/ChatClass.js"></script>
+    <script src="js/BonStatusFilter.js"></script>
     <script src="js/WeekView.js"></script>
     <script src="js/TableEnhancer.js"></script>
 
@@ -271,6 +272,8 @@
 
         </section>
         <section id="calendar" style="display:none">
+            <div id="calendar-div">
+            </div>
         </section>
         <section id="week" style="display:none">
         </section>
@@ -309,7 +312,7 @@
         Globals.myLoginHandler.setLoginForm("#login");
         Globals.myLoginHandler.whenLoggedIn(() => {
 
-            Globals.myCalender=new BonCalendar("#calendar");
+            Globals.myCalender=new BonCalendar("#calendar-div");
 
             Globals.myConfig=new BonConfig("#admin");
 

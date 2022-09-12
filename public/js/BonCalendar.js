@@ -1,13 +1,24 @@
 class BonCalendar {
 
-    constructor(div) {
+
+
+
+    constructor(calendarDiv) {
+        let self=this;
 
         this.myPopup = new OverLay();
-        this.myCalendar = new CalendarClass("#calendar");
+        this.myCalendar = new CalendarClass(calendarDiv);
+
+
+        this.myStatusFilter=new BonStatusFilter(this.myCalendar.getHeaderDiv());
+        this.myStatusFilter.setOnStatusChange(()=>{
+            self.refresh();
+        })
+
+
         this.myRepo = new BonRepository();
         this.myBonForm = new BonForm(this.myPopup, this.myRepo);
-        //this.myBonForm.updateItems();
-        let self=this;
+
 
         this.myCalendar.setOnDateClick((date, calObj) => {
             date.setHours(12);
@@ -57,12 +68,14 @@ class BonCalendar {
 
         this.myCalendar.setOnMonthChange((year, month) => {
             let p = MessageBox.popup("Henter Bons...");
+            let statuses=self.myStatusFilter.getStatuses();
             self.myRepo.getBons(year, month + 1, (bons) => {
                 bons.forEach(b => {
-                    b.delivery_date = new Date(b.delivery_date);
-                    let [label, statusColor] = self.myBonForm.createBonLabelAndcolor(b);
-                    self.myCalendar.addEvent(b.delivery_date, label, statusColor, b);
-
+                    if(statuses[b.status]) {
+                        b.delivery_date = new Date(b.delivery_date);
+                        let [label, statusColor] = self.myBonForm.createBonLabelAndcolor(b);
+                        self.myCalendar.addEvent(b.delivery_date, label, statusColor, b);
+                    }
                 });
                 p.hide();
                 self.UpdateUnseenIds();

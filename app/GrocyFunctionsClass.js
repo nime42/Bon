@@ -294,7 +294,7 @@ module.exports = class GrocyFunctionsClass {
     consumeItem(quantity, recipe_external_id) {
         this.getRecipieProducts(recipe_external_id, (status, products) => {
             products.forEach(p => {
-                console.log("consumeItem", recipe_external_id, p);
+                //console.log("consumeItem", recipe_external_id, p);
                 this.consumeProduct(p.product_id, quantity * parseFloat(p.amount), (status, actual_amount) => {
                     if (quantity * parseFloat(p.amount) != actual_amount) {
                         this.addToShoppingList(p.product_id, (status, res) => {

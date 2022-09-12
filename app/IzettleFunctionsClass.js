@@ -3,11 +3,44 @@ const fetch = require("node-fetch");
 const bonUtils =require("./BonUtils.js");
 
 module.exports = class IzettleFunctionsClass {
-  constructor(config, bonDbInstance) {
+
+  constructor(config, bonDbInstance,grocyInstance) {
     this.config = config;
     this.db = bonDbInstance.getDbHandler();
     this.bonDB=bonDbInstance;
+    this.grocy=grocyInstance;
   }
+
+  checkPurchases(periodic) {
+    let self = this;
+
+    let fun=()=>{
+      console.log("Fetching Izettle Purchases");
+
+      self.updateProducts(null);
+      self.getPurchaseList((purchases)=>{
+        self.savePurchases(purchases);
+        self.consumePurchases(purchases);
+        console.log(`processed ${purchases.length} Izettle purchases`);
+      }, 26);      
+    }
+
+    if (periodic) {
+      fun();
+      this.intervalId = setInterval(() => {
+        fun();
+      }, periodic * 1000 * 60);
+    } else {
+      fun();
+    }
+  }
+  stopCheckPurchases() {
+    if(this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId=undefined;
+    }
+  }
+
 
   getToken(callBack = console.log) {
     let body = `grant_type=${this.config.iZettle.grant_type}&client_id=${this.config.iZettle.client_id}&assertion=${this.config.iZettle.api_key}`;
@@ -71,9 +104,8 @@ module.exports = class IzettleFunctionsClass {
               .filter(filterFunction);
 
             self.getAllPurchases(token, purchaseList, (purchases) => {
-              self.savePurchases(purchases);
               self.updateLastPurchaseHash(data.lastPurchaseHash);
-              callBack(purchases);
+              callBack && callBack(purchases);
             });
           })
           .catch(function (err) {
@@ -90,7 +122,6 @@ module.exports = class IzettleFunctionsClass {
       let p = purchaseList[0];
       let rest = purchaseList.slice(1);
       this.getPurchase(token, p.purchaseUUID1, (status, purchase) => {
-        console.log(purchases.length);
         if (status) {
           purchase.created = p.created;
           purchase.userDisplayName = p.userDisplayName;
@@ -170,9 +201,12 @@ module.exports = class IzettleFunctionsClass {
     });
   }
 
+  undefinedProductName="Engangsbeløb?";
+
   updateProducts(callBack = console.log) {
     this.getProducts((status, products) => {
       if (status) {
+        products.push({name:this.undefinedProductName});
         this.saveProducts(products);
         callBack && callBack(status, products);
       } else {
@@ -194,11 +228,13 @@ module.exports = class IzettleFunctionsClass {
   }
 
   updateLastPurchaseHash(lastPurchaseHash) {
-    let sql = "delete from izettle_purchases where type='lastPurchaseHash'";
-    this.db.prepare(sql).run();
-    sql =
-      "insert into izettle_purchases(type,purchase_data) values('lastPurchaseHash',?)";
-    this.db.prepare(sql).run(lastPurchaseHash);
+    if (lastPurchaseHash) {
+      let sql = "delete from izettle_purchases where type='lastPurchaseHash'";
+      this.db.prepare(sql).run();
+      sql =
+        "insert into izettle_purchases(type,purchase_data) values('lastPurchaseHash',?)";
+      this.db.prepare(sql).run(lastPurchaseHash);
+    }
   }
 
   savePurchases(purchases) {
@@ -219,8 +255,57 @@ module.exports = class IzettleFunctionsClass {
     });
   }
 
+
+  consumePurchases(purchases) {
+    if (purchases.length === 0) {
+      return;
+    }
+
+    let first=purchases[0];
+    let rest=purchases.slice(1);
+    this.consumePurchase(first,(status,consumed)=>{
+      this.consumePurchases(rest);
+    })
+
+
+  }
+
+
+
+  consumePurchase(purchase,callback) {
+    
+    this.consumePurchaseProducts(purchase?.products,callback);
+  }
+
+  consumePurchaseProducts(products,callback) {
+    if(!products || products.length===0) {
+      callback(true);
+      return;
+    }
+    let p=products[0];
+    let rest=products.slice(1);
+
+    
+
+    let izettle_product=this.getProduct(p);
+    if(izettle_product?.external_id!=null) {
+      let totQuantity=p.quantity*izettle_product.quantity;
+      this.grocy.consumeItem(totQuantity,izettle_product.external_id);
+      setTimeout(()=>{ //grocy could be chooking if we do too many calls,wait a second before we do the next...
+        this.consumePurchaseProducts(rest,callback);
+      }, 1000);
+    } else {
+      this.consumePurchaseProducts(rest,callback);
+    }
+
+
+  }
+
+
+
+
+
   createBon(purchase) {
-    console.log(purchase);
     let bon=bonUtils.getEmptyBon();
     bon.status='closed';
     bon.customer.forename='IZettle';
@@ -228,23 +313,33 @@ module.exports = class IzettleFunctionsClass {
   
     bon.delivery_date=new Date(purchase.created).toJSON();
     bon.kitchen_info="PurchaseNr:"+purchase.purchaseNumber;
-    bon.orders=this.createOrderFromProduct(purchase.products);
+    bon.orders=this.createOrderFromProduct(purchase);
+    let pax=bon.orders.reduce((total,o)=>{
+      return total+parseInt(o.quantity);
+    },0)
+    bon.nr_of_servings=pax;
     let bonId=this.bonDB.createBon(bon,null);
     return bonId;
-
   }
 
-  createOrderFromProduct(products) {
+  createOrderFromProduct(purchase) {
+    let products=purchase.products;
     let orders=[];
     products.forEach((p) =>{
       let product=this.getProduct(p);
+      if(!product) {
+        console.log(`Warning: Product with name ${p.name} was missing in local db (adding it now)`);
+        console.log("Purchase:",purchase);
+        product=this.addProduct(p);
+        return;
+      }
       let order={
         comment: "",
         cost_price: 0,
         id: null,
         izettle_product_id: product.id,
-        price: product.unitPrice/100.0,
-        quantity: product.quantity
+        price: p.unitPrice/100.0,
+        quantity: p.quantity
       }
       orders.push(order);
     })
@@ -253,8 +348,16 @@ module.exports = class IzettleFunctionsClass {
   }
 
   getProduct(product) {
-    let sql="select * from izettle_products where name=?";
-    return this.db.prepare(sql).get(product.name);
+    let sql=`
+    select p.*,i.external_id from izettle_products p
+    left join items i on p.grocy_item_id =i.id
+    where p.name=?
+    `;
+    let name=product.name;
+    if(name===undefined) {
+      name=this.undefinedProductName;
+    }
+    return this.db.prepare(sql).get(name.trim());
 
   }
 
@@ -278,6 +381,18 @@ module.exports = class IzettleFunctionsClass {
     products.forEach((p) => {
       statement.run(p.name.trim());
     });
+  }
+
+  addProduct(product) {
+    let sql =
+      "INSERT into izettle_products(name) values(?) on conflict(name) do nothing";
+
+    product.name=product.name.trim();
+    this.db.prepare(sql).run(product.name);
+
+    return this.getProduct(product);
+   
+
   }
 
   getProductList(callBack = console.log) {

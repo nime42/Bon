@@ -87,11 +87,13 @@ loginHandler.resumeSessions();
 
 var iZettleFunctions=require("./IzettleFunctionsClass.js");
 
-var IZettleHandler=new iZettleFunctions(config,DB);
 
-IZettleHandler.updateProducts(null);
+var IZettleHandler=new iZettleFunctions(config,DB,grocy);
 
-IZettleHandler.getPurchaseList(console.log,10);
+if(config.iZettle?.check_frequence) {
+    IZettleHandler.checkPurchases(config.iZettle.check_frequence)
+}
+
 
 
 app.use((req,res,next)=>{
@@ -281,19 +283,17 @@ app.delete("/api/bons/:id",(req,res) => {
 
 
 app.put("/api/consumeBon/:id",(req,res) => {
-    consumeBon(req.params.id);
-    res.sendStatus(200);  
-
-})
-
-function consumeBon(id) {
-    DB.getOrders(id,function(status,items){
+    DB.getOrders(req.params.id,function(status,items){
         items.forEach(i => {
             grocy.consumeItem(i.quantity,i.external_id);
             
         });
-    });   
-}
+    });  
+
+
+    res.sendStatus(200);  
+
+})
 
 
 
@@ -581,6 +581,27 @@ app.get("/api/unseenBonIdMails",(req,res) => {
             }        
         });
 })
+
+
+app.get("/api/allBonWithMails",(req,res) => {
+    if (!loginHandler.isLoggedIn) {
+        res.sendStatus(401);
+        return;
+    }
+
+    mailManager.getBonWithMails("*",(status,mails) => {
+        mails.forEach(m=>{
+            let searchParams={bonId:m.bonId};
+            let [bon]=allBonInstances.searchBons(m.prefix,searchParams,true,null);
+            m.bon=bon;
+        })
+        res.json(mails.filter((m)=>(m.bon!==undefined)));
+    });
+})
+
+
+
+
 
 
 app.get("/api/allUnseenBonIdMails",(req,res) => {

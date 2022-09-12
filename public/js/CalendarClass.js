@@ -25,6 +25,7 @@ class CalendarClass {
       <div class="container calendar" style="margin-top: 5%">
       <div class="row">
           <div class="twelwe columns" style="text-align: center;">
+          <div id="header"></div>
           <span>
           <i id="prevMonth" class="fa fa-caret-left" aria-hidden="true" style="font-weight: bold;font-size: 25px;cursor: pointer;"></i>
           <span id="currentMonth" style="text-align: center;padding-left: 10px;padding-right: 10px;font-weight: bold;">2022 April</span>
@@ -244,6 +245,10 @@ class CalendarClass {
 
   getAllEvents() {
     return [...this.myDiv.querySelectorAll(".event")].map(e=>({elem:e,data:e.myData}));
+  }
+
+  getHeaderDiv() {
+    return this.myDiv.querySelector("#header");
   }
 
   _createDays(year, month) {
