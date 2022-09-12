@@ -22,7 +22,7 @@ module.exports = class IzettleFunctionsClass {
         self.savePurchases(purchases);
         self.consumePurchases(purchases);
         console.log(`processed ${purchases.length} Izettle purchases`);
-      }, 26);      
+      }, 1);      
     }
 
     if (periodic) {
