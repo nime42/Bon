@@ -64,10 +64,11 @@
     </div>
     <script>
         var content=`
-        <div>hello</div>
+        <div style="width:120px;height:200px; background:white">hello</div>
         `
         var myPopup=new ModalPopup();
-        //myPopup.show(content);
+        //myPopup.show(document.querySelector("#item-config"));
+        myPopup.show(content);
 
     </script>
 </body>

@@ -712,7 +712,8 @@ class BonConfig {
         });
         this.myBonTable.append(tableRows);
 
-        TableEnhancer.sortable(this.myBonTable);
+        TableEnhancer.sortable(this.myBonTable, {0:(td)=>(parseInt(td.textContent.replace("#","")))});
+
         TableEnhancer.filterable(this.myBonTable);
     }
 

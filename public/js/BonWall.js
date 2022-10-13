@@ -35,6 +35,7 @@ class BonWall {
         margin-bottom: 15px;
         `
         let bs=new BonStrip(col,editable);
+        bs.showMails();
         bs.initFromBon(bon,orders);
         this.bonRow.appendChild(col);
         return [bs,col];

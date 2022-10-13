@@ -9,9 +9,23 @@ https://grocytest.ristetrug.dk/
 nils/???
 
 deploy all
-./deploy.sh
+./deployTest.sh
 ./deployCafe.sh
 ./deployNordhavn.sh
 ./deployTrailer.sh
 ./deployHelsingor.sh
 ./deployZoo.sh
+./deployTrelleborg.sh
+./deployStrandlyst.sh
+
+Update all db:
+sqlite3 -init install/updateDB.sql bonServer/resources/bon.db
+sqlite3 -init install/updateDB.sql helsingorServer/resources/bon.db
+sqlite3 -init install/updateDB.sql nordhavnServer/resources/bon.db
+sqlite3 -init install/updateDB.sql trelleborgServer/resources/bon.db
+sqlite3 -init install/updateDB.sql cafeServer/resources/bon.db
+sqlite3 -init install/updateDB.sql strandlystServer/resources/bon.db
+sqlite3 -init install/updateDB.sql zooServer/resources/bon.db
+sqlite3 -init install/updateDB.sql trailerServer/resources/bon.db
+
+

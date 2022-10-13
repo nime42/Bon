@@ -461,8 +461,18 @@ app.post("/api/sendBonMail/",(req,res) => {
         return;        
     }
 
+
+
+    let id=req.body.bonId;
+    let prefix=config.bonPrefix;
+    if(id.match(/.+-\d+/)) {
+        [prefix,id]=id.split("-");
+    }
+
+
+
     let message=req.body.message;
-    let subject="#Bon:"+config.bonPrefix+"-"+req.body.bonId+":";
+    let subject="#Bon:"+prefix+"-"+id+":";
     let to=req.body.email;
 
     mailSender.sendMail(config.mail.user,to,undefined,undefined,subject,message,undefined, function(err) {
@@ -485,9 +495,9 @@ app.post("/api/sendBonMail/",(req,res) => {
 })
 
 app.get("/api/bonMails/:id",(req,res) => {
-    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
+    if (!loginHandler.isLoggedIn) {
         res.sendStatus(401);
-        return;        
+        return;
     }
     let id=req.params.id;
     let prefix=config.bonPrefix;

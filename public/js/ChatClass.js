@@ -5,13 +5,15 @@ class ChatClass {
     chatContent=`
     <ul id="chat">
     </ul>
+    <div data-check-access="\${ADMIN\}">
     <div>
           <textarea id="chat-input" rows="4"></textarea>
     </div>
-    <div style="width:95%">
-        <button type="button" id="send-message" class="button-primary" >Send</button>
-        <button type="button" id="add-bon-no-price" style="float: right;">Insätt Bon(uden pris)</button>
-        <button type="button" id="add-bon" style="float: right;margin-right:5px">Insätt Bon</button>
+    <div style="min-width: 350px;">
+        <button type="button" id="send-message" class="button-primary" style="padding: 0 5px;">Send</button>
+        <button type="button" id="add-bon-no-price" style="float: right; padding: 0 5px;">Bon(uden pris)</button>
+        <button type="button" id="add-bon" style="float: right;margin-right:5px; padding: 0 5px;">Bon</button>
+    </div>
     </div>         
     `;
     messageLeftRow=`
@@ -72,9 +74,9 @@ class ChatClass {
             }
         }
 
-
-
     }
+
+
     addMessage(leftRight,name,date,message) {
         let row=document.createElement("li");
         row.classList.add(leftRight);
@@ -136,7 +138,11 @@ class ChatClass {
             qoutedMessages+=r+"\n";
         })
         return qoutedMessages.replace(/^/gm,">");
-    }   
+    }  
+    
+    isAllowedToSend() {
+        Globals.myLoginHandler.checkAccess(Globals.userInfo?.roles,this.myDiv);
+    }
 
 }   
 

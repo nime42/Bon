@@ -427,6 +427,7 @@ class BonStrip {
                 mailElem.style.display=""
                 this.chat.clear();
                 let p=MessageBox.popup("Henter mails...");
+                this.chat.isAllowedToSend();
                 this.myRepo.getBonMails(self.bonId,(mails)=>{
                     p.hide();
                     mails.forEach(m=>{   
@@ -451,7 +452,7 @@ class BonStrip {
         let orderList=this.getOrders(); 
         let orders; 
         if(withPrices) {        
-            orders=orderList.orders.map(o=>(`${o.quantity} X ${o.name}\t\t\t${o.price*o.quantity} kr${o.comment!==""?"  \n\t"+o.comment:""}`));
+            orders=orderList.orders.map(o=>(`${o.quantity} X ${o.name} (${o.price*o.quantity} kr)${o.comment!==""?"  \n\t"+o.comment:""}`));
         } else {
             orders=orderList.orders.map(o=>(`${o.quantity} X ${o.name}${o.comment!==""?"  \n\t"+o.comment:""}`));
         }
@@ -467,7 +468,9 @@ class BonStrip {
         text+="\n"+deliveryAdr;
         text+="\n\n"+"Bestilling:";
         text+="\n"+orderText;
-        text+="\n"+totSum;
+        if(withPrices) {
+            text+="\n"+totSum;
+        }
         text+="\n";
         text+="----------------------";
         text+="\n";
