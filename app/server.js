@@ -464,6 +464,7 @@ app.post("/api/sendBonMail/",(req,res) => {
 
 
     let id=req.body.bonId;
+    id=id.toString();
     let prefix=config.bonPrefix;
     if(id.match(/.+-\d+/)) {
         [prefix,id]=id.split("-");

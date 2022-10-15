@@ -174,6 +174,10 @@ class BonRepository {
     } 
 
 
+    getAllBonWithMails(callback) {
+        let url="api/allBonWithMails/";
+        $.get(url,callback);
+    }     
 
 
     getBonsForWeek(monday,callback) {

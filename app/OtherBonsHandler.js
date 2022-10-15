@@ -99,15 +99,17 @@ module.exports = class OtherBonsHandler {
             instances=[prefix];
         }
 
-        instances.forEach(k=>{
-            let db=this.bonInstances[k].db;
-            let bons=db.searchBons(searchParams,includeOrders,null);
-            let prefix=this.bonInstances[k].config.bonPrefix;
-            bons.forEach(b=>{
-                b.id=prefix+"-"+b.id;
-                b.prefix=prefix;
-            })
+        instances.forEach((k) => {
+          if (this.bonInstances[k] != undefined) {
+            let db = this.bonInstances[k].db;
+            let bons = db.searchBons(searchParams, includeOrders, null);
+            let prefix = this.bonInstances[k].config.bonPrefix;
+            bons.forEach((b) => {
+              b.id = prefix + "-" + b.id;
+              b.prefix = prefix;
+            });
             res.push(...bons);
+          }
         });
 
         if (callback === null) {
