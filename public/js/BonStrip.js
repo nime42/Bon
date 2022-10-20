@@ -287,7 +287,7 @@ class BonStrip {
             <div>
                 <div style="margin-top:6px">
                     <input type="button" id="save" value="Gem">
-                    <input type="button" id="delete" value="Ta bort">
+                    <input type="button" id="delete" value="Fjern">
                     <span>&nbsp;&nbsp;</span>
                     <input type="button" id="cancel" value="Avbryt">
             </div>

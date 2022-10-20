@@ -245,7 +245,7 @@ class BonConfig {
        <br> 
         <div style="width:100%">
             <input type="submit" id="create-update-user" value="Uppdater">
-            <input type="button" id="remove-user" value="Ta bort">
+            <input type="button" id="remove-user" value="Fjern">
 
             <input type="button" id="cancel" value="Avbryd" >
         </div>
@@ -649,7 +649,7 @@ class BonConfig {
                 return false;                     
             }
             this.UserAdminForm.querySelector("#remove-user").onclick=function() {
-                MessageBox.popup("Vill du verkligen ta bort denna användare?", {
+                MessageBox.popup("Vill du verkligen Fjern denna användare?", {
                     b1: {
                       text: "Ja",
                       onclick: () => {
@@ -659,7 +659,7 @@ class BonConfig {
                                 self.userInfoAdminPopup.hide();
                                 row.remove();
                             } else {
-                                self.UserAdminForm.querySelector("#error-msg").innerHTML="Det gick inte att ta bort brugeren";
+                                self.UserAdminForm.querySelector("#error-msg").innerHTML="Det gick inte att fjerne brugeren";
                             }
                           })
                       },

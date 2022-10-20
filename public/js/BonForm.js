@@ -235,7 +235,7 @@ class BonForm {
                   <div class="bon-row" style="position:sticky;bottom:0;background: wheat;">
                   <div id="buttons" style="text-align: center;padding-top: 10px;">
                   <input class="button-primary" type="button" id="save" value="Gem">
-                  <input type="button" id="delete" value="Ta bort" class="for-update">
+                  <input type="button" id="delete" value="Fjern" class="for-update">
                   <input type="button" id="copy" value="Kopier" class="for-update">
                   <input type="button" id="cancel" value="Avbryt">
                   </div>
@@ -364,7 +364,7 @@ class BonForm {
     };
 
     buttons.querySelector("#delete").onclick = function (e) {
-      MessageBox.popup("Vill du verkligen ta bort denna Bon?", {
+      MessageBox.popup("Vill du verkligen fjerne denna Bon?", {
         b1: {
           text: "Ja",
           onclick: () => {
