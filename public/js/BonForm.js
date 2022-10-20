@@ -237,7 +237,7 @@ class BonForm {
                   <input class="button-primary" type="button" id="save" value="Gem">
                   <input type="button" id="delete" value="Fjern" class="for-update">
                   <input type="button" id="copy" value="Kopier" class="for-update">
-                  <input type="button" id="cancel" value="Avbryt">
+                  <input type="button" id="cancel" value="Afbryd">
                   </div>
                   </div>
 
