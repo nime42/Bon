@@ -85,12 +85,11 @@ class BonMails {
     }
 
     refreshMails() {
+        let p=MessageBox.popup("henter mail...");
         this.myRepo.getAllBonWithMails((mails)=>{
+            p.hide();
             this.createMailTable(mails);
         })
-
-
-
     }
 
     createMailTable(mails) {
@@ -99,7 +98,7 @@ class BonMails {
         
         let headers=`
         <tr>
-        <th></th>
+        <th>Ulæst</th>
         <th>Datum</th>
         <th>Bon-ID</th>
         <th>Kunde</th>
@@ -131,7 +130,7 @@ class BonMails {
         })
 
         this.myMailTable.append(tableRows);
-        TableEnhancer.sortable(this.myMailTable);
+        TableEnhancer.sortable(this.myMailTable,{0:(td)=>(td.querySelector("li").style.display)});
 
 
     }
