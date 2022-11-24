@@ -568,7 +568,6 @@ module.exports = class DB {
 
     updateMessages(id,message,callback = console.log) {
         let sql = "update messages set name=?,message=?,sortorder=? where id=?";
-        console.log(id,message);
         try {
             this.db.prepare(sql).run(message.name,message.message,message.sortorder, id);
             callback(true);
