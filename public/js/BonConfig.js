@@ -227,7 +227,31 @@ class BonConfig {
     </div>
     </div>
     `
-
+    messages=`
+    <div id="message-div">
+    <select id="messages" style="height: auto;">
+    <option>Bekræftelse</option>
+    </select>
+    <br>
+    <div>
+    <div style="float: left;margin-right: 20px;width: 70%;">
+    <p style="margin-bottom: 0;">Besked</p>
+    <textarea id="message-content" rows="6" style="width: 100%;"></textarea>
+    </div>
+    <div>
+        <p style="margin-bottom: 0;">Variabler</p>
+        <select id="message-variables" size="6">
+        </select>
+        <br>
+        <input type="button" id="test-message" value="Test">
+    </div>
+    </div>
+    <br>
+    <input type="button" id="save-message" value="Opdater">
+    <input type="button" id="new-message" value="Ny">
+    <input type="button" id="del-message" value="Slet">
+    </div>
+    `
 
     userForm=`
     <form id="user-admin" class="form"  autocomplete="off" method="post" >
@@ -262,6 +286,7 @@ class BonConfig {
         this.myTabs.addTab("Izettle produkter",this.izettleProducts,()=>{this.getIzettleProducts()});
         this.myTabs.addTab("Bruger",this.users,()=>{this.getUsers()});
         this.myTabs.addTab("Bons",this.bons,()=>{this.getBons()});
+        this.myTabs.addTab("Beskeder",this.messages,()=>{this.setupMessageEditor()});
 
 
 
@@ -276,6 +301,7 @@ class BonConfig {
         this.myBonTable=div.querySelector("#bons-table");
         this.myIZettleProductTable=div.querySelector("#izettle-products-table");
         this.myGrocyItemsDatalist=div.querySelector("#grocy-items-data-list");
+        this.myMessages=div.querySelector("#message-div");
         
         let self=this;
         this.myRefreshDB.onclick=function() {
@@ -765,4 +791,140 @@ class BonConfig {
             this.UserAdminForm.querySelector("#"+k).value=userProps[k];
         });
     }
+
+
+    valuesExample={
+        deliveryAdr: "Gadegaden 2\n11111 Byn",
+        deliveryDate: "2022-11-22",
+        deliveryTime: "12:00",
+        foreName: "Ole",
+        surName: "Svendsen",
+        pax: "2",
+        totSum: "150.00",
+        orderWithPrices: "1 X Dansk italiene (75 kr)\n1 X Bobler (75 kr)",
+        orders: "1 X Dansk italiene\n1 X Bobler"
+    }
+
+
+
+    setupMessageEditor() {
+        this.myRepo.getMessages(messages=>{
+            let select=this.myMessages.querySelector("#messages");
+            let textArea=this.myMessages.querySelector("#message-content");
+            select.innerHTML="";
+
+            select.onchange=()=>{
+                let message=messages.find(m=>(m.name===select.value));
+                textArea.value="";
+                if(message) {
+                    textArea.value=message.message;
+                }
+                
+            };
+
+            messages.forEach(m=>{
+                let o=document.createElement("option");
+                o.text=m.name;
+                select.add(o);
+            })
+            select.onchange();
+
+            Object.keys(this.valuesExample).forEach(k=>{
+                let o=document.createElement("option");
+                let variableList=this.myMessages.querySelector("#message-variables");
+                o.text="${"+k+"}";
+                o.onclick=()=>{
+                    Helper.typeInTextarea(o.text,textArea);
+                    textArea.focus();
+                }
+                variableList.add(o);
+            })
+
+
+            let saveButton=this.myMessages.querySelector("#save-message");
+            saveButton.onclick=()=>{
+                let message=messages.find(m=>(m.name===select.value));
+                if(message) {
+                    let p=MessageBox.popup("Gemmer...");
+                    message.message=textArea.value;
+                    this.myRepo.updateMessage(message.id,message, ()=>{
+                        p.hide();
+                    });
+                }
+
+            }
+
+            let newButton=this.myMessages.querySelector("#new-message");
+            newButton.onclick=()=>{
+                let newMessage = prompt("indtast navn til ny besked");
+                if(newMessage.trim()!=="") {
+
+                    this.myRepo.addMessage(newMessage, (status,message) => {
+                        if (status) {
+                            messages.push(message);
+                            let o = document.createElement("option");
+                            o.text = newMessage;
+                            select.add(o);
+                            select.value = newMessage;
+                            textArea.value = "";
+                        } else {
+                            if(message.status==409) {
+                                alert("beskeden findes allerede!");
+                            } else {
+                                alert("Kunne ikke gemme!");
+                            }
+                        }
+                    })
+
+                }
+
+            }
+
+            let delButton=this.myMessages.querySelector("#del-message");
+            delButton.onclick=()=>{
+
+                if(confirm("vil du fjerne beskeden \""+select.value+"\"")) {
+                    let message=messages.find(m=>(m.name===select.value));
+                    if(message) {
+                        this.myRepo.delMessage(message.id,message, ()=>{
+                            messages=messages.filter(m=>(m.id!==message.id));
+                            let o=[...select.options].find(o=>(o.selected));
+                            o && o.remove();
+                            message=messages.find(m=>(m.name===select.value));
+                            textArea.value=message?.message;
+                        });
+    
+
+                    }
+                    
+                }
+                return
+
+            }
+
+
+
+            let testButton=this.myMessages.querySelector("#test-message");
+            testButton.onclick=()=>{
+                let message=messages.find(m=>(m.name===select.value));
+                if(message) {
+
+                    alert(Helper.replaceAllFromValues(textArea.value,this.valuesExample));
+
+                }
+
+            }
+
+            
+
+        })
+
+    }
+
+    getMessages(callback) {
+        this.myRepo.getMessages(messages=>{
+            callback(messages);
+        })
+    }
+
 }

@@ -28,6 +28,7 @@ class BonStrip {
         font-family: sans-serif;
         
     }
+  
 
     #address {
         padding-left: 15px;
@@ -166,7 +167,9 @@ class BonStrip {
         <fieldset>
             <legend>Navn <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
             <div class="field-content">
-            <div id="customer" class="bonstrip-items"></div>
+            <div id="customer">
+            <span id="forename" class="bonstrip-items"></span>&nbsp;<span id="surname" class="bonstrip-items"></span>
+            </div>
             <div id="email" class="bonstrip-items"></div>
             <div id="phonenr" class="bonstrip-items"></div>
             </div>
@@ -404,11 +407,17 @@ class BonStrip {
 
         })
 
-        this.chat.onAddBon(()=>{
-            return this.bonToText(true);
-        });
-        this.chat.onAddBonNoPrice(()=>{
-            return this.bonToText(false);
+
+        this.chat.onSelectTemplate((template)=>{
+            let fun=(callback)=>{
+                Globals.myConfig.getMessages(messages=>{
+                    let message=messages.find(m=>(m.name===template));
+                    let text=this.bonToText(message?.message);
+                    callback(text);
+                })
+
+            }
+            return fun;
         });
 
 
@@ -428,6 +437,7 @@ class BonStrip {
                 this.chat.clear();
                 let p=MessageBox.popup("Henter mails...");
                 this.chat.isAllowedToSend();
+                this.chat.uppdateTemplates();
                 this.myRepo.getBonMails(self.bonId,(mails)=>{
                     p.hide();
                     mails.forEach(m=>{   
@@ -435,6 +445,7 @@ class BonStrip {
                     })
                     this.onMailSeen && this.onMailSeen(this.bonId);
                 });
+                this.chatDiv.scrollIntoView();
             } else {
                 mailElem.style.display="none";
             }
@@ -444,10 +455,41 @@ class BonStrip {
 
     }
 
+    showMailDialogue(text) {
+        if(this.chatDiv.style.display==="none") {
+            this.myDiv.querySelector("#show-mails").onclick();
+        }
+        this.chat.prepareMessage(text);
+
+    }
+
     setOnMailSeen(fun) {
         this.onMailSeen=fun;
     }
 
+    bonToText(template,values) {
+        if(values===undefined) {
+            values={};
+            let orderList=this.getOrders(); 
+            values.orderWithPrices=orderList.orders.map(o=>(`${o.quantity} X ${o.name} (${o.price*o.quantity} kr)${o.comment!==""?"  \n\t"+o.comment:""}`)).join("\n");
+            values.orders=orderList.orders.map(o=>(`${o.quantity} X ${o.name}${o.comment!==""?"  \n\t"+o.comment:""}`)).join("\n");
+            values.totSum=orderList.totPrice;
+            values.deliveryDate=this.myDiv.querySelector("#date").innerHTML;
+            values.deliveryTime=this.myDiv.querySelector("#time").innerHTML;
+            values.deliveryAdr=this.myDiv.querySelector("#address").innerText;
+            values.foreName=this.myDiv.querySelector("#forename").innerText;
+            values.surName=this.myDiv.querySelector("#surname").innerText;
+            values.pax=this.myDiv.querySelector("#pax").innerHTML;
+
+        }
+
+        return Helper.replaceAllFromValues(template,values);
+
+    }
+
+
+
+    /*
     bonToText(withPrices) {  
         let orderList=this.getOrders(); 
         let orders; 
@@ -476,12 +518,8 @@ class BonStrip {
         text+="\n";
         return text;
 
-
-        
-
-
-
     }
+    */
 
     saveOrders() {
         Globals.myConfig.myRepo.updateOrders(this.bonId, this.getOrders().orders);
@@ -751,8 +789,11 @@ class BonStrip {
     }
 
     setCustomerInfo(bon) {
-        let name=bon.customer.forename+" "+bon.customer.surname;
-        this.myDiv.querySelector("#customer").innerHTML=name;
+        //let name=bon.customer.forename+" "+bon.customer.surname;
+        //this.myDiv.querySelector("#customer").innerHTML=name;
+        this.myDiv.querySelector("#forename").innerHTML=bon.customer.forename;
+        this.myDiv.querySelector("#surname").innerHTML=bon.customer.surname;
+
         this.myDiv.querySelector("#email").innerHTML=bon.customer.email;
         this.myDiv.querySelector("#phonenr").innerHTML=bon.customer.phone_nr;
     }
@@ -799,8 +840,10 @@ class BonStrip {
 
     updateNameOnChange(forenameElem,surnameElem) {
         let f=()=> {
-            let name=forenameElem.value+" "+surnameElem.value;
-            this.myDiv.querySelector("#customer").innerHTML=name;
+
+            this.myDiv.querySelector("#forename").innerHTML=forenameElem.value;
+            this.myDiv.querySelector("#surname").innerHTML=surnameElem.value;
+
         }
         forenameElem.oninput=f;
         surnameElem.oninput=f;

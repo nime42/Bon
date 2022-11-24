@@ -401,6 +401,22 @@ class BonForm {
         let elem = event.target;
         elem.style.background = elem.dataset["activeBackground"];
         elem.classList.add("active");
+
+        if(elem.id===Globals.Statuses["approved"].name) {
+          MessageBox.popup("Vil du sende en bekræftelse??", {
+            b1: {
+              text: "Ja",
+              onclick: () => {
+                this.myBonStrip.showMailDialogue();
+  
+              },
+            },
+            b2: { text: "Nej" },
+          });
+          
+
+        }
+
       };
     });
 
@@ -738,7 +754,7 @@ class BonForm {
             o.izettle_product_id
           );
         });
-        this.myBonStrip.updateTotalSum();
+        this.myBonStrip.updateTotalSum(); 
       });
     }
   }

@@ -545,5 +545,47 @@ module.exports = class DB {
     }
 
 
+    getMessages(callback = console.log) {
+        let sql =
+            "SELECT * FROM messages order by coalesce(sortorder,'Z'),id";
+        try {
+            const rows = this.db.prepare(sql).all();
+            callback(true, rows);
+        } catch (err) {
+            callback(false, err);
+        }
+    }
+    createMessage(message,callback = console.log) {
+        let sql ="INSERT INTO messages(name,message,sortorder) values(?,?,?)";
+        try {
+            const res = this.db.prepare(sql).run(message.name,message.message,message.sortorder);
+            message.id=res.lastInsertRowid;
+            callback(true,message);
+        } catch (err) {
+            callback(false,err.code);
+        }
+    }
+
+    updateMessages(id,message,callback = console.log) {
+        let sql = "update messages set name=?,message=?,sortorder=? where id=?";
+        console.log(id,message);
+        try {
+            this.db.prepare(sql).run(message.name,message.message,message.sortorder, id);
+            callback(true);
+        } catch (err) {
+            callback(false, err);
+        }
+    }
+
+    deleteMessage(id, callback = console.log) {
+        var sql = "delete from messages where id=?";
+        try {
+            this.db.prepare(sql).run(id);
+
+            callback(true, null);
+        } catch (err) {
+            callback(false, err);
+        }
+    }
 
 }

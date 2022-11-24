@@ -100,6 +100,24 @@ class Helper {
 
   }
 
+/**
+ * Replaces all variable references "${key}" in  atext with the value for that key in values-element
+ * example
+ * replaceAllFromValues("Hello ${name} ${lastname}!", {name:"Bob",lastname:"Smith"}) => "Hello Bob Smith!"
+ *
+ * @static
+ * @param {*} text
+ * @param {*} values
+ * @return {*} 
+ * @memberof Helper
+ */
+static replaceAllFromValues(text, values) {
+    Object.keys(values).forEach(k => {
+      text = text.replaceAll("${" + k + "}", values[k]);
+    });
+    return text;
+  }
+
 }
 
 

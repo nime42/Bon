@@ -198,4 +198,48 @@ class BonRepository {
 
     }
 
+    getMessages(callback) {
+        let url="api/messages/";
+        $.get(url,callback);
+    }
+
+
+    addMessage(messageName,callback) {
+        let url="api/messages/";
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify({name:messageName}),
+            success: function(data,status,xhr) {callback(true,data);},
+            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            dataType: "json",
+            contentType: "application/json"
+          });
+    }
+
+    updateMessage(id,message,callback) {
+        let url="api/messages/"+id;
+        $.ajax({
+            type: "PUT",
+            url: url,
+            data: JSON.stringify(message),
+            complete: callback,
+            dataType: "json",
+            contentType: "application/json"
+          });
+    }
+
+    delMessage(id,message,callback) {
+        let url="api/messages/"+id;
+        $.ajax({
+            type: "DELETE",
+            url: url,
+            data: JSON.stringify(message),
+            complete: callback,
+            dataType: "json",
+            contentType: "application/json"
+          });
+    }
+
+
 }

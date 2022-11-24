@@ -317,11 +317,12 @@
         Globals.myLoginHandler.setLoginForm("#login");
         Globals.myLoginHandler.whenLoggedIn(() => {
 
+            Globals.myConfig=new BonConfig("#admin");
+
             Globals.myCalender=new BonCalendar("#calendar-div");
 
             Globals.myMails=new BonMails("#mails");
 
-            Globals.myConfig=new BonConfig("#admin");
 
             Globals.myKitchenBonWall=new BonWall("#kitchen",["approved","preparing","done"]);
 

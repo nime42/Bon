@@ -11,8 +11,7 @@ class ChatClass {
     </div>
     <div style="min-width: 350px;">
         <button type="button" id="send-message" class="button-primary" style="padding: 0 5px;">Send</button>
-        <button type="button" id="add-bon-no-price" style="float: right; padding: 0 5px;">Bon(uden pris)</button>
-        <button type="button" id="add-bon" style="float: right;margin-right:5px; padding: 0 5px;">Bon</button>
+        <select type="button" id="add-template" style="float: right; padding: 0 5px;"></select>
     </div>
     </div>         
     `;
@@ -59,20 +58,44 @@ class ChatClass {
             self.onSend && self.onSend(message);
         }
 
-        this.myDiv.querySelector("#add-bon").onclick=()=>{
-            if(self.onAddBon) {
-                let text=self.onAddBon();
-                Helper.typeInTextarea(text,textInput);
+
+
+
+        this.templateSelector=this.myDiv.querySelector("#add-template");
+
+
+        this.uppdateTemplates();
+
+
+
+        this.templateSelector.onchange=()=>{
+            let text;
+            if(self.onSelectTemplate) {
+                let text=self.onSelectTemplate(self.templateSelector.value);
+                if(text instanceof Function) {
+                    text((message)=>{
+                        Helper.typeInTextarea(message,textInput);         
+                    })
+                } else {
+                    Helper.typeInTextarea(text,textInput);
+                }
             }
+            self.templateSelector.value=self.templateSelector.firstChild?.textContent;
+
         }
 
-        this.myDiv.querySelector("#add-bon-no-price").onclick=()=>{
-            if(self.onAddBon) {
-                let text=self.onAddBonNoPrice();
-                Helper.typeInTextarea(text,textInput);
+    }
 
-            }
-        }
+    uppdateTemplates() {
+        this.templateSelector.innerHTML="";
+        Globals.myConfig.getMessages((messages=>{
+            messages=[{name:"indsæt besked..."},...messages]
+            messages.forEach(m=>{
+                let o=document.createElement("option");
+                o.text=m.name;
+                this.templateSelector.add(o);
+            })
+        }))
 
     }
 
@@ -95,12 +118,8 @@ class ChatClass {
         this.onSend=fun;
     }
 
-    onAddBon(fun) {
-        this.onAddBon=fun;
-    }
-
-    onAddBonNoPrice(fun) {
-        this.onAddBonNoPrice=fun;
+    onSelectTemplate(fun) {
+        this.onSelectTemplate=fun;
     }
 
 
@@ -110,7 +129,14 @@ class ChatClass {
     }
 
     clear() {
-        this.myDiv.querySelector("#chat").innerHTML="";
+        this.myDiv.querySelector("#chat").innerHTML=""; 
+        this.myDiv.querySelector("#chat-input").value="";
+    }
+
+    prepareMessage(newText) {
+        if(newText!==undefined) {
+            this.myDiv.querySelector("#chat-input").value=newText;
+        }
     }
 
     getHistory() {

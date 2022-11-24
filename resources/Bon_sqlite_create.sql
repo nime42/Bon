@@ -148,3 +148,11 @@ CREATE TABLE orders (
 					ON UPDATE NO ACTION
 	
 );
+
+-- messages definiton
+CREATE TABLE messages (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT UNIQUE,
+	message TEXT,
+	sortorder INTEGER
+);

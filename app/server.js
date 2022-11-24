@@ -669,3 +669,83 @@ app.get("/api/checkStock",(req,res)=>{
 
 
 })
+
+
+app.get("/api/messages",(req,res) => {
+
+    DB.getMessages(function(status,messages){
+        if(status) { 
+            res.json(messages); 
+        } else {
+            console.log("getMessages",messages);
+            res.sendStatus(404);  
+
+        }
+    })   
+})
+
+
+
+app.post("/api/messages",(req,res) => {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
+        res.sendStatus(401);
+        return;        
+    }    
+
+    let message=req.body;
+
+    DB.createMessage(message,function(status,message){
+        if(status) { 
+            res.json(message); 
+        } else {
+            console.log("createMessage",message);
+            if(message=="SQLITE_CONSTRAINT_UNIQUE") {
+                res.sendStatus(409);  
+            } else {
+                res.sendStatus(500);  
+            }
+        }
+    })   
+})
+
+
+app.put("/api/messages/:id",(req,res) => {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
+        res.sendStatus(401);
+        return;        
+    }
+
+
+    let message=req.body;
+    let id=req.params.id;
+
+    DB.updateMessages(id,message,function(status,err){
+        if(status) { 
+            res.sendStatus(200);  
+ 
+        } else {
+            console.log("updateMessage",err);
+            res.sendStatus(500);  
+
+        }
+    })  
+})
+
+app.delete("/api/messages/:id",(req,res) => {
+    if(!loginHandler.checkRoles(req,"${ADMIN}")) {
+        res.sendStatus(401);
+        return;        
+    }
+    let id=req.params.id;
+    DB.deleteMessage(id,function(status,err){
+        if(status) { 
+            res.sendStatus(200);  
+ 
+        } else {
+            console.log("deleteMessage",err);
+            res.sendStatus(500);  
+
+        }
+    })
+
+})
