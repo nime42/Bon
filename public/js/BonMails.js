@@ -47,7 +47,7 @@ class BonMails {
         ${this.style}
     </style>
     <div class="mail-style">
-    <div class="tableFixHead" style="width: 90%;">
+    <div class="tableFixHead" style="width: 90%; margin-left:10px;">
     <table id="mail-table">
     </table>
     </div>
@@ -136,8 +136,14 @@ class BonMails {
     }
 
     onSelectBon(bon) {
-        this.myBonStrip.initFromBon(bon,bon.orders);
-        this.myPopUp.show(this.myBonStripDiv);
+
+        if(bon.id.startsWith(Globals.bonPrefix)) {
+            Globals.myCalender.myBonForm.initFromBonId(bon.id.replace(Globals.bonPrefix+"-",""));
+
+        } else {
+            this.myBonStrip.initFromBon(bon,bon.orders);
+            this.myPopUp.show(this.myBonStripDiv);    
+        }
     }
 
 
