@@ -99,8 +99,9 @@ class BonMails {
         let headers=`
         <tr>
         <th>Ulæst</th>
-        <th>Datum</th>
+        <th>Dato</th>
         <th>Bon-ID</th>
+        <th>Leveringsdato</th>
         <th>Kunde</th>
         <th>Firma</th>
         <th>Email</th>
@@ -116,6 +117,7 @@ class BonMails {
                 <td><li id="bon-id-${m.bon.id}" class="fa fa-envelope mail" style="display:${m.mail.unread?"":"none"}"></li></td>
                 <td>${new Date(m.mail.date).toLocaleString()}</td>
                 <td><a id="bon-id-${m.bon.id}" href="#">${m.bon.id}</a></td>
+                <td>${new Date(m.bon.delivery_date).toLocaleString()}</td>
                 <td>${m.bon.customer.forename + " " + m.bon.customer.surname}</td>
                 <td>${m.bon.customer.company.name}</td>
                 <td>${m.bon.customer.email}</td>
@@ -130,7 +132,11 @@ class BonMails {
         })
 
         this.myMailTable.append(tableRows);
-        TableEnhancer.sortable(this.myMailTable,{0:(td)=>(td.querySelector("li").style.display)});
+        TableEnhancer.sortable(this.myMailTable,{
+            0:(td)=>(td.querySelector("li").style.display),
+            1:(td)=>(new Date(td.innerText)),
+            3:(td)=>(new Date(td.innerText)),
+        });
 
 
     }
