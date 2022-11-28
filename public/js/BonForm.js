@@ -393,7 +393,7 @@ class BonForm {
 
 
     form.querySelectorAll(".status-button").forEach((e) => {
-      e.onclick = (event) => {
+      e.onclick = (event,programmatically) => {
         form.querySelectorAll(".status-button").forEach((s) => {
           s.style.background = "";
           s.classList.remove("active");
@@ -402,7 +402,7 @@ class BonForm {
         elem.style.background = elem.dataset["activeBackground"];
         elem.classList.add("active");
 
-        if(elem.id===Globals.Statuses["approved"].name) {
+        if(elem.id===Globals.Statuses["approved"].name && !programmatically) {
           MessageBox.popup("Vil du sende en bekræftelse??", {
             b1: {
               text: "Ja",
@@ -517,7 +517,8 @@ class BonForm {
     });
     try {
       let elem = form.querySelector("#" + status);
-      elem.click();
+      //second arg = true => the click is triggered programmatically
+      elem.onclick({target:elem},true);
     } catch (err) {}
   }
 
