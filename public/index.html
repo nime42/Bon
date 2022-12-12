@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+    <link rel="stylesheet" href="css/bon.css">
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/skeleton.css">
 
@@ -40,6 +41,8 @@
     <script src="js/BonStatusFilter.js"></script>
     <script src="js/WeekView.js"></script>
     <script src="js/TableEnhancer.js"></script>
+    <script src="js/Notifier.js"></script>
+
 
     <script>
         function toggleMenu() {
@@ -107,7 +110,7 @@
 
     <!-- Top Navigation Menu -->
     <div class="topnav">
-        <a href="#home" class="menu" onclick="toggleMenu()">RR &nbsp;<span id="menu-header"></span><span id="bon-instance" style="float: right;margin-right: 50%;margin-bottom: 0;font-weight: bold;">Hej</span></a>
+        <a href="#home" class="menu" onclick="toggleMenu()">RR<span id="menu-header"></span><span id="bon-instance" style="float: right;margin-right: 50%;margin-bottom: 0;font-weight: bold;">Hej</span></a>
         <div id="myLinks">
             <a href="#calendar" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i> Kalender</a>
             <a href="#mails" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myMails.refreshMails();toggleMenu();"><i class="fa fa-envelope"></i> Mails</a>
@@ -134,6 +137,9 @@
             <i class="fa fa-bars"></i>
         </a>
     </div>
+    <div id="new-bon" style="width: fit-content;padding: 5px;">
+   </div>
+
     <div id="menu-elems" style="margin-top: 5%;">
         <section id="log-in">
             <div class="container">
@@ -323,7 +329,6 @@
 
             Globals.myMails=new BonMails("#mails");
 
-
             Globals.myKitchenBonWall=new BonWall("#kitchen",["approved","preparing","done"]);
 
             Globals.myInvoiceBonWall=new BonWall("#invoices",["delivered"]);
@@ -334,7 +339,8 @@
             Globals.myWeekWiew=new WeekView("#week");
             Globals.myWeekWiew.setOnChange(Globals.myWeekWiew.fetchBons);
 
-
+            Globals.myNotifier=new Notifier("#new-bon");
+            Globals.myNotifier.setCheckInterval(3);
 
             Globals.myLoginHandler.getUserInfo((userInfo) => {
                 Globals.userInfo = userInfo;

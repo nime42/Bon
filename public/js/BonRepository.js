@@ -242,4 +242,37 @@ class BonRepository {
     }
 
 
+    getNotifiedBon(callback) {
+        let url="/api/getNotifiedBon";
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function(data,status,xhr) {callback(true,data);},
+            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            contentType: "application/json",
+            cache: false
+          });
+    }
+
+
+    notifyBon(bonId,callback) {
+        let url="/api/notifyBon/"+bonId;
+        $.ajax({
+            type: "PUT",
+            url: url,
+            complete: callback
+          });
+    }
+
+    seeBon(bonId,callback) {
+        let url="/api/seeBon/"+bonId;
+        $.ajax({
+            type: "PUT",
+            url: url,
+            complete: callback
+          });
+    }
+
+
+
 }

@@ -587,4 +587,30 @@ module.exports = class DB {
         }
     }
 
+    getNotifiedBon(userId,callback=console.log) {
+        let sql="select bon_id from notified_bons b where user_id<>? and not exists (select null from notified_bons where bon_id=b.bon_id and user_id=?) order by notify_date limit 1";
+        let res = this.db.prepare(sql).get(userId,userId);
+        if(res) {
+            callback(true,res);
+        } else {
+            callback(false);
+        }
+    }
+
+    seeBon(userId,bonId,callback=console.log) {
+        let sql = "insert into notified_bons(user_id,bon_id) values(?,?) on conflict(user_id,bon_id) DO NOTHING";
+        this.db.prepare(sql).run(userId, bonId);
+        callback(true);
+    }
+
+    notifyBon(userId, bonId, callback = console.log) {
+
+        let sql="delete from notified_bons where bon_id=? and user_id<>?";        
+        this.db.prepare(sql).run(bonId,userId);
+        sql = "insert into notified_bons(user_id,bon_id) values(?,?) on conflict(user_id,bon_id) DO NOTHING";
+        this.db.prepare(sql).run(userId, bonId);
+        callback(true);
+
+    }
+
 }

@@ -403,7 +403,7 @@ class BonForm {
         elem.classList.add("active");
 
         if(elem.id===Globals.Statuses["approved"].name && !programmatically) {
-          MessageBox.popup("Vil du sende en bekræftelse??", {
+          MessageBox.popup("Vil du sende en bekræftelse?", {
             b1: {
               text: "Ja",
               onclick: () => {
@@ -413,7 +413,7 @@ class BonForm {
             },
             b2: { text: "Nej" },
           });
-          
+         
 
         }
 

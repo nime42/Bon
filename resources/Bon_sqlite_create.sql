@@ -31,6 +31,16 @@ CREATE UNIQUE INDEX items_external_id_IDX ON items (external_id);
 CREATE UNIQUE INDEX items_name_IDX ON items (name);
 
 
+-- messages definition
+
+CREATE TABLE messages (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT UNIQUE,
+	message TEXT,
+	sortorder INTEGER
+);
+
+
 -- companies definition
 
 CREATE TABLE companies (
@@ -127,6 +137,19 @@ CREATE TABLE izettle_purchases (
 );
 
 
+-- notified_bons definition
+
+CREATE TABLE notified_bons (
+	user_id INTEGER,
+	bon_id INTEGER,
+	notify_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (user_id, bon_id)
+	FOREIGN KEY (bon_id)
+	REFERENCES "bons" (id) ON DELETE CASCADE
+					ON UPDATE NO ACTION	
+);
+
+
 -- orders definition
 
 CREATE TABLE orders (
@@ -147,12 +170,4 @@ CREATE TABLE orders (
 	REFERENCES items (id) ON DELETE CASCADE
 					ON UPDATE NO ACTION
 	
-);
-
--- messages definiton
-CREATE TABLE messages (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	name TEXT UNIQUE,
-	message TEXT,
-	sortorder INTEGER
 );

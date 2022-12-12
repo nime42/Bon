@@ -86,6 +86,7 @@ loginHandler.init(app,config.userDB,mailSender.sendMail,config.forgotPasswordMai
 loginHandler.resumeSessions();
 
 var iZettleFunctions=require("./IzettleFunctionsClass.js");
+const dbFunctions = require('./LoginHandler/dbFunctions.js');
 
 
 var IZettleHandler=new iZettleFunctions(config,DB,grocy);
@@ -747,5 +748,60 @@ app.delete("/api/messages/:id",(req,res) => {
 
         }
     })
+    
+})
+
+
+app.put("/api/notifyBon/:id",(req,res) => {
+    if (!loginHandler.isLoggedIn) {
+        res.sendStatus(401);
+        return;
+    }
+    let bonId=req.params.id;
+    let userId=loginHandler.getSession(req).userId;
+    DB.notifyBon(userId,bonId, (status)=>{
+        if(status) { 
+            res.sendStatus(200);  
+ 
+        } else {
+            console.log("notifyBon: something went wrong");
+            res.sendStatus(500);  
+        }
+    })
+})
+
+app.put("/api/seeBon/:id",(req,res) => {
+    if (!loginHandler.isLoggedIn) {
+        res.sendStatus(401);
+        return;
+    }
+    let bonId=req.params.id;
+    let userId=loginHandler.getSession(req).userId;
+    DB.seeBon(userId,bonId, (status)=>{
+        if(status) { 
+            res.sendStatus(200);  
+ 
+        } else {
+            console.log("seeBon: something went wrong");
+            res.sendStatus(500);  
+        }
+    })
+})
+
+app.get("/api/getNotifiedBon",(req,res) =>{
+    if (!loginHandler.isLoggedIn) {
+        res.sendStatus(401);
+        return;
+    }
+    let userId=loginHandler.getSession(req).userId;
+    DB.getNotifiedBon(userId,(status,bonId)=>{
+        if(status) {
+            res.json(bonId); 
+        } else {
+            res.sendStatus(404);
+        }
+    })
+
+
 
 })

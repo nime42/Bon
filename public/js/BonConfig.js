@@ -767,20 +767,22 @@ class BonConfig {
 
     showBonForm(id,rowElem) {
         Globals.myCalender.myBonForm.initFromBonId(id,(event,arg1,arg2,arg3) => {
-            switch(event) {
-                case "saved":
-                    let bon=arg1;
-                    this.myRepo.getBonSummary(bon.id,bons=>{
-                        bon=bons[0];
-                        rowElem.innerHTML=this._createTableRow(bon);
-                    })
-                    break;
-                case "deleted":
-                    rowElem.remove();
-                    break;
-                case "copied":
-                    this.getBons();
-                    break;
+            if (rowElem) {
+                switch (event) {
+                    case "saved":
+                        let bon = arg1;
+                        this.myRepo.getBonSummary(bon.id, bons => {
+                            bon = bons[0];
+                            rowElem.innerHTML = this._createTableRow(bon);
+                        })
+                        break;
+                    case "deleted":
+                        rowElem.remove();
+                        break;
+                    case "copied":
+                        this.getBons();
+                        break;
+                }
             }
         });
     }

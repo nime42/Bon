@@ -220,9 +220,9 @@ class BonStrip {
 
         <div id="add-items">
         <br>
-        <i id="show-items-list" class="fa fa-plus-square" style="font-size:20px; color:${this.foreground};display:none"></i>        
-        <i id="show-mails" class="fa fa-envelope" style="font-size:20px; color:${this.foreground};display:none"></i>        
-
+        <i id="show-items-list" class="fa fa-plus-square" style="font-size:20px; color:${this.foreground};display:none" title="Tilføj menu!"></i>        
+        <i id="show-mails" class="fa fa-envelope" style="font-size:20px; color:${this.foreground};display:none" title="Send mail til kunden!"></i>        
+        <i id="notify-kitchen" class="fa fa-paper-plane" style="font-size:20px; color:${this.foreground};display:none" title="Send en besked til køkkenet!"></i>
         <div id="items-list" style="display:none"></div>
         <div id="mail-list" style="display:none"></div>
         </div>
@@ -264,6 +264,28 @@ class BonStrip {
                     itemslistElem.style.display="none";
                 }
             }
+
+            let self=this;
+            this.myDiv.querySelector("#notify-kitchen").style.display="";
+            this.myDiv.querySelector("#notify-kitchen").onclick=() => {
+                MessageBox.popup("Vil du sende en besked til køkkenet?", {
+                    b1: {
+                      text: "Ja",
+                      onclick: () => {
+                        if(self.bonId) {
+                          Globals.myNotifier.notify(self.bonId);
+                        } else {
+                          alert("Gem venligst først!");
+                        }
+                       
+          
+                      },
+                    },
+                    b2: { text: "Nej" },
+                  });
+            }
+
+
 
         }
         this.isEditable=isEditable;
