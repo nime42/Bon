@@ -123,6 +123,13 @@ CREATE TABLE bons (
 );
 
 
+CREATE TRIGGER clear_notification UPDATE OF status ON bons 
+  BEGIN
+	  delete from notified_bons where bon_id=new.id and new.status in ('invoiced','closed');
+  END;
+
+
+
 -- izettle_purchases definition
 
 CREATE TABLE izettle_purchases (
@@ -148,6 +155,8 @@ CREATE TABLE notified_bons (
 	REFERENCES "bons" (id) ON DELETE CASCADE
 					ON UPDATE NO ACTION	
 );
+
+
 
 
 -- orders definition
