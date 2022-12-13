@@ -243,7 +243,7 @@ class BonRepository {
 
 
     getNotifiedBon(callback) {
-        let url="/api/getNotifiedBon";
+        let url="api/getNotifiedBon";
         $.ajax({
             type: "GET",
             url: url,
@@ -256,7 +256,7 @@ class BonRepository {
 
 
     notifyBon(bonId,callback) {
-        let url="/api/notifyBon/"+bonId;
+        let url="api/notifyBon/"+bonId;
         $.ajax({
             type: "PUT",
             url: url,
@@ -265,7 +265,7 @@ class BonRepository {
     }
 
     seeBon(bonId,callback) {
-        let url="/api/seeBon/"+bonId;
+        let url="api/seeBon/"+bonId;
         $.ajax({
             type: "PUT",
             url: url,
