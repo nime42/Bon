@@ -19,13 +19,13 @@ deploy all
 ./deployStrandlyst.sh
 
 Update all db:
-sqlite3 -init install/updateDB.sql bonServer/resources/bon.db
-sqlite3 -init install/updateDB.sql helsingorServer/resources/bon.db
-sqlite3 -init install/updateDB.sql nordhavnServer/resources/bon.db
-sqlite3 -init install/updateDB.sql trelleborgServer/resources/bon.db
-sqlite3 -init install/updateDB.sql cafeServer/resources/bon.db
-sqlite3 -init install/updateDB.sql strandlystServer/resources/bon.db
-sqlite3 -init install/updateDB.sql zooServer/resources/bon.db
-sqlite3 -init install/updateDB.sql trailerServer/resources/bon.db
+sqlite3 bonServer/resources/bon.db < install/updateDB.sql
+sqlite3 helsingorServer/resources/bon.db < install/updateDB.sql
+sqlite3 nordhavnServer/resources/bon.db < install/updateDB.sql
+sqlite3 trelleborgServer/resources/bon.db < install/updateDB.sql
+sqlite3 cafeServer/resources/bon.db < install/updateDB.sql
+sqlite3 strandlystServer/resources/bon.db < install/updateDB.sql
+sqlite3 zooServer/resources/bon.db < install/updateDB.sql
+sqlite3 trailerServer/resources/bon.db < install/updateDB.sql
 
 
