@@ -1,0 +1,26 @@
+* {
+    font-family: "Trebuchet MS", Verdana, sans-serif;
+  }
+
+button {
+    background-color: lightgray;
+    border-radius: 5px;
+    box-shadow: rgb(0 0 0 / 60%) 0 2px 4px;
+    border: 0;
+    color: black;
+    cursor: pointer;
+    padding: 3px 9px 2px 9px;
+}
+
+button:hover {
+    background: #a8b1ad;
+  }
+
+
+
+  input[type=text], textarea {
+    padding: 3px 9px 2px 9px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+  }

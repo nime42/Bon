@@ -1,0 +1,106 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="flexy.css">
+    <script src="flexy.js"></script>
+    <style>
+        .label-style {
+            color: black;
+            margin-right: 5px;
+            min-width: 10ch;
+        }
+
+        .row-style {
+            margin-bottom: 5px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main" style="background: rebeccapurple; width: 100%;height: 100%;"></div>
+    <script>
+
+        function createForm() {
+
+            let localVars=FlexyVariable.createLocalVars();
+
+            let inputRow = (label, variable) => {
+                let f = Flexy.Frame("row", "wrap").class("row-style");
+                let l = Flexy.Label(label + ":").class("label-style");
+                let i = Flexy.Input("text").variable(variable,localVars);
+                f.add(l).add(i);
+                return f;
+            }
+
+            let sendForm = () => {
+                let form = {};
+                FlexyVariable.searchVariables(/form\./,localVars).forEach(v => {
+                    let attr = v.split(".")[1];
+                    form[attr] = FlexyVariable.getValue(v,localVars);
+                })
+                alert("Sending:" + JSON.stringify(form))
+            }
+
+
+            let frame = Flexy.Frame("column", "wrap").style({ background: "ghostwhite", margin: "auto", padding: "15px", borderRadius: "5px" });
+
+
+
+            frame.add(inputRow("First name", "form.firstName"))
+                .add(inputRow("Last name", "form.lastName"))
+                .add(inputRow("Email", "form.email"))
+                .add(Flexy.Frame("row", "wrap").class("row-style")
+                    .add(Flexy.Label("Car:").class("label-style"))
+                    .add(Flexy.Select("cars").variable("form.car",localVars)
+                        .add(Flexy.Option("none", "-"))
+                        .add(Flexy.Option("volvo", "Volvo"))
+                        .add(Flexy.Option("saab", "Saab")))
+                    , "start")
+                .add(Flexy.Frame("row", "wrap").class("row-style")
+                    .add(Flexy.Label("Male:"))
+                    .add(Flexy.Input("radio", "male", "sex").variable("form.sex",localVars))
+                    .add(Flexy.Label("Female:"))
+                    .add(Flexy.Input("radio", "female", "sex").variable("form.sex",localVars))
+                    .add(Flexy.Label("Other:"))
+                    .add(Flexy.Input("radio", "other", "sex").variable("form.sex",localVars))
+                    , "start")
+                .add(Flexy.Frame("row", "wrap").class("row-style")
+                    .add(Flexy.Label("Get newsletter"))
+                    .add(Flexy.Input("checkbox", "yes").variable("form.newsletter",localVars))
+                    , "start")
+                .add(new FlexyElement("br"))
+                .add(Flexy.Button("Send").onClick(sendForm), "end");
+
+            return frame;
+
+        }
+
+        function menu(side,text,background) {
+        let divStyle={
+            width: "20px",
+            height: "3px",
+            backgroundColor: "white",
+            marginBottom: "2px"}
+            let hamburger=Flexy.Frame("column").style({padding:"5px"});
+            hamburger.add(new FlexyElement("div").style(divStyle));
+            hamburger.add(new FlexyElement("div").style(divStyle));
+            hamburger.add(new FlexyElement("div").style(divStyle));
+        let menuFrame=Flexy.Frame("row").style({background:background});
+        menuFrame.add(hamburger,"start");
+        menuFrame.add(Flexy.Label(text).style({marginLeft:"auto",marginRight:"5px"}));
+        return menuFrame;
+    }
+
+
+
+        let main = new Flexy("#main", "column");
+
+        main.add(menu("left","RR","green"),"stretch")
+        main.add(createForm(), "start");
+
+    </script>
+</body>
+
+</html>
