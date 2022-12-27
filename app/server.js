@@ -33,22 +33,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 
 
-//-------------logging--------------
-var morgan = require('morgan')
-var path = require('path')
-var rfs = require('rotating-file-stream') // version 2.x
 
-morgan.token('remote-user', function (req, res) { let session=loginHandler.getSession(req); if(session) {return session.userId} else {return ""}});
-
-// create a rotating write stream
-var accessLogStream = rfs.createStream('access.log', {
-    interval: '7d', // rotate daily
-    path: path.join('log')
-  })
-  
-  // setup the logger
-  app.use(morgan('common', { stream: accessLogStream }))
-  
 
 
 
@@ -84,6 +69,23 @@ var loginHandler=require("./LoginHandler/loginHandler");
 loginHandler.init(app,config.userDB,mailSender.sendMail,config.forgotPasswordMailTemplate);
 
 loginHandler.resumeSessions();
+
+//-------------logging--------------
+var morgan = require('morgan')
+var path = require('path')
+var rfs = require('rotating-file-stream') // version 2.x
+morgan.token('remote-user', function (req, res) { let session=loginHandler.getSession(req); if(session) {return session.userId} else {return ""}});
+// create a rotating write stream
+var accessLogStream = rfs.createStream('access.log', {
+    interval: '7d', // rotate daily
+    path: path.join('log')
+  })
+  
+  // setup the logger
+  app.use(morgan('common', { stream: accessLogStream }))
+  
+
+
 
 var iZettleFunctions=require("./IzettleFunctionsClass.js");
 const dbFunctions = require('./LoginHandler/dbFunctions.js');
