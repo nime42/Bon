@@ -16,7 +16,7 @@ class CalendarClass {
       "December",
     ],
     weekNr: "uge",
-    weekDays: ["mon", "tir", "ons", "tor", "fre", "lör", "sön"],
+    weekDays: ["man", "tir", "ons", "tor", "fre", "lør", "søn"],
   };
 
 

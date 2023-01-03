@@ -98,8 +98,8 @@ class WeekView {
       <th>Ons</th>
       <th>Tor</th>
       <th>Fre</th>
-      <th>Lör</th>
-      <th>Sön</th>
+      <th>Lør</th>
+      <th>Søn</th>
     </tr>
     </thead>
     <tbody>

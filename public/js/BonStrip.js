@@ -205,7 +205,7 @@ class BonStrip {
             </div>
         </fieldset>
         <fieldset id="kitchen-field">
-            <legend>Kökken info</legend>
+            <legend>Køkken info</legend>
             <span id="kitchenInfoText"></span>
         </fieldset>
 

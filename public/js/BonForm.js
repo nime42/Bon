@@ -54,6 +54,38 @@ class BonForm {
                   </div>
               </div>
 
+              <h5>Køkken info</h5>
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                     <span>
+                      <input type="checkbox" id="kitchen_selects" name="kitchen_selects" value="1"
+                          style="margin-right: 5px;"> Køkkenet vælger
+                     </span>
+                  </div>
+              </div>
+
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      Pax:
+                  </div>
+                  <div class="bon-column">
+                      <input type="text" id="nr_of_servings" name="nr_of_servings" placeholder="Pax"
+                          autocomplete="nope">
+                  </div>
+              </div>
+
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      Pris kategorie:
+                  </div>
+                  <div class="bon-column">
+                      <select name="price_category" id="price-categories"></select>
+                  </div>
+                  </div>              
+
+                  <div class="bon-row" style="position:sticky;bottom:0;background: wheat;">
+
+                  </div>
 
               <h5>Kunde <i class="fa fa-caret-up" aria-hidden="true" onclick="Helper.expandCollapse(this,'#collapse-customer')"></i></h5>
               <div id="collapse-customer">
@@ -186,48 +218,19 @@ class BonForm {
               </div>
               </div>
 
-              <h5>Kunde önsker</h5>
+              <h5>Kunde Ønsker </h5>
               <div class="bon-row indent">
                   <div class="bon-column">
-                      <textarea name="customer_info" placeholder="Kunde Önsker" rows="2"
+                      <textarea name="customer_info" placeholder="Kunde Ønsker" rows="2"
                           autocomplete="nope"></textarea>
                   </div>
               </div>
 
 
               <h5>Køkken info</h5>
-              <div class="bon-row indent">
-                  <div class="bon-column">
-                     <span>
-                      <input type="checkbox" id="kitchen_selects" name="kitchen_selects" value="1"
-                          style="margin-right: 5px;"> Køkkenet vælger
-                     </span>
-                  </div>
-              </div>
-
-              <div class="bon-row indent">
-                  <div class="bon-column">
-                      Pax:
-                  </div>
-                  <div class="bon-column">
-                      <input type="text" id="nr_of_servings" name="nr_of_servings" placeholder="Pax"
-                          autocomplete="nope">
-                  </div>
-              </div>
-
-              <div class="bon-row indent">
-                  <div class="bon-column">
-                      Pris kategorie:
-                  </div>
-                  <div class="bon-column">
-                      <select name="price_category" id="price-categories"></select>
-                  </div>
-                  </div>              
-
-
                   <div class="bon-row indent">
                       <div class="bon-column">
-                          <textarea name="kitchen_info" id="kitchen_info" placeholder="Kökken info" rows="2"
+                          <textarea name="kitchen_info" id="kitchen_info" placeholder="køkken info" rows="2"
                               autocomplete="nope"></textarea>
                       </div>
                   </div>
@@ -281,12 +284,12 @@ class BonForm {
   
   <br>
 </div>
-<textarea name="customer_info" placeholder="Kunde Önsker" rows="2" autocomplete="nope" ></textarea>
+<textarea name="customer_info" placeholder="Kunde ønsker" rows="2" autocomplete="nope" ></textarea>
 </span><br><br>
 
 
 <div id="items" style=""></div>
-<textarea name="kitchen_info" id="kitchen_info" placeholder="Kökken info" rows="2" autocomplete="nope" ></textarea>
+<textarea name="kitchen_info" id="kitchen_info" placeholder="Køkken info" rows="2" autocomplete="nope" ></textarea>
 
 `;
 
