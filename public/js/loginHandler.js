@@ -33,10 +33,10 @@ class LoginHandler {
                 error: function (data, status, jqxhr) {
                     let errorMsg;
                     if (data.status === 401) {
-                        errorMsg = "Ogiltigt användarnamn eller lösenord!!!";
+                        errorMsg = "Ugyldigt anvender navn eller password!!!";
 
                     } else {
-                        errorMsg = "Just nu går det inte att logga in, försök senare!";
+                        errorMsg = "Lige nu går det ikke at logge på, prøv senere!";
 
                     }
                     if (errorElem) {
@@ -86,10 +86,10 @@ class LoginHandler {
                 error: function (data, status, jqxhr) {
                     let errorMsg;
                     if (data.status === 403) {
-                        errorMsg = "Användaren finns redan";
+                        errorMsg = "Brugeren findes allerede";
 
                     } else {
-                        errorMsg = "Det gick inte att registrera användaren, försök senare!";
+                        errorMsg = "Det gik ikke at registrere brugeren, førsøg senere!";
 
                     }
                     if (errorElem) {
@@ -140,7 +140,7 @@ class LoginHandler {
                         errorMsg = "mailadress saknas";
 
                     } else {
-                        errorMsg = "Det gick inte att återställa lösenordet, försök senare!";
+                        errorMsg = "Det gik ikke at nulstille password, fforsøg igen senere!";
 
                     }
                     if (errorElem) {
@@ -188,10 +188,10 @@ class LoginHandler {
                 error: function (data, status, jqxhr) {
                     let errorMsg;
                     if (data.status === 404) {
-                        errorMsg = "okänd användare";
+                        errorMsg = "ukendt bruger";
 
                     } else {
-                        errorMsg = "Det gick inte att återställa lösenordet, försök senare!";
+                        errorMsg = "Det gik ikke at nulstille password, prøv igen senere!";
 
                     }
                     if (errorElem) {
