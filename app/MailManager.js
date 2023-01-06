@@ -207,11 +207,6 @@ function getBonIds(mails,withPrefix) {
 }
 
 let incomingMailHelper= {
-  entries:[
-    "(?<attr>.*):\\n?(?<value>.*)",
-    "(?<attr>Email):\\n?(?<value>.*)"
-
-  ],
   bonAttribMap:{
     forename:"Fornavn",
     surname:"Efternavn",
@@ -233,8 +228,7 @@ let incomingMailHelper= {
 function getIncomingOrders(subjectContains,callback) {
     getMails("INBOX",['UNSEEN',['SUBJECT',subjectContains]],true, (status,data) => {
       if(status) {
-        let regExps=incomingMailHelper.entries.map(e=>(new RegExp(e,'g')));
-        let bons=data.map(m=>({orgMessage:m.message, bon:buildBon(parseIncomingMessage(m.message,regExps))}));
+        let bons=data.map(m=>({orgMessage:m.message, bon:buildBon(parseIncomingMessage(m.message,incomingMailHelper.bonAttribMap))}));
         callback(true,bons);
       } else {
         callback(false,data);
@@ -306,20 +300,23 @@ function getFromEntry(entries,attr) {
   return val!==undefined?val:"";
 }
 
-function parseIncomingMessage(mess, regExps) {
-  let entries = {};
-  regExps.forEach(r => {
-    mess.match(r)?.forEach(m => {
-      regExps.forEach(s => {
-        let groups=m.match(new RegExp(s.source))?.groups;
-        if(groups) {
-          entries[groups.attr]=groups.value
-        }
-      })
-    })
+
+
+function parseIncomingMessage(mess,entries) {
+  let res={}
+  Object.keys(entries).forEach(k=>{
+    let regExp=new RegExp(`(?<attr>${entries[k]}):\\n(?<value>[\\s\\S]*?)(?<end>(.*?:\\n|$))`);
+    let m=mess.match(regExp);
+    if(m) {
+      res[k]=m.groups["value"];
+    } else {
+      res[k]=undefined;
+    }
+
   })
-  return entries;
+  return res;
 }
+
 
   /**
    * Get the time difference between a local date and another timezone.
