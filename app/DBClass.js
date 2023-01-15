@@ -1,3 +1,5 @@
+
+
 module.exports = class DB {
     constructor(dbFile) {
         var sqlite3 = require("better-sqlite3");
@@ -81,6 +83,11 @@ module.exports = class DB {
       case b.customer_collects 
       when true then ''
       else trim(a.street_name2||' '||a.street_name||' '||a.street_nr||', '||a.zip_code||' '||a.city) end as delivery_adr,
+      a.street_name2,
+      a.street_name,
+      a.street_nr,
+      a.zip_code,
+      a.city,
       c.forename ||' '||c.surname as name,
       c.email,c.phone_nr,
       co.name as company,co.ean_nr,
@@ -92,7 +99,7 @@ module.exports = class DB {
      left join companies co on c.company_id =co.id
      left join addresses co_a on co_a.id=co.address_id
      left join orders o on b.id=o.bon_id)
-    select id,delivery_date,status ,nr_of_servings,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,name,email,phone_nr,company,ean_nr,sum(price) as price,sum(cost_price) as cost_price from boninfo
+    select id,delivery_date,status ,nr_of_servings,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,sum(price) as price,sum(cost_price) as cost_price from boninfo
     where coalesce(?,id)=id
     group by id order by id desc
     `;
@@ -610,6 +617,29 @@ module.exports = class DB {
         sql = "insert into notified_bons(user_id,bon_id) values(?,?) on conflict(user_id,bon_id) DO NOTHING";
         this.db.prepare(sql).run(userId, bonId);
         callback(true);
+
+    }
+
+
+
+    complementWithGrocyIds(orders,callback = console.log) {
+        let grocySql="select external_id from items where id=?";
+        let grocyStmt=this.db.prepare(grocySql);
+        let izettleSQl="select i.external_id from izettle_products iz join items i on iz.grocy_item_id =i.id where iz.id=?"
+        let izettleStmt=this.db.prepare(izettleSQl);
+
+        orders.forEach(o=> {
+            if(o.id!="") {
+                let row=grocyStmt.get(o.id);
+                o.external_id=row?.external_id;
+            } else if (o.izettle_product_id!="") {
+                let row=izettleStmt.get(o.izettle_product_id);
+                o.external_id=row?.external_id;
+            }
+        })
+        callback(true,orders);
+
+        
 
     }
 
