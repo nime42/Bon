@@ -413,9 +413,21 @@ class BonForm {
             },
             b2: { text: "Nej" },
           });
-         
-
         }
+
+
+        if(elem.id===Globals.Statuses["delivered"].name && !programmatically && this.myBonStrip.bonId) {
+          MessageBox.popup("Ønsker du at trække varerne fra lageret?", {
+            b1: {
+              text: "Ja",
+              onclick: () => {
+                this.myRepoObj.consumeBon(this.myBonStrip.bonId);
+              },
+            },
+            b2: { text: "Nej" },
+          });
+        }
+
 
       };
     });
