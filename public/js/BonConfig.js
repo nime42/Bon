@@ -170,7 +170,7 @@ class BonConfig {
             ${this.style}
         </style>
         <div class="config-style">
-        <input type="button" id="refresh-db" value="Hämta från DB">
+        <input type="button" id="refresh-db" value="Hænter fra DB">
         <br><br>
         <div class="tableFixHead">
         <table id="items-table">
@@ -347,10 +347,10 @@ class BonConfig {
                     if(!status) {
                         let errorMsg;
                         if (data.status === 403) {
-                            errorMsg = "Användaren finns redan";
+                            errorMsg = "Brugeren findes allerede";
     
                         } else {
-                            errorMsg = "Det gick inte att registrera användaren, försök senare!";
+                            errorMsg = "Det gik ikke at registrere brugeren, forsøg senere!";
     
                         }
                         self.UserAdminForm.querySelector("#error-msg").innerHTML=errorMsg;  
@@ -653,10 +653,10 @@ class BonConfig {
                     if(!status) {
                         let errorMsg;
                         if (data.status === 403) {
-                            errorMsg = "Användaren finns redan";
+                            errorMsg = "Brugeren findes allerede";
     
                         } else {
-                            errorMsg = "Det gick inte att registrera användaren, försök senare!";
+                            errorMsg = "Det gik ikke at registrere brugeren, forsøg senere!";
     
                         }
                         self.UserAdminForm.querySelector("#error-msg").innerHTML=errorMsg;  
@@ -675,7 +675,7 @@ class BonConfig {
                 return false;                     
             }
             this.UserAdminForm.querySelector("#remove-user").onclick=function() {
-                MessageBox.popup("Vill du verkligen Fjern denna användare?", {
+                MessageBox.popup("Vil du virkelig fjerne denne bruger?", {
                     b1: {
                       text: "Ja",
                       onclick: () => {

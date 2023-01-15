@@ -116,8 +116,8 @@
             <a href="#calendar" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i> Kalender</a>
             <a href="#mails" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myMails.refreshMails();toggleMenu();"><i class="fa fa-envelope"></i> Mails</a>
             <a href="#week" data-check-access="${ADMIN}" onclick="console.log('week');gotoMenu(this);Globals.myWeekWiew.refresh();toggleMenu();"><i class="fa fa-home"></i> Ugeoversigt</a>
-            <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i class="fa fa-cutlery"></i> Kökken vy idag</a>
-            <a href="#future" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i class="fa fa-sun-o"></i>Senare</a>
+            <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i class="fa fa-cutlery"></i> Køkken idag</a>
+            <a href="#future" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i class="fa fa-sun-o"></i>køkken senere</a>
             <a href="#grocy" id="link-to-grocy"><i class="fa fa-database"> Grocy</i></a>
             <a href="#invoices" data-check-access="${ADMIN}" onclick="gotoMenu(this);Globals.myInvoiceBonWall.getBonsForInvoice();toggleMenu();"><i class="fa fa-money"></i> Fakturer</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i class="fa fa-wrench"></i> Admin</a>
@@ -172,8 +172,8 @@
                     <div class="row">
                         <div class="three columns">
                             <a href="javascript:void(0);" style="font-size: small;"
-                                onclick="document.querySelector('#login').style.display='none';document.querySelector('#forgot-password').style.display='block';">Glömt
-                                lösenord?</a>
+                                onclick="document.querySelector('#login').style.display='none';document.querySelector('#forgot-password').style.display='block';">Glemt
+                                password?</a>
                         </div>
                     </div>
                 </form>
@@ -190,7 +190,7 @@
 
                 <!--Forgot password-->
                 <form id="forgot-password" autocomplete="off" method="post" style="display:none">
-                    <h5>Glömt Lösenord</h5>
+                    <h5>glemt password/h5>
                     <div class="row">
                         <div class="twelwe columns" id="error-msg" style="color:red"></div>
                     </div>
@@ -208,7 +208,7 @@
                 </form>
 
                 <form id="reset-password" autocomplete="off" method="post" style="display:none">
-                    <h5>Återställ lösenord</h5>
+                    <h5>nulstill password</h5>
                     <div class="row">
                         <div class="six columns">
                             <label for="pwd-reset">Password</label>
