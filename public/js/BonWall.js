@@ -63,7 +63,10 @@ class BonWall {
                         status="approved";
                     }
                     if(status=="delivered" && onOff=="on") {
-                        this._fadeout(colElem,bonStrip.bonId,"delivered",(id)=>{
+                        if(bonStrip.getPaymentType()=="Kontant") {
+                            status="closed";
+                        }
+                        this._fadeout(colElem,bonStrip.bonId,status,(id)=>{
                             self.myBonRepo.consumeBon(bonStrip.bonId);
                         });
                     } else {
