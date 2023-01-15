@@ -220,9 +220,10 @@ class BonStrip {
 
         <div id="add-items">
         <br>
-        <i id="show-items-list" class="fa fa-plus-square" style="font-size:20px; color:${this.foreground};display:none" title="Tilføj menu!"></i>        
-        <i id="show-mails" class="fa fa-envelope" style="font-size:20px; color:${this.foreground};display:none" title="Send mail til kunden!"></i>        
-        <i id="notify-kitchen" class="fa fa-paper-plane" style="font-size:20px; color:${this.foreground};display:none" title="Send en besked til køkkenet!"></i>
+        <i id="show-items-list" class="fa fa-plus-square" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Tilføj menu!"></i>        
+        <i id="show-mails" class="fa fa-envelope" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Send mail til kunden!"></i>        
+        <i id="notify-kitchen" class="fa fa-paper-plane" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Send en besked til køkkenet!";margin-right: 10px;></i>
+        <i id="ingredients-info" class="fa fa-info-circle" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="ingredienser!"></i>        
         <div id="items-list" style="display:none"></div>
         <div id="mail-list" style="display:none"></div>
         </div>
@@ -289,6 +290,16 @@ class BonStrip {
 
         }
         this.isEditable=isEditable;
+
+        this.myIngredientList=new IngredientList();
+
+        this.myDiv.querySelector("#ingredients-info").style.display="";
+        this.myDiv.querySelector("#ingredients-info").onclick=() => {
+            this.myIngredientList.show(this.getOrders());
+        }
+
+
+
 
         this.myRepo = new BonRepository();
 
@@ -602,6 +613,8 @@ class BonStrip {
         this.setPaxAndKitchenSelects(bon);
         this.setDeliveryDate(bon.delivery_date);
         this.setKitchenInfo(bon.kitchen_info);
+        this.setPaymentType(bon.payment_type);
+        
         this.status=bon.status;
 
         if(orders) {
@@ -748,7 +761,11 @@ class BonStrip {
         this.myDiv.querySelector("#orders").querySelectorAll("#total-cost").forEach(e=>{
             e.style.display="none";
         })
-        this.myDiv.querySelector("#total-sum-row").style.display="none";
+
+
+        if(this.getPaymentType()!="Kontant") {
+            this.myDiv.querySelector("#total-sum-row").style.display="none";
+        }
     }
 
     getOrders() {
@@ -780,6 +797,10 @@ class BonStrip {
             totCostPrice:totCostPrice.toFixed(2)
         }
 
+    }
+
+    getPaymentType() {
+        return this.myDiv.querySelector("#payment-type").innerHTML; 
     }
 
     updateTotalSum() {
@@ -850,8 +871,10 @@ class BonStrip {
             this.myDiv.querySelector("#kitchen-field").style.display="none";
 
         }
+    }
 
-
+    setPaymentType(pType) {
+        this.myDiv.querySelector("#payment-type").innerHTML=pType;
     }
 
     setPaxAndKitchenSelects(bon) {

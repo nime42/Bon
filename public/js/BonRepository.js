@@ -273,6 +273,21 @@ class BonRepository {
           });
     }
 
+    getGrocyProductsForOrders(orders,callback) {
+        let url="/api/getGrocyProductsForOrders/";
 
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(orders),
+            success: function(data,status,xhr) {callback(true,data);},
+            error:function(data,status,xhr) {callback(false,data,status,xhr)},            
+            dataType: "json",
+            contentType: "application/json"
+          });
+
+
+
+    }
 
 }
