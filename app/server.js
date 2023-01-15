@@ -17,6 +17,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 var config=require('../resources/config.js');
 
+
 if(config.app.https) {
     var privateKey  = fs.readFileSync(config.certs.privateKey, 'utf8');
     var certificate = fs.readFileSync(config.certs.certificate, 'utf8');
@@ -53,7 +54,7 @@ var DBClass=require('./DBClass.js');
 var DB=new DBClass('./resources/bon.db');
 
 var GrocyFunctionsClass=require('./GrocyFunctionsClass.js');
-grocy=new GrocyFunctionsClass(config);
+var grocy=new GrocyFunctionsClass(config);
 
 var mailSender=require("./mailSender.js");
 mailSender.init(config.mail);
@@ -106,6 +107,14 @@ app.use((req,res,next)=>{
         next();
     }
 })
+
+
+var vismaConfig=require('../resources/vismaConfig.js');
+var VismaFunctions=require("./VismaFunctions.js");
+var Visma=new VismaFunctions(vismaConfig,DB);
+//Visma.createInvoiceDraft(1022);
+//Visma.getCustomer("lasc@kea.dk","KEA");
+
 
 
 app.get("/shutdown",(req,res) => {
@@ -208,7 +217,11 @@ app.get("/api/bonSummaryFile",(req,res) => {
         worksheet.cell(row, col++).string("#"+config.bonPrefix+"-"+b.id);
         worksheet.cell(row, col++).date(new Date(b.delivery_date));
         worksheet.cell(row, col++).string(b.status);
-        worksheet.cell(row, col++).number(b.nr_of_servings?b.nr_of_servings:0);
+        if(!isNaN(b.nr_of_servings)) {
+            worksheet.cell(row, col++).number(b.nr_of_servings?b.nr_of_servings:0);
+        } else {
+            worksheet.cell(row, col++).string(b.nr_of_servings?b.nr_of_servings:"0");
+        }
         worksheet.cell(row, col++).string(b.kitchen_selects?"Ja":"Nej");
         worksheet.cell(row, col++).string(b.customer_collects?"Afhentes":b.delivery_adr);
         worksheet.cell(row, col++).string(b.name);
@@ -427,6 +440,7 @@ app.get("/api/updateDB", (req, res) => {
         res.sendStatus(401);
         return;        
     }
+    grocy.clearCache();
     grocy.getAllRecipes((status, data) => {
         if (status) {
             DB.updateItems(data, function (status2, err) {
@@ -807,3 +821,32 @@ app.get("/api/getNotifiedBon",(req,res) =>{
 
 
 })
+
+app.post("/api/getGrocyProductsForOrders", (req, res) => {
+  if (!loginHandler.isLoggedIn) {
+    res.sendStatus(401);
+    return;
+  }
+  if (req.body.orders) {
+    let orders = req.body.orders;
+    DB.complementWithGrocyIds(orders, (status, orders) => {
+      if (status) {
+        grocy.complementOrdersWithProducts(orders, () => {
+          orders.forEach((o) => {
+            console.log(o);
+          });
+          res.json(orders);
+        });
+      } else {
+        console.log("getGrocyProducts, something went wrong", orders);
+        res.sendStatus(500);
+      }
+    });
+  }
+});
+
+app.post("/api/createInvoiceDraft", (req, res) => {});
+
+  
+
+
