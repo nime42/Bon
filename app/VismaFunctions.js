@@ -7,6 +7,12 @@ module.exports = class VismaFunctions {
     }
 
     getCustomer(email,companyName,callback=console.log) {
+        if(!this.config) {
+            let msg="vismaConfig is missing";
+            console.log(msg);
+            callback(false,msg);
+            return;
+        }
 
         let headers = {
             "Content-Type":"application/json",
@@ -34,15 +40,16 @@ module.exports = class VismaFunctions {
 
     }
 
-    populateInvoiceObject(bon) {
-        let invoiceObject  = JSON.parse(JSON.stringify(this.createInvoiceObject));
-        invoiceObject.currency=this.currency;
-        invoiceObject.paymentTerms.paymentTermsNumber=this.paymentTermsNumber;
-        invoiceObject.layout.layoutNumber=this.layoutNumber;
 
-    }
 
     createInvoiceDraft(bonId, callback=console.log) {
+
+        if(!this.config) {
+            let msg="vismaConfig is missing";
+            console.log(msg);
+            callback(false,msg);
+            return;
+        }
         
         let [bon]=this.db.getBonSummary(bonId);
         let orders=this.db.getOrders(bonId);
@@ -95,16 +102,5 @@ module.exports = class VismaFunctions {
             callback(status,customerInfo);
         });
 
-
- 
-        return;
-        this.getCustomer(bon.email,bon.companyName,(status,customerInfo)=>{
-            if(status) {
-                let invoiceObject=this.populateInvoiceObject(bon);
-                invoiceObject.customer.customerNumber=customerInfo.customerNumber;
-                invoiceObject.currency=customerInfo.currency?customerInfo.currency:invoiceObject.currency;
-
-            }
-        })
-    }
+   }
 }

@@ -108,12 +108,17 @@ app.use((req,res,next)=>{
     }
 })
 
-
-var vismaConfig=require('../resources/vismaConfig.js');
+var vismaConfig=null;
+try {
+    vismaConfig=require('../resources/vismaConfig.js');
+} catch(error) {
+    console.log("VismaConfig.js is missing")
+}
 var VismaFunctions=require("./VismaFunctions.js");
 var Visma=new VismaFunctions(vismaConfig,DB);
 //Visma.createInvoiceDraft(1022);
 //Visma.getCustomer("lasc@kea.dk","KEA");
+
 
 
 
