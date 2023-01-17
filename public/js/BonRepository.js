@@ -274,7 +274,7 @@ class BonRepository {
     }
 
     getGrocyProductsForOrders(orders,callback) {
-        let url="/api/getGrocyProductsForOrders/";
+        let url="api/getGrocyProductsForOrders/";
 
         $.ajax({
             type: "POST",
