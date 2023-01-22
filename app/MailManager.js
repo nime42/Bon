@@ -240,21 +240,22 @@ function getIncomingOrders(subjectContains,callback) {
 function buildBon(entries) {
   let bon=bonUtils.getEmptyBon();
   bon.status="new";
-  bon.customer.forename=getFromEntry(entries,"forename");
-  bon.customer.surname=getFromEntry(entries,"surname");
-  bon.customer.email=getFromEntry(entries,"email");
-  bon.customer.phone_nr=getFromEntry(entries,"phone_nr");
-  bon.customer.company.name=getFromEntry(entries,"company_name");
-  bon.customer.company.ean_nr=getFromEntry(entries,"ean_nr");
-  bon.nr_of_servings=getFromEntry(entries,"nr_of_servings");
+  bon.customer.forename=entries["forename"];
+  bon.customer.surname=entries["surname"];
+  bon.customer.email=entries["email"];
+  bon.customer.phone_nr=entries["phone_nr"];
+  bon.customer.company.name=entries["company_name"];
+  bon.customer.company.ean_nr=entries["ean_nr"];
+  bon.nr_of_servings=entries["nr_of_servings"];
   bon.kitchen_selects=1;
   bon.price_category="Catering";
   bon.delivery_date=parseDeliveryDate(entries);
-  bon.delivery_address.street_name2=getFromEntry(entries,"delivery_address");
-  bon.delivery_address.zip_code=getFromEntry(entries,"delivery_zipcode");
+  bon.delivery_address.street_name2=entries["delivery_address"];
+  bon.delivery_address.zip_code=entries["delivery_zipcode"];
+  bon.customer_info=entries["customer_info"];
 
   if(bon.delivery_date===undefined) {
-    bon.customer_info="BEMÆRK, dato kunne ikke læses. Tjek email.";
+    bon.kitchen_info="BEMÆRK, dato kunne ikke læses. Tjek email.";
   }
   return bon;
 }
@@ -266,8 +267,8 @@ function buildBon(entries) {
 
 
 function parseDeliveryDate(entries) {
-  let date=getFromEntry(entries,"delivery_date");
-  let time=getFromEntry(entries,"delivery_time");
+  let date=entries["delivery_date"];
+  let time=entries["delivery_time"];
   let dateValue=undefined;
   if(date && date.match(/.* \d{1,2},\d{2,4}/)) {
     dateValue=new Date(date)+1; //need to add one day if date is on format "Month day, Year" 
@@ -304,11 +305,13 @@ function getFromEntry(entries,attr) {
 
 function parseIncomingMessage(mess,entries) {
   let res={}
+  mess=mess.replace(/CONTACT\n.*/,""); //Not sure about this.
   Object.keys(entries).forEach(k=>{
     let regExp=new RegExp(`(?<attr>${entries[k]}):\\n(?<value>[\\s\\S]*?)(?<end>(.*?:\\n|$))`);
     let m=mess.match(regExp);
     if(m) {
       res[k]=m.groups["value"];
+      res[k]=res[k].replaceAll("<br/>","");
     } else {
       res[k]=undefined;
     }
