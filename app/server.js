@@ -17,6 +17,9 @@ process.on('unhandledRejection', (reason, promise) => {
 
 var config=require('../resources/config.js');
 
+var grocyFunctions=require("./GrocyFunctions.js");
+let grocyFuncs=new grocyFunctions(config);
+
 
 if(config.app.https) {
     var privateKey  = fs.readFileSync(config.certs.privateKey, 'utf8');
@@ -332,14 +335,8 @@ app.get("/api/customers",(req,res) => {
 })
 
 app.get("/api/getGrocyRecipes",(req,res) => {
-    grocy.getAllRecipes(function(status,recipes){
-        if(status) { 
+    grocyFuncs.getAllRecipes(function(recipes){
             res.json(recipes); 
-        } else {
-            console.log("grocyRecipes",recipes);
-            res.sendStatus(500);  
-
-        }
     })   
 })
 
@@ -445,23 +442,20 @@ app.get("/api/updateDB", (req, res) => {
         res.sendStatus(401);
         return;        
     }
-    grocy.clearCache();
-    grocy.getAllRecipes((status, data) => {
-        if (status) {
-            DB.updateItems(data, function (status2, err) {
-                if (status2) {
+    grocyFuncs.updateCache(()=>{
+        grocyFuncs.getAllRecipes(recipies=>{
+            DB.updateItems(recipies, function (status, err) {
+                if (status) {
                     res.sendStatus(200);
                 } else {
                     console.log("updateDB updateItems", err);
                     res.sendStatus(500);
                 }
             });
-        } else {
-            console.log("updateDB getAllRecepies", data);
-            res.sendStatus(500);
+        })
 
-        }
-    });
+    })
+
 });
 
 app.get("/api/searchBons",(req,res) => {
@@ -836,12 +830,11 @@ app.post("/api/getGrocyProductsForOrders", (req, res) => {
     let orders = req.body.orders;
     DB.complementWithGrocyIds(orders, (status, orders) => {
       if (status) {
-        grocy.complementOrdersWithProducts(orders, () => {
-          orders.forEach((o) => {
-            console.log(o);
-          });
-          res.json(orders);
-        });
+        orders.forEach(o=>{
+            o.ingredients=grocyFuncs.getIngredients(o.external_id);
+        })
+        res.json(orders);
+
       } else {
         console.log("getGrocyProducts, something went wrong", orders);
         res.sendStatus(500);

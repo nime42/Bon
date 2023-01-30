@@ -118,6 +118,12 @@ static replaceAllFromValues(text, values) {
     return text;
   }
 
+
+  static isNumeric(num){
+    return !isNaN(num)
+  }
+
+
 }
 
 
