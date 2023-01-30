@@ -20,9 +20,9 @@ module.exports = class GrocyFunctions {
         recipy.ingredients?.forEach(i=>{
             res.products.push({
               name:i.name,
-              stock_amount:i.stock_amount,
+              stock_amount:i.stock_amount/(recipy.base_servings*1.0),
               stock_unit:{name:i.qu_id_stock.name,name_plural:i.qu_id_stock.name_plural},
-              purchase_amount:i.purchase_amount,
+              purchase_amount:i.purchase_amount/(recipy.base_servings*1.0),
               variable_amount:i.variable_amount,
               purchase_unit:{name:i.qu_id_purchase.name,name_plural:i.qu_id_purchase.name_plural}
             });
@@ -205,6 +205,7 @@ module.exports = class GrocyFunctions {
                 sellableZettle: recipe.userfields ? recipe.userfields.sellableZettle : "",
                 external_id: recipe.id,
                 salesPrices: salesPrices,
+                base_servings:recipe.base_servings
             };
     }
 
