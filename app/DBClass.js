@@ -29,7 +29,7 @@ module.exports = class DB {
          left join customers c on b.customer_id =c.id
          left join companies co on c.company_id =co.id
          left join addresses co_a on co_a.id=co.address_id
-          where strftime('%Y-%m',b.delivery_date) like ? 
+          where strftime('%Y-%m',datetime(b.delivery_date,'localtime')) like ? 
         `;
 
         try {
