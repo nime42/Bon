@@ -295,7 +295,7 @@ class BonStrip {
 
         this.myDiv.querySelector("#ingredients-info").style.display="";
         this.myDiv.querySelector("#ingredients-info").onclick=() => {
-            this.myIngredientList.show(this.getOrders());
+            this.myIngredientList.show(this.bonId,this.getOrders());
         }
 
 

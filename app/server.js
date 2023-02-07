@@ -56,8 +56,6 @@ if(config.app.https) {
 var DBClass=require('./DBClass.js');
 var DB=new DBClass('./resources/bon.db');
 
-var GrocyFunctionsClass=require('./GrocyFunctionsClass.js');
-var grocy=new GrocyFunctionsClass(config);
 
 var mailSender=require("./mailSender.js");
 mailSender.init(config.mail);
@@ -95,7 +93,7 @@ var iZettleFunctions=require("./IzettleFunctionsClass.js");
 const dbFunctions = require('./LoginHandler/dbFunctions.js');
 
 
-var IZettleHandler=new iZettleFunctions(config,DB,grocy);
+var IZettleHandler=new iZettleFunctions(config,DB,grocyFuncs);
 
 if(config.iZettle?.check_frequence) {
     IZettleHandler.checkPurchases(config.iZettle.check_frequence)
@@ -118,6 +116,7 @@ try {
     console.log("VismaConfig.js is missing")
 }
 var VismaFunctions=require("./VismaFunctions.js");
+const { otherBons } = require('../resources/config.js');
 var Visma=new VismaFunctions(vismaConfig,DB);
 //Visma.createInvoiceDraft(1022);
 //Visma.getCustomer("lasc@kea.dk","KEA");
@@ -309,8 +308,7 @@ app.delete("/api/bons/:id",(req,res) => {
 app.put("/api/consumeBon/:id",(req,res) => {
     DB.getOrders(req.params.id,function(status,items){
         items.forEach(i => {
-            grocy.consumeItem(i.quantity,i.external_id);
-            
+            grocyFuncs.consumeRecipy(i.quantity,i.external_id); 
         });
     });  
 
@@ -671,6 +669,9 @@ app.get("/api/checkStock",(req,res)=>{
         return;        
     }
 
+    //Don't do this now
+    res.json([]);
+    return;
 
     allBonInstances.checkStock((status,bons) =>{
         if(status) {
@@ -821,24 +822,24 @@ app.get("/api/getNotifiedBon",(req,res) =>{
 
 })
 
+
+
+
 app.post("/api/getGrocyProductsForOrders", (req, res) => {
   if (!loginHandler.isLoggedIn) {
     res.sendStatus(401);
     return;
   }
   if (req.body.orders) {
+    let bonId=req.body.bonId;
     let orders = req.body.orders;
-    DB.complementWithGrocyIds(orders, (status, orders) => {
-      if (status) {
-        orders.forEach(o=>{
-            o.ingredients=grocyFuncs.getIngredients(o.external_id);
-        })
-        res.json(orders);
-
-      } else {
-        console.log("getGrocyProducts, something went wrong", orders);
-        res.sendStatus(500);
-      }
+    allBonInstances.getGrocyProductsForOrders(bonId,orders,(status,orders)=>{
+        if(status) {
+            res.json(orders);
+        } else {
+            console.log("getGrocyProductsForOrders, something went wrong", orders);
+            res.sendStatus(500);
+        }
     });
   }
 });

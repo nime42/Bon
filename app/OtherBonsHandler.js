@@ -4,10 +4,11 @@ module.exports = class OtherBonsHandler {
 
     constructor(config,localDb) {
         this.local=localDb;
+        this.defaultBonPrefix=config.bonPrefix;
         var path = require('path');
         var DBClass=require('./DBClass.js');
-        var GrocyFunctionsClass=require('./GrocyFunctionsClass.js');
-        let grocy=new GrocyFunctionsClass(config);
+        var GrocyFunctions=require('./GrocyFunctions.js');
+        let grocy=new GrocyFunctions(config);
         this.bonInstances={};
         this.bonInstances[config.bonPrefix]={
             db:localDb,
@@ -19,7 +20,7 @@ module.exports = class OtherBonsHandler {
             //console.log(conf);
             let dbFile=path.dirname(f)+"/bon.db";
             let db=new DBClass(dbFile);
-            let grocy=new GrocyFunctionsClass(conf);
+            let grocy=new GrocyFunctions(conf);
             this.bonInstances[conf.bonPrefix]={
                 db:db,
                 config:conf,
@@ -119,5 +120,32 @@ module.exports = class OtherBonsHandler {
         }
     }
 
+    getGrocyProductsForOrders(bonId, orders, callback) {
+        bonId = bonId + "";
+        let prefix = this.defaultBonPrefix;
+        let parts = bonId.split("-");
+        if (parts.length === 2) {
+            bonId = parts[1];
+            prefix = parts[0];
+        }
+        let bonInstance = this.bonInstances[prefix];
+
+        bonInstance.db.complementWithGrocyIds(orders, (status, orders) => {
+            if (status) {
+                bonInstance.grocy.getCurrentStock((status, stock) => {
+                    orders.forEach(o => {
+                        bonInstance.grocy.addStockInfo(o.external_id, stock);
+                        o.numberInStock = bonInstance.grocy.calculateNumberInStock(o.external_id);
+                        o.ingredients = bonInstance.grocy.getIngredients(o.external_id);
+                    })
+                    callback(true, orders);
+                })
+
+            } else {
+                callback(false, orders)
+            }
+        });
+
+    }
 
 }

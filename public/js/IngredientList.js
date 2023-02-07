@@ -33,9 +33,9 @@ class IngredientList {
     this.myRepo = new BonRepository();
   }
 
-  show(orders) {
+  show(bonId,orders) {
     let p = MessageBox.popup("Henter Ingredienser...");
-    this.myRepo.getGrocyProductsForOrders(
+    this.myRepo.getGrocyProductsForOrders(bonId,
       orders,
       (status, ordersWithProducts) => {
         if (status) {
@@ -67,7 +67,9 @@ class IngredientList {
             stock_amount:0,
             purchase_unit:p.purchase_unit,
             stock_unit:p.stock_unit,
-            variable_amount:""
+            variable_amount:"",
+            in_stock:Number(p.in_stock)
+            
           }
         }
         unique[p.name].purchase_amount+=i.quantity*p.purchase_amount;
@@ -83,7 +85,9 @@ class IngredientList {
               purchase_amount: 0,
               stock_amount: 0,
               purchase_unit: n.purchase_unit,
-              stock_unit: n.stock_unit
+              stock_unit: n.stock_unit,
+              in_stock:Number(n.numberInStock)
+
             }
           }
           unique[name].purchase_amount += i.quantity * n.servings;
@@ -98,8 +102,12 @@ class IngredientList {
     uniqueProducts.forEach(e=>{
       e.purchase_amount=parseFloat(e.purchase_amount.toFixed(3));
       e.stock_amount=parseFloat(e.stock_amount.toFixed(3));
+      e.in_stock=parseFloat(e.in_stock.toFixed(3));
+      e.in_stock_unit=e.in_stock<=1?e.stock_unit.name:e.stock_unit.name_plural;
       e.purchase_unit=e.purchase_amount<=1?e.purchase_unit.name:e.purchase_unit.name_plural;
       e.stock_unit=e.stock_amount<=1?e.stock_unit.name:e.stock_unit.name_plural;
+      
+
     })
 
 
@@ -176,11 +184,17 @@ class IngredientList {
       }
     }
 
+    let background="";
+    if(product.in_stock<product.stock_amount) {
+      background="red"
+    }
 
     let cols = `
         <td style="padding:5px; font-style: italic;">${product.name}</td>
         <td style="padding:5px;font-style: italic;">${purchase_amount} (${product.stock_amount} ${product.stock_unit})</td>
-    `;
+        <td style="padding:5px;font-style: italic;background:${background}">${product.in_stock} ${product.in_stock_unit}</td>
+
+        `;
     let row = document.createElement("tr");
     row.style.cssText=`
     border: 1px solid ${Globals.foreground};

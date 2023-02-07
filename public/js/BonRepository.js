@@ -273,13 +273,13 @@ class BonRepository {
           });
     }
 
-    getGrocyProductsForOrders(orders,callback) {
+    getGrocyProductsForOrders(bonId,orders,callback) {
         let url="api/getGrocyProductsForOrders/";
 
         $.ajax({
             type: "POST",
             url: url,
-            data: JSON.stringify(orders),
+            data: JSON.stringify({bonId,...orders}),
             success: function(data,status,xhr) {callback(true,data);},
             error:function(data,status,xhr) {callback(false,data,status,xhr)},            
             dataType: "json",

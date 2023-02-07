@@ -290,7 +290,7 @@ module.exports = class IzettleFunctionsClass {
     let izettle_product=this.getProduct(p);
     if(izettle_product?.external_id!=null) {
       let totQuantity=p.quantity*izettle_product.quantity;
-      this.grocy.consumeItem(totQuantity,izettle_product.external_id);
+      this.grocy.consumeRecipy(totQuantity,izettle_product.external_id);
       setTimeout(()=>{ //grocy could be chooking if we do too many calls,wait a second before we do the next...
         this.consumePurchaseProducts(rest,callback);
       }, 1000);

@@ -3,17 +3,19 @@ const fetch = require('node-fetch');
 module.exports = class GrocyFunctions {
     constructor(config) {
         this.config = config;
-        this.updateCache();
+        this.updateCache(()=>{
+            console.log("updating Grocy cache");
+        });
     }
 
-    getRecipy(id) {
-        return this.allRecipies[id];
+    getRecipy(recipyId) {
+        return this.allRecipies[recipyId];
     }
 
 
-    getIngredients(id) {
+    getIngredients(recipyId) {
         let res={products:[],nestedRecipies:[]};
-        let recipy=this.allRecipies[id];
+        let recipy=this.allRecipies[recipyId];
         if(!recipy) {
             return res;
         }
@@ -24,7 +26,9 @@ module.exports = class GrocyFunctions {
               stock_unit:{name:i.qu_id_stock.name,name_plural:i.qu_id_stock.name_plural},
               purchase_amount:i.purchase_amount/(recipy.base_servings*1.0),
               variable_amount:i.variable_amount,
-              purchase_unit:{name:i.qu_id_purchase.name,name_plural:i.qu_id_purchase.name_plural}
+              purchase_unit:{name:i.qu_id_purchase.name,name_plural:i.qu_id_purchase.name_plural},
+              in_stock:i.in_stock,
+              in_stock_purchase_unit:i.in_stock_purchase_unit
             });
         })
         let nested_unit={name:"Portion",name_plural:"Portioner"}
@@ -34,13 +38,244 @@ module.exports = class GrocyFunctions {
                 recipy:this.getIngredients(n.recipy.external_id),
                 servings:n.servings,
                 purchase_unit:nested_unit,
-                stock_unit:nested_unit
+                stock_unit:nested_unit,
+                numberInStock:n.numberInStock
+
             });
         })
-
-        return res;
-        
+        return res;  
     }
+
+
+
+    addStockInfo(recipyId,stock) {
+        let recipy = this.allRecipies[recipyId];
+        if (!recipy) {
+            return;
+        }
+        recipy.ingredients?.forEach(i=>{
+            i.in_stock=stock[i.product_id]?stock[i.product_id].amount:0;
+            if(i.conversion) {
+                i.in_stock_purchase_unit=i.in_stock*i.conversion.factor*1.0;
+            } else {
+                i.in_stock_purchase_unit=i.in_stock;
+            }
+            
+        });
+        recipy.nested_recipies?.forEach(n=>{
+            this.addStockInfo(n.recipy.external_id,stock)
+        })
+    }
+
+
+    calculateNumberInStock(recipyId) {
+        let recipy=this.allRecipies[recipyId];
+        if(!recipy) {
+            return undefined;
+        }
+        let minAmount=Number.MAX_VALUE;
+        let products=this.getAllProductsForRecipy(recipyId);
+        products.forEach(p=>{
+            let amountInStock=(p.in_stock!=undefined?p.in_stock:0)/p.stock_amount;
+            amountInStock=amountInStock/recipy.base_servings;
+            if(amountInStock<minAmount) {
+                minAmount=amountInStock;
+            }
+        })
+
+        recipy?.nested_recipies?.forEach(r=>{
+            r.numberInStock=this.calculateNumberInStock(r.recipy_id);
+        })
+        recipy.numberInStock=Math.trunc(minAmount);
+        return recipy.numberInStock;
+
+    }
+
+
+  /**
+   * Get amount of all products in stock
+   * @param {function} callback - function(status,products)
+   *                          @param status {boolean} true if the call to grocy succeed.
+   *                          @param products {{product_id:{name,amount}}} Object with product_id as keys and name and amount as value
+   */
+    getCurrentStock(callback = console.log) {
+        let stock = {};
+        let httpReq = this.config.grocy.url + "/api/stock?GROCY-API-KEY=" + this.config.grocy.apiKey;
+        fetch(httpReq)
+            .then((res) => res.json())
+            .then((products) => {
+                products.forEach((p) => {
+                    stock[p.product_id] = {
+                        product_id: p.product_id,
+                        name: p.product.name,
+                        amount: p.amount_aggregated,
+                    }      
+                })
+                callback(true, stock);
+            })
+            .catch((err) => {
+                callback(false, err);
+            });
+
+    }
+
+
+
+
+
+
+    consumeRecipy(amount,recipyId) {
+        let products=this.getAllProductsForRecipy(recipyId);
+        console.log(products);
+        products.forEach(p=>{
+            let amount_to_consume=amount*p.stock_amount;
+            this.consumeProduct(p.product_id,amount_to_consume,(status,consumed_amount)=>{
+                
+                if(status) {
+                    if(consumed_amount<amount_to_consume) {
+                        this.addToShoppingList(p.productId,(status)=>{
+                            if(status) {
+                                console.log(`adding ${p.name} to shoppinglist`);
+                            } else {
+                                console.log(`failed to add ${p.name} to shoppinglist`);
+                            }
+                        })
+                    }
+                } else {
+                    console.log(`failed to consume ${p.name}`);
+                }
+            })
+
+        })
+
+    }
+
+
+
+    getAllProductsForRecipy(recipyId) {
+        let recipy=this.allRecipies[recipyId];
+        if(!recipy) {
+            return [];
+        }
+
+        let unique={};
+        recipy.ingredients?.forEach(i=>{
+            if(!unique[i.name]) {
+                unique[i.name]={
+                    product_id:i.product_id,
+                    name:i.name,
+                    stock_amount:0.0,
+                    stock_unit:i.qu_id_stock,
+                    in_stock:i.in_stock
+                }
+            }
+            unique[i.name].stock_amount+=i.stock_amount/(recipy.base_servings*1.0);
+        })
+        recipy.nested_recipies?.forEach(n=>{
+            let products=this.getAllProductsForRecipy(n.recipy.external_id);
+            products.forEach(p=>{
+                if(!unique[p.name]) {
+                    unique[p.name]={
+                        product_id:p.product_id,
+                        name:p.name,
+                        stock_amount:0.0,
+                        stock_unit:p.stock_unit,
+                        in_stock:p.in_stock
+                    }
+                }
+                unique[p.name].stock_amount+=p.stock_amount*n.servings; 
+                
+
+
+            })
+        });
+
+        return Object.values(unique);
+
+    }
+
+
+
+  /**
+   * Withdraw an amount of a product from grocy
+   *
+   * @param {*} productId the grocy product-id
+   * @param {*} quantityAmount total amount of the product
+   * @param {*} callback fun(status,consumed_amount)
+   *                          status - true if call succeeded
+   *                          consumed_amount - total amount consumed from grocy.
+   */
+
+  consumeProduct(productId, quantityAmount, callback = console.log) {
+    let httpReq =this.config.grocy.url +"/api/stock/products/" +productId +"?GROCY-API-KEY=" +this.config.grocy.apiKey;
+    fetch(httpReq)
+      .then((res) => res.json())
+      .then(
+        (json) => {
+          let stock_amount = json.stock_amount;
+          let consumed_amount =
+            quantityAmount < stock_amount ? quantityAmount : stock_amount;
+          httpReq =this.config.grocy.url +"/api/stock/products/" +productId +"/consume" +"?GROCY-API-KEY=" +this.config.grocy.apiKey;
+          let body = {
+            amount: consumed_amount,
+            transaction_type: "consume",
+            spoiled: false,
+          };
+
+          fetch(httpReq, {
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            method: "POST",
+            body: JSON.stringify(body),
+          })
+            .then(function (res) {
+              callback(true, consumed_amount);
+            })
+            .catch(function (res) {
+              callback(false, 0);
+            });
+        },
+        (err) => {
+          console.log("failed", err);
+          callback(false, err);
+        }
+      );
+  }
+
+
+  /**
+   * Add a product to shopping list in Grocy
+   * @param {*} productId
+   * @param {*} callback
+   */
+  addToShoppingList(productId, callback = console.log) {
+    let httpReq =this.config.grocy.url +"/api/stock/shoppinglist/add-product" +"?GROCY-API-KEY=" +this.config.grocy.apiKey;
+    let body = {
+      product_id: productId,
+      list_id: 1,
+      product_amount: 1,
+      note: "Uppdateret från Bon",
+    };
+
+    fetch(httpReq, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(body),
+    })
+      .then(function (res) {
+        callback(true);
+      })
+      .catch(function (res) {
+        callback(false, res);
+      });
+  }
+
+
 
 
     getAllRecipes(callback) {
@@ -103,7 +338,7 @@ module.exports = class GrocyFunctions {
                 if(!recipy.nested_recipies) {
                     recipy.nested_recipies=[];
                 }
-                recipy.nested_recipies.push({recipy:recipes[n.includes_recipe_id],servings:n.servings});
+                recipy.nested_recipies.push({recipy:recipes[n.includes_recipe_id],servings:n.servings,recipy_id:n.includes_recipe_id});
             })
 
             if(callback!=null) {
@@ -170,6 +405,7 @@ module.exports = class GrocyFunctions {
         }
         let res={
             name:p.name,
+            product_id:p.id,
             stock_amount:recipy_pos.amount,
             qu_id_stock:quantityUnitLookUp[p.qu_id_stock],
             qu_id_purchase:quantityUnitLookUp[recipy_pos.qu_id],
