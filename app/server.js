@@ -17,8 +17,6 @@ process.on('unhandledRejection', (reason, promise) => {
 
 var config=require('../resources/config.js');
 
-var grocyFunctions=require("./GrocyFunctions.js");
-let grocyFuncs=new grocyFunctions(config);
 
 
 if(config.app.https) {
@@ -62,8 +60,12 @@ mailSender.init(config.mail);
 
 var mailManager=require("./MailManager");
 
+
+var grocyFunctions=require("./GrocyFunctions.js");
+let grocyFuncs=new grocyFunctions(config);
+
 var OtherBonsHandler=require('./OtherBonsHandler.js');
-var allBonInstances=new OtherBonsHandler(config,DB);
+var allBonInstances=new OtherBonsHandler(config,DB,grocyFuncs);
 
 var loginHandler=require("./LoginHandler/loginHandler");
 
@@ -90,7 +92,6 @@ var accessLogStream = rfs.createStream('access.log', {
 
 
 var iZettleFunctions=require("./IzettleFunctionsClass.js");
-const dbFunctions = require('./LoginHandler/dbFunctions.js');
 
 
 var IZettleHandler=new iZettleFunctions(config,DB,grocyFuncs);

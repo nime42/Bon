@@ -2,13 +2,12 @@ const { callbackify } = require('util');
 
 module.exports = class OtherBonsHandler {
 
-    constructor(config,localDb) {
+    constructor(config,localDb,grocy) {
         this.local=localDb;
         this.defaultBonPrefix=config.bonPrefix;
         var path = require('path');
         var DBClass=require('./DBClass.js');
         var GrocyFunctions=require('./GrocyFunctions.js');
-        let grocy=new GrocyFunctions(config);
         this.bonInstances={};
         this.bonInstances[config.bonPrefix]={
             db:localDb,

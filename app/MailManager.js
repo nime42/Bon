@@ -216,11 +216,11 @@ let incomingMailHelper= {
     delivery_time:"Tidspunkt for levering",
     delivery_address:"Leveringsadresse",
     delivery_zipcode:"Postnummer",
-    nr_of_servings:"Antal Personer",
+    nr_of_servings:"Antal",
     kitchen_selects:"Ristet Rug vælger",
     company_name:"Firmanavn",
     ean_nr:"EAN/faktura info",
-    customer_info:"Øvrig kommentarer"
+    customer_info:"Dine ønsker"
   }
 }
 
@@ -250,9 +250,19 @@ function buildBon(entries) {
   bon.kitchen_selects=1;
   bon.price_category="Catering";
   bon.delivery_date=parseDeliveryDate(entries);
-  bon.delivery_address.street_name2=entries["delivery_address"];
+  bon.delivery_address.street_name=entries["delivery_address"];
   bon.delivery_address.zip_code=entries["delivery_zipcode"];
   bon.customer_info=entries["customer_info"];
+
+  try {
+    //streetname and streetnumber is in the same field, try to parse them apart
+    let street_nr = bon.delivery_address.street_name.match(/\d+/);
+    if (street_nr) {
+      bon.delivery_address.street_nr = street_nr[0];
+      bon.delivery_address.street_name = bon.delivery_address.street_name.replace(bon.delivery_address.street_nr, "").trim();
+    }
+  } catch(err) {}
+  
 
   if(bon.delivery_date===undefined) {
     bon.kitchen_info="BEMÆRK, dato kunne ikke læses. Tjek email.";

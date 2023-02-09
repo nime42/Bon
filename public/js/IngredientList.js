@@ -35,6 +35,8 @@ class IngredientList {
 
   show(bonId,orders) {
     let p = MessageBox.popup("Henter Ingredienser...");
+    this.myDiv.querySelector("#expand-nested").checked = false;
+
     this.myRepo.getGrocyProductsForOrders(bonId,
       orders,
       (status, ordersWithProducts) => {
@@ -68,13 +70,23 @@ class IngredientList {
             purchase_unit:p.purchase_unit,
             stock_unit:p.stock_unit,
             variable_amount:"",
-            in_stock:Number(p.in_stock)
+            in_stock:Number(p.in_stock),
+            count_variable_amount:{
+              with_variable_amount:0,
+              without_variable_amount:0
+            }
             
           }
         }
         unique[p.name].purchase_amount+=i.quantity*p.purchase_amount;
         unique[p.name].stock_amount+=i.quantity*p.stock_amount;
         unique[p.name].variable_amount=this.handleVariableAmount(i.quantity,unique[p.name].variable_amount,p.variable_amount);
+        //Count how often there is a variable_amount value or not (see function createRow below)
+        if(p.variable_amount!="") {
+          unique[p.name].count_variable_amount.with_variable_amount++;
+        } else {
+          unique[p.name].count_variable_amount.without_variable_amount++;
+        } 
       })
       if (!expandNested) {
         i.ingredients.nestedRecipies.forEach(n => {
@@ -173,6 +185,13 @@ class IngredientList {
 
 
   createRow(product) {
+
+    if(product.count_variable_amount && product.count_variable_amount.with_variable_amount>0 && product.count_variable_amount.without_variable_amount>0) {
+      //If the same product have had both variable_amount and not. We can't count with the variable_amount
+      //since it is missing from some of the products
+      product.variable_amount=undefined;
+    }
+
     let purchase_amount=`${product.purchase_amount} ${product.purchase_unit}`;
     if(product.variable_amount!=undefined && product.variable_amount!="") {
       if(Helper.isNumeric(product.variable_amount)) {

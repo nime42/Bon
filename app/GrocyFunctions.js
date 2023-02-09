@@ -376,8 +376,8 @@ module.exports = class GrocyFunctions {
 
     getGrocyObjects(objectName, callback) {
 
-        let httpReq = `${this.config.grocy.url}/api/objects/${objectName}?GROCY-API-KEY=${this.config.grocy.apiKey}`;
-        fetch(httpReq)
+        let httpReq = `${this.config.grocy.url}/api/objects/${objectName}?GROCY-API-KEY=${this.config.grocy.apiKey}&dummy=${Date.now()}`;
+        fetch(httpReq, {cache: 'no-store'})
             .then((res) => res.json())
             .then(
                 (json) => {
