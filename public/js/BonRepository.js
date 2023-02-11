@@ -40,7 +40,14 @@ class BonRepository {
         if(id) {
             url+="/"+id;
         }
-        $.get(url,callback);
+
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function(data,status,xhr) {callback(data);},
+            contentType: "application/json",
+            cache: false
+          });
     }
 
     getCustomers(email,callback) {

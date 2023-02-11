@@ -117,17 +117,10 @@ CREATE TABLE bons (
 	nr_of_servings INTEGER,
 	customer_info TEXT,
 	service_type TEXT,
-	payment_type TEXT, kitchen_info TEXT, price_category TEXT, kitchen_selects INTEGER DEFAULT 0 NOT NULL, customer_collects INTEGER DEFAULT 0, 
+	payment_type TEXT, kitchen_info TEXT, price_category TEXT, kitchen_selects INTEGER DEFAULT 0 NOT NULL, customer_collects INTEGER DEFAULT 0, invoice_info TEXT, invoice_date DATETIME, 
 	CONSTRAINT FK_bons_customers FOREIGN KEY (customer_id) REFERENCES customers(id),
 	CONSTRAINT FK_customers_addresses FOREIGN KEY (delivery_address_id) REFERENCES Addresses(id) ON DELETE set null
 );
-
-
-CREATE TRIGGER clear_notification UPDATE OF status ON bons 
-  BEGIN
-	  delete from notified_bons where bon_id=new.id and new.status in ('invoiced','closed');
-  END;
-
 
 
 -- izettle_purchases definition
@@ -155,8 +148,6 @@ CREATE TABLE notified_bons (
 	REFERENCES "bons" (id) ON DELETE CASCADE
 					ON UPDATE NO ACTION	
 );
-
-
 
 
 -- orders definition

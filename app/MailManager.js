@@ -219,7 +219,7 @@ let incomingMailHelper= {
     nr_of_servings:"Antal",
     kitchen_selects:"Ristet Rug vælger",
     company_name:"Firmanavn",
-    ean_nr:"EAN/faktura info",
+    invoice_info:"EAN/faktura info",
     customer_info:"Dine ønsker"
   }
 }
@@ -245,7 +245,6 @@ function buildBon(entries) {
   bon.customer.email=entries["email"];
   bon.customer.phone_nr=entries["phone_nr"];
   bon.customer.company.name=entries["company_name"];
-  bon.customer.company.ean_nr=entries["ean_nr"];
   bon.nr_of_servings=entries["nr_of_servings"];
   bon.kitchen_selects=1;
   bon.price_category="Catering";
@@ -253,13 +252,19 @@ function buildBon(entries) {
   bon.delivery_address.street_name=entries["delivery_address"];
   bon.delivery_address.zip_code=entries["delivery_zipcode"];
   bon.customer_info=entries["customer_info"];
-
+  bon.invoice_info=entries["invoice_info"];
   try {
     //streetname and streetnumber is in the same field, try to parse them apart
     let street_nr = bon.delivery_address.street_name.match(/\d+/);
     if (street_nr) {
       bon.delivery_address.street_nr = street_nr[0];
       bon.delivery_address.street_name = bon.delivery_address.street_name.replace(bon.delivery_address.street_nr, "").trim();
+    }
+  } catch(err) {}
+  try {
+    let ean_nr = bon.invoice_info.match(/\d{13}/);
+    if(ean_nr) {
+      bon.customer.company.ean_nr=ean_nr[0];
     }
   } catch(err) {}
   

@@ -724,6 +724,7 @@ class BonConfig {
         <th>Priskategorie</th>
         <th>Købspris</th>
         <th>Pris</th>
+        <th>Fakturadato</th>
         </tr>
         `;
         let headerRow=document.createElement("thead");
@@ -747,7 +748,7 @@ class BonConfig {
         
         return `
         <td><a href="javascript:void(0);"  onclick="Globals.myConfig.showBonForm(${b.id},this.parentNode.parentNode);">#${b.id}</a></td>
-        <td>${new Date(b.delivery_date).toLocaleDateString("sv-SE")} ${new Date(b.delivery_date).toLocaleTimeString("sv-SE",{hour: '2-digit', minute:'2-digit'})}</td>
+        <td>${Helper.formatDate(b.delivery_date)}</td>
         <td style="background-color:${Globals.Statuses[b.status].color};color:${Helper.contrastColor(Globals.Statuses[b.status].color)}">${Globals.Statuses[b.status].label}</td>
         <td>${b.nr_of_servings}</td>
         <td>${b.kitchen_selects?"Ja":"Nej"}</td>
@@ -761,6 +762,7 @@ class BonConfig {
         <td>${b.price_category}</td>
         <td>${b.cost_price?b.cost_price.toFixed(2):0}</td>
         <td>${b.price?b.price.toFixed(2):0}</td>
+        <td>${Helper.formatDate(b.invoice_date)}</td>
         `;
     }
 

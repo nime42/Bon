@@ -19,7 +19,7 @@ module.exports = class DB {
 
         let sql = `
         select 
-          b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,
+          b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.invoice_info,b.kitchen_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,
           a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,
           c.forename,c.surname,c.email,c.phone_nr,
           co.name,co.ean_nr,
@@ -80,6 +80,7 @@ module.exports = class DB {
       b.id,b.delivery_date,b.status,b.nr_of_servings,
       b.price_category,b.payment_type,
       b.kitchen_selects,b.customer_collects,
+      b.invoice_date,
       case b.customer_collects 
       when true then ''
       else trim(a.street_name2||' '||a.street_name||' '||a.street_nr||', '||a.zip_code||' '||a.city) end as delivery_adr,
@@ -99,7 +100,7 @@ module.exports = class DB {
      left join companies co on c.company_id =co.id
      left join addresses co_a on co_a.id=co.address_id
      left join orders o on b.id=o.bon_id)
-    select id,delivery_date,status ,nr_of_servings,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,sum(price) as price,sum(cost_price) as cost_price from boninfo
+    select id,delivery_date,status ,nr_of_servings,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,sum(price) as price,sum(cost_price) as cost_price,invoice_date from boninfo
     where coalesce(?,id)=id
     group by id order by id desc
     `;
@@ -135,7 +136,7 @@ module.exports = class DB {
         })
         let sql = `
       select 
-        b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.kitchen_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,
+        b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.invoice_info,b.kitchen_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,b.invoice_date,
         a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,
         c.forename,c.surname,c.email,c.phone_nr,
         co.name,co.ean_nr,
@@ -237,6 +238,8 @@ module.exports = class DB {
             let newBonId = res.lastInsertRowid;
             this.saveOrders(newBonId, bonData.orders);
 
+            this.updateInvoiceDate(newBonId,bonData.status);
+
             if (callback === null) {
                 return newBonId;
             } else {
@@ -254,6 +257,7 @@ module.exports = class DB {
     updateBon(id, bonData, callback = console.log) {
         bonData.customer_id = this.createCustomer(bonData.customer);
         bonData.delivery_address_id = this.createAddress(bonData.delivery_address);
+        this.updateInvoiceDate(id,bonData.status);
         let sql = `
       update bons set 
         status=@status, 
@@ -265,6 +269,7 @@ module.exports = class DB {
         kitchen_selects=@kitchen_selects,
         customer_collects=@customer_collects,
         customer_info=@customer_info, 
+        invoice_info=@invoice_info, 
         kitchen_info=@kitchen_info, 
         service_type=@service_type, 
         payment_type=@payment_type,
@@ -278,6 +283,19 @@ module.exports = class DB {
         } catch (err) {
             callback(false, err);
         }
+    }
+
+    updateInvoiceDate(bonId,newStatus) {
+        if(newStatus==="invoiced") {
+            let sql="select * from bons where id=?";
+            const row = this.db.prepare(sql).get(bonId);
+            if(row.status!==newStatus || row.invoice_date===null) {
+                sql="update bons set invoice_date=datetime('now') where id=?";
+                const res = this.db.prepare(sql).run(bonId);
+            }
+        }
+
+
     }
 
     getCustomers(email, callback = console.log) {

@@ -226,6 +226,14 @@ class BonForm {
                   </div>
               </div>
 
+              <h5>Faktura Info </h5>
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                      <textarea name="invoice_info" placeholder="EAN/Faktura Info" rows="2"
+                          autocomplete="nope"></textarea>
+                  </div>
+              </div>
+
 
               <h5>Køkken info</h5>
                   <div class="bon-row indent">
@@ -268,34 +276,7 @@ class BonForm {
    
     `;
 
-  itemsTab = `
-<span>
-<br>
-<div>
-<span style="margin-right: 5px;color: ${this.foreground};">Pax:</span><input type="text" id="nr_of_servings" name="nr_of_servings" placeholder="Pax" autocomplete="nope" style="vertical-align: top; margin-right:5px;width: 10%;"> 
-<select name="price_category" id="price-categories"></select>
 
-
-  <br><br>
-  <label style="color:${this.foreground}">
-  Køkkenet vælger
-  <input type="checkbox" id="kitchen_selects" name="kitchen_selects" value="1" style="margin-left: 5px;">
-  </label>
-  
-  <br>
-</div>
-<textarea name="customer_info" placeholder="Kunde ønsker" rows="2" autocomplete="nope" ></textarea>
-</span><br><br>
-
-
-<div id="items" style=""></div>
-<textarea name="kitchen_info" id="kitchen_info" placeholder="Køkken info" rows="2" autocomplete="nope" ></textarea>
-
-`;
-
-  miscTab = `
-<div>Øvrig info</div>
-`;
 
   constructor(popupObj, repoObj) {
     this.myPopupObj = popupObj;
@@ -551,6 +532,7 @@ class BonForm {
     bon.price_category = props.price_category;
     bon.payment_type = props.payment_type;
     bon.customer_info = props.customer_info;
+    bon.invoice_info = props.invoice_info;
     bon.kitchen_info = props.kitchen_info;
     bon.service_type = null;
 
@@ -707,8 +689,8 @@ class BonForm {
     form.querySelector("select[name=payment_type]").value = bon.payment_type;
     form.querySelector("select[name=payment_type]").onchange();
 
-    form.querySelector("textarea[name=customer_info]").value =
-      bon.customer_info;
+    form.querySelector("textarea[name=customer_info]").value =bon.customer_info;
+    form.querySelector("textarea[name=invoice_info]").value =bon.invoice_info;
     form.querySelector("textarea[name=kitchen_info]").value = bon.kitchen_info;
 
     this._updateOrMerge(

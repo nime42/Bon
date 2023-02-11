@@ -198,7 +198,8 @@ app.get("/api/bonSummaryFile",(req,res) => {
         "Betaling",
         "Priskategorie",
         "Købspris",
-        "Pris"
+        "Pris",
+        "Fakturadato",
     ];
 
     const excel = require('excel4node');
@@ -223,7 +224,12 @@ app.get("/api/bonSummaryFile",(req,res) => {
         col=1;
         row++;
         worksheet.cell(row, col++).string("#"+config.bonPrefix+"-"+b.id);
-        worksheet.cell(row, col++).date(new Date(b.delivery_date));
+
+        if(b.delivery_date) {
+            worksheet.cell(row, col++).date(new Date(b.delivery_date));
+        } else {
+            worksheet.cell(row, col++).string("");
+        }
         worksheet.cell(row, col++).string(b.status);
         if(!isNaN(b.nr_of_servings)) {
             worksheet.cell(row, col++).number(b.nr_of_servings?b.nr_of_servings:0);
@@ -241,6 +247,13 @@ app.get("/api/bonSummaryFile",(req,res) => {
         worksheet.cell(row, col++).string(b.price_category);
         worksheet.cell(row, col++).number(b.cost_price?(Math.round(b.cost_price*100)/100):0);
         worksheet.cell(row, col++).number(b.price?(Math.round(b.price*100)/100):0);
+        if(b.invoice_date) {
+            worksheet.cell(row, col++).date(new Date(b.invoice_date));
+        } else {
+            worksheet.cell(row, col++).string("");
+        }
+        
+
    })
    workbook.write('bons.xlsx',res);
 })

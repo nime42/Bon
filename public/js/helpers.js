@@ -123,6 +123,13 @@ static replaceAllFromValues(text, values) {
     return !isNaN(num)
   }
 
+  static formatDate(date) {
+    if(date) {
+      return  `${new Date(date).toLocaleDateString("sv-SE")} ${new Date(date).toLocaleTimeString("sv-SE",{hour: '2-digit', minute:'2-digit'})}`;
+    } else {
+      return "";
+    }
+  }
 
 }
 
