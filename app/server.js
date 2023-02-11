@@ -213,6 +213,7 @@ app.get("/api/bonSummaryFile",(req,res) => {
       });
     const worksheet = workbook.addWorksheet('Sheet 1');
     worksheet.column(2).setWidth(18);
+    worksheet.column(16).setWidth(18);
     let row=1;
     let col=1;
     headers.forEach(h => {
