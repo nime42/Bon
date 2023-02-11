@@ -445,6 +445,16 @@ app.get("/api/updateDB", (req, res) => {
         grocyFuncs.getAllRecipes(recipies=>{
             DB.updateItems(recipies, function (status, err) {
                 if (status) {
+
+                    //Update all other boninstances also
+                    Object.values(allBonInstances.getAllInstances()).forEach(i=>{
+                        if(i.grocy!==grocyFuncs) {
+                            console.log("updating grocy for",i.grocy.config.grocy.url);
+                            i.grocy.updateCache();
+                        }
+                    })
+
+
                     res.sendStatus(200);
                 } else {
                     console.log("updateDB updateItems", err);
@@ -452,8 +462,8 @@ app.get("/api/updateDB", (req, res) => {
                 }
             });
         })
-
     })
+
 
 });
 

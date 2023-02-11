@@ -29,6 +29,10 @@ module.exports = class OtherBonsHandler {
 
     }
 
+    getAllInstances() {
+        return this.bonInstances;
+    }
+
     getBonsForWeek(mondayDate) {
         let before=new Date();
         before.setTime(mondayDate.getTime()+6*(24*3600*1000));
