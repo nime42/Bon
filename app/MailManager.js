@@ -224,8 +224,10 @@ let incomingMailHelper= {
   }
 }
 
-
+var ongoing=false;
 function getIncomingOrders(subjectContains,callback) {
+
+    ongoing=true;
     getMails("INBOX",['UNSEEN',['SUBJECT',subjectContains]],true, (status,data) => {
       if(status) {
         let bons=data.map(m=>({orgMessage:m.message, bon:buildBon(parseIncomingMessage(m.message,incomingMailHelper.bonAttribMap))}));
@@ -233,6 +235,7 @@ function getIncomingOrders(subjectContains,callback) {
       } else {
         callback(false,data);
       }
+      ongoing=false;
     })
 }
 
@@ -246,7 +249,7 @@ function buildBon(entries) {
   bon.customer.phone_nr=entries["phone_nr"];
   bon.customer.company.name=entries["company_name"];
   bon.nr_of_servings=entries["nr_of_servings"];
-  bon.kitchen_selects=1;
+  bon.kitchen_selects=entries["kitchen_selects"]!==undefined?1:0;
   bon.price_category="Catering";
   bon.delivery_date=parseDeliveryDate(entries);
   bon.delivery_address.street_name=entries["delivery_address"];
@@ -255,7 +258,7 @@ function buildBon(entries) {
   bon.invoice_info=entries["invoice_info"];
   try {
     //streetname and streetnumber is in the same field, try to parse them apart
-    let street_nr = bon.delivery_address.street_name.match(/(\d)+[[A-Z]?/);
+    let street_nr = bon.delivery_address.street_name.match(/(\d)+ ?[A-Z]?/);
     if (street_nr) {
       bon.delivery_address.street_nr = street_nr[0];
       bon.delivery_address.street_name = bon.delivery_address.street_name.replace(bon.delivery_address.street_nr, "").trim();
@@ -317,7 +320,6 @@ function getFromEntry(entries,attr) {
 }
 
 
-
 function parseIncomingMessage(mess,entries) {
   let res={}
   mess=mess.replace(/CONTACT\n.*/,""); //Not sure about this.
@@ -355,7 +357,6 @@ function parseIncomingMessage(mess,entries) {
 
 
   }
-
 
 
 module.exports = {
