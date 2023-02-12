@@ -255,7 +255,7 @@ function buildBon(entries) {
   bon.invoice_info=entries["invoice_info"];
   try {
     //streetname and streetnumber is in the same field, try to parse them apart
-    let street_nr = bon.delivery_address.street_name.match(/\d+/);
+    let street_nr = bon.delivery_address.street_name.match(/(\d)+[[A-Z]?/);
     if (street_nr) {
       bon.delivery_address.street_nr = street_nr[0];
       bon.delivery_address.street_name = bon.delivery_address.street_name.replace(bon.delivery_address.street_nr, "").trim();
