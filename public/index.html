@@ -114,7 +114,7 @@
         <a href="#home" class="menu" onclick="toggleMenu()">RR<span id="menu-header"></span><span id="bon-instance" style="float: right;margin-right: 50%;margin-bottom: 0;font-weight: bold;">Hej</span></a>
         <div id="myLinks">
             <a href="#calendar" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i> Kalender</a>
-            <a href="#mails" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myMails.refreshMails();toggleMenu();"><i class="fa fa-envelope"></i> Mails</a>
+            <a href="#mails" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myMails.refreshMails(true);toggleMenu();"><i class="fa fa-envelope"></i> Mails</a>
             <a href="#week" data-check-access="${ADMIN}" onclick="console.log('week');gotoMenu(this);Globals.myWeekWiew.refresh();toggleMenu();"><i class="fa fa-home"></i> Ugeoversigt</a>
             <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i class="fa fa-cutlery"></i> Køkken idag</a>
             <a href="#future" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i class="fa fa-sun-o"></i>køkken senere</a>
@@ -190,7 +190,7 @@
 
                 <!--Forgot password-->
                 <form id="forgot-password" autocomplete="off" method="post" style="display:none">
-                    <h5>glemt password/h5>
+                    <h5>glemt password</h5>
                     <div class="row">
                         <div class="twelwe columns" id="error-msg" style="color:red"></div>
                     </div>
@@ -329,6 +329,7 @@
             Globals.myCalender=new BonCalendar("#calendar-div");
 
             Globals.myMails=new BonMails("#mails");
+            Globals.myMails.refreshMails();
 
             Globals.myKitchenBonWall=new BonWall("#kitchen",["approved","preparing","done"]);
 

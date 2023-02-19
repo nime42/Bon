@@ -476,6 +476,7 @@ class BonStrip {
                     mails.forEach(m=>{   
                         this.chat.addMessage(m.subject.startsWith("SENT:")?"right":"left",m.from,new Date(m.date),m.message);
                     })
+                    Globals.myMails.markAsRead(self.bonId);
                     this.onMailSeen && this.onMailSeen(this.bonId);
                 });
                 this.chatDiv.scrollIntoView();

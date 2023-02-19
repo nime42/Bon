@@ -576,9 +576,15 @@ function mailIncomingOrders(orders,callback) {
     });          
 }
 
-
+let isManagingIncomingOrders=false;
 function manageIncomingOrders(callback) {
+    if(isManagingIncomingOrders) {
+        callback(true);
+        return;
+    }
+
     if(config.mailManager.incomingMails) {
+        isManagingIncomingOrders=true;
         mailManager.getIncomingOrders(config.mailManager.incomingMails.subjectContains,(status,orders)=>{
             if(status) {
                 let mailOrders=[];
@@ -590,6 +596,7 @@ function manageIncomingOrders(callback) {
             } else {
                 callback(status);
             }
+            isManagingIncomingOrders=false;
         });
     } else {
         callback(true);
@@ -614,6 +621,15 @@ if(config.mailManager.incomingMails) {
     },checkPeriod*1000*60);
 }
 
+app.get("/api/checkIncomingMails",(req,res)=>{
+    if(config.mailManager.incomingMails) {
+        manageIncomingOrders((status)=>{
+            console.log("checking incoming mails,status:"+status);
+        });
+    }
+    res.sendStatus(200);
+
+})
 
 app.get("/api/unseenBonIdMails",(req,res) => {
     if (!loginHandler.isLoggedIn) {
@@ -639,7 +655,11 @@ app.get("/api/allBonWithMails",(req,res) => {
         return;
     }
 
-    mailManager.getBonWithMails("*",(status,mails) => {
+    let mailsSince=undefined;
+    if(req.query.mailsSince!=="") {
+        mailsSince=new Date(req.query.mailsSince);
+    }
+    mailManager.getBonWithMails("*",mailsSince,(status,mails) => {
         mails.forEach(m=>{
             let searchParams={bonId:m.bonId};
             let [bon]=allBonInstances.searchBons(m.prefix,searchParams,true,null);

@@ -10,7 +10,7 @@ class BonMails {
         background: #f1e6b2;
       }
       
-      .mail-style td, .mail-style th {
+    .mail-style td, .mail-style th {
         border: 1px solid ${this.foreground};
         padding: 8px;
         color: ${this.foreground};
@@ -18,6 +18,10 @@ class BonMails {
         white-space: nowrap;
         overflow:hidden;
         
+      }
+
+      .mail-style td .unread-mails:hover {
+        cursor:pointer;
       }
       
       .tableFixHead { 
@@ -51,6 +55,7 @@ class BonMails {
     <table id="mail-table">
     </table>
     </div>
+    <input type="button" id="refresh-mails" value="Opdater" style="margin: 10px;">
     </div>
     </div>
     `    
@@ -71,24 +76,57 @@ class BonMails {
         this.myBonStripDiv=document.createElement("div");
         this.myBonStrip=new BonStrip(this.myBonStripDiv,false);
         this.myBonStrip.showMails();
+
+        let self=this;
         this.myBonStrip.setOnMailSeen((bonId)=>{
-            let envelope=this.myMailTable.querySelector("#bon-id-"+bonId);
-            if(envelope) {
-                envelope.style.display="none"
-            }
+            self.markAsRead(bonId);
         })
 
+
+        let refreshButton=this.myDiv.querySelector("#refresh-mails");
+        refreshButton.onclick = function () {
+            self.refreshMails(true);
+            self.myRepo.checkIncomingMails();
+        }
+
+
+        this.myMails={};
+        this.lastRefresh=undefined;
 
 
 
 
     }
 
-    refreshMails() {
-        let p=MessageBox.popup("henter mail...");
-        this.myRepo.getAllBonWithMails((mails)=>{
-            p.hide();
-            this.createMailTable(mails);
+    markAsRead(bonId) {
+
+        if(Helper.isNumeric(bonId)) {
+            bonId=Globals.bonPrefix+"-"+bonId;
+        }
+
+        if(this.myMails[bonId]) {
+            this.myMails[bonId].mail.unread=false;
+        }
+        let envelope=this.myMailTable.querySelector(`#bon-id-${bonId}`);
+        if(envelope) {
+            envelope.style.display="none"
+        }
+    }
+
+    refreshMails(withProgressMessage) {
+        let p=undefined;
+        if(withProgressMessage) {
+            p=MessageBox.popup("henter mail...");
+        }
+        let mailsSince=this.lastRefresh;
+        this.lastRefresh=new Date();
+        this.myRepo.getAllBonWithMails(mailsSince,(mails)=>{
+            p && p.hide();
+            mails.forEach(m=>{
+                this.myMails[m.bon.id]=m;
+            })
+
+            this.createMailTable(Object.values(this.myMails));
         })
     }
 
@@ -114,9 +152,9 @@ class BonMails {
 
         mails.forEach(m=>{
             let r=`
-                <td><li id="bon-id-${m.bon.id}" class="fa fa-envelope mail" style="display:${m.mail.unread?"":"none"}"></li></td>
+                <td><li id="bon-id-${m.bon.id}" class="fa fa-envelope mail unread-mails" style="display:${m.mail.unread?"":"none"}"></li></td>
                 <td>${new Date(m.mail.date).toLocaleString()}</td>
-                <td><a id="bon-id-${m.bon.id}" href="#">${m.bon.id}</a></td>
+                <td><a href="#">${m.bon.id}</a></td>
                 <td>${new Date(m.bon.delivery_date).toLocaleString()}</td>
                 <td>${m.bon.customer.forename + " " + m.bon.customer.surname}</td>
                 <td>${m.bon.customer.company.name}</td>
@@ -125,6 +163,10 @@ class BonMails {
                 let row=document.createElement("tr");
                 row.innerHTML=r;
                 row.querySelector("a").onclick=() =>{
+                    self.onSelectBon(m.bon);
+                    return false;
+                }
+                row.querySelector(`#bon-id-${m.bon.id}`).onclick=() =>{
                     self.onSelectBon(m.bon);
                     return false;
                 }
@@ -144,6 +186,7 @@ class BonMails {
     onSelectBon(bon) {
 
         if(bon.id.startsWith(Globals.bonPrefix)) {
+
             Globals.myCalender.myBonForm.initFromBonId(bon.id.replace(Globals.bonPrefix+"-",""));
 
         } else {
