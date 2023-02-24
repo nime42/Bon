@@ -67,10 +67,10 @@ function getMails(mailbox, searchCriteria, markAsRead, callback = console.log) {
               return Promise.reject(ex);
             });
             f.once('end', () => {
-
               imap.end();
             });
           } else {
+            imap.end();
             callback(true,allMessages);
           }
         });
@@ -79,11 +79,9 @@ function getMails(mailbox, searchCriteria, markAsRead, callback = console.log) {
 
     imap.once('error', err => {
       console.log(err);
+      imap.end();
     });
 
-    imap.once('end', () => {
-      //console.log('Connection ended');
-    });
 
     imap.connect();
   } catch (ex) {
