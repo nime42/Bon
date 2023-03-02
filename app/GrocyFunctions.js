@@ -413,7 +413,7 @@ module.exports = class GrocyFunctions {
                     callback(true, json);
                 },
                 (err) => {
-                    console.log(`getGrocyObjects for instance "${config.bonInstance}" failed:`,err);
+                    console.log(`getGrocyObjects for instance "${this.config.bonInstance}" failed:`,err);
                     callback(false, err)
                 }
             );
