@@ -259,10 +259,94 @@ app.get("/api/bonSummaryFile",(req,res) => {
    workbook.write('bons.xlsx',res);
 })
 
+/**
+ * Get all products (items) with their different price categories and cost price
+ * @param {*} callback 
+ */
+function getProducts(callback=console.log) {
+    DB.getItems(function(status,items){
+        if(status) { 
+            DB.getItemPrices(function(status,prices) {
+                if(status) {
+                    let item_lookUpPrices={};
+                    prices.items.forEach(p=>{
+                        item_lookUpPrices[p.id]=p;
+                    })
+                    let headers=["Kategorie","Vare","Pris",...prices.categoryNames.map(e=>("Pris - "+e))];
+                    let rows=[];
+                    rows.push(headers);
+                    items.filter(e=>(e.sellable===1)).forEach(i=>{
+                        let row=[];
+                        row.push(i.category);
+                        row.push(i.name);
+                        row.push(i.cost_price);
+                        let categoryPrices=item_lookUpPrices[i.id];
+                        prices.categoryNames.forEach(n=>{
+                            row.push(categoryPrices.price_categories[n]);
+                        })
+                        rows.push(row);
+                    })
+                    callback(true,rows);
+                } else {
+                    callback(false,prices);
+                }
+            })
+        } else {
+            callback(false,items);
+        }
+    })  
+
+}
 
 
+app.get("/api/productFile", (req, res) => {
+    if (!loginHandler.checkRoles(req, "${ADMIN}")) {
+        res.sendStatus(401);
+        return;
+    }
+
+    getProducts((status, rows) => {
+        if (status) {
+            const excel = require('excel4node');
+            const workbook = new excel.Workbook();
+            let headerStyle = workbook.createStyle({
+                font: {
+                    bold: true
+                }
+            });
+            try {
+            const worksheet = workbook.addWorksheet('Sheet 1');
+            let headers = rows[0];
+            let row = 1;
+            let col = 1;
+            headers.forEach(h => {
+                worksheet.cell(row, col++).string(h).style(headerStyle);
+            });
+            row++;
+            rows.slice(1).forEach(r=>{
+                col=1;
+                r.forEach(v=>{
+                    if(!isNaN(v)) {
+                        worksheet.cell(row, col++).number(+Number(v).toFixed(2));
+                    } else {
+                        worksheet.cell(row, col++).string(v);
+                    }  
+                })
+                row++;
+            })
+            workbook.write('products.xlsx',res);
+        } catch(err) {
+            console.log("get productFile failed",err);
+            res.sendStatus(500);
+        }
+        } else {
+            res.sendStatus(404);
+        }
+
+    })
 
 
+})
 
 
 app.post("/api/bons",(req,res) => {
@@ -578,26 +662,33 @@ function mailIncomingOrders(orders,callback) {
 
 let isManagingIncomingOrders=false;
 function manageIncomingOrders(callback) {
-    if(isManagingIncomingOrders) {
+    if (isManagingIncomingOrders) {
         callback(true);
         return;
     }
 
-    if(config.mailManager.incomingMails) {
-        isManagingIncomingOrders=true;
-        mailManager.getIncomingOrders(config.mailManager.incomingMails.subjectContains,(status,orders)=>{
-            if(status) {
-                let mailOrders=[];
-                orders.forEach(o=>{
-                    let bonId=DB.createBon(o.bon,null);
-                    mailOrders.push({bonId:bonId,orgMessage:o.orgMessage});
-                })
-                mailIncomingOrders(mailOrders,callback);
-            } else {
-                callback(status);
-            }
-            isManagingIncomingOrders=false;
-        });
+    if (config.mailManager.incomingMails) {
+        try {
+            isManagingIncomingOrders = true;
+            mailManager.getIncomingOrders(config.mailManager.incomingMails.subjectContains, (status, orders) => {
+                if (status) {
+                    let mailOrders = [];
+                    orders.forEach(o => {
+                        let bonId = DB.createBon(o.bon, null);
+                        mailOrders.push({ bonId: bonId, orgMessage: o.orgMessage });
+                    })
+                    mailIncomingOrders(mailOrders, callback);
+                } else {
+                    callback(status);
+                }
+                
+            });
+        } catch (err) {
+            console.log("something went wrong in manageIncomingOrders",err);
+        } finally {
+            isManagingIncomingOrders = false;
+        }
+
     } else {
         callback(true);
     }

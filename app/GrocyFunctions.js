@@ -126,7 +126,6 @@ module.exports = class GrocyFunctions {
 
     consumeRecipy(amount,recipyId) {
         let products=this.getAllProductsForRecipy(recipyId);
-        console.log(products);
         products.forEach(p=>{
             let amount_to_consume=amount*p.stock_amount;
             this.consumeProduct(p.product_id,amount_to_consume,(status,consumed_amount)=>{
@@ -151,6 +150,24 @@ module.exports = class GrocyFunctions {
     }
 
 
+    calculatePriceForRecipy(recipyId) {
+        let recipy=this.allRecipies[recipyId];
+        if(!recipy) {
+            return 0;
+        }
+        let productsPrice=0;
+        recipy.ingredients?.forEach((i)=>{
+            productsPrice+=i.stock_price;
+        });
+
+        let nestedPrices=0;
+        recipy.nested_recipies?.forEach(n=>{
+            nestedPrices+=this.calculatePriceForRecipy(n.recipy.external_id);
+        });
+
+        return (productsPrice+nestedPrices)/recipy.base_servings;
+
+    }
 
     getAllProductsForRecipy(recipyId) {
         let recipy=this.allRecipies[recipyId];
@@ -286,6 +303,9 @@ module.exports = class GrocyFunctions {
     updateCache(callback) {
         this.buildAllRecipes((recipies)=>{
             this.allRecipies=recipies;
+            Object.keys(this.allRecipies).forEach(k=>{
+                this.allRecipies[k].calculated_price=+(this.calculatePriceForRecipy(k).toFixed(2));
+            })
             callback && callback(recipies);
         })
     }
@@ -299,6 +319,10 @@ module.exports = class GrocyFunctions {
                 productsLookUp[p.id] = p;
             })
 
+            let last_purchased={};
+            objects["products_last_purchased"].forEach(l=>{
+                last_purchased[l.product_id]=l;
+            })
 
             let quantityUnitLookUp = {};
             objects["quantity_units"].forEach(u => {
@@ -317,7 +341,7 @@ module.exports = class GrocyFunctions {
                 if (recipePosLookup[recipe_id] == undefined) {
                     recipePosLookup[recipe_id] = [];
                 }
-                recipePosLookup[recipe_id].push(this.parseIngredient(p,productsLookUp,quantityUnitsConversionLookup,quantityUnitLookUp));
+                recipePosLookup[recipe_id].push(this.parseIngredient(p,productsLookUp,quantityUnitsConversionLookup,quantityUnitLookUp,last_purchased));
             })
 
 
@@ -357,13 +381,18 @@ module.exports = class GrocyFunctions {
             "recipes_pos",
             "recipes_nestings",
             "quantity_units",
-            "quantity_unit_conversions"
+            "quantity_unit_conversions",
+            "products_last_purchased"
         ];
         let res = {}
         let requests = objects.length;
         objects.forEach(o => {
             this.getGrocyObjects(o, (status, objs) => {
-                res[o] = objs;
+                if(status) {
+                    res[o] = objs;
+                } else {
+                    res[o]=[];
+                }
                 requests--;
                 if (requests == 0) {
                     callback(res);
@@ -383,7 +412,10 @@ module.exports = class GrocyFunctions {
                 (json) => {
                     callback(true, json);
                 },
-                (err) => callback(false, err)
+                (err) => {
+                    console.log(`getGrocyObjects for instance "${config.bonInstance}" failed:`,err);
+                    callback(false, err)
+                }
             );
     }
 
@@ -391,7 +423,7 @@ module.exports = class GrocyFunctions {
 
 
 
-    parseIngredient(recipy_pos,productLookUp,conversionLookup,quantityUnitLookUp) {
+    parseIngredient(recipy_pos,productLookUp,conversionLookup,quantityUnitLookUp,purchaseLookup) {
         let p=productLookUp[recipy_pos.product_id];
         //console.log(recipy_pos);
         //console.log(p);
@@ -411,7 +443,8 @@ module.exports = class GrocyFunctions {
             qu_id_purchase:quantityUnitLookUp[recipy_pos.qu_id],
             conversion:conversion,
             purchase_amount:purchase_amount,
-            variable_amount:recipy_pos.variable_amount
+            variable_amount:recipy_pos.variable_amount,
+            stock_price:(purchaseLookup[p.id]?.price?purchaseLookup[p.id]?.price:0)*(recipy_pos.amount?recipy_pos.amount:0)
         }
         //console.log(res);
         return res;

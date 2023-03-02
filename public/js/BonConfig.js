@@ -176,7 +176,7 @@ class BonConfig {
         <table id="items-table">
         </table>
         </div>
-
+        <a href="api/productFile">Download</a>
         </div>
         </div>
     `;

@@ -427,7 +427,7 @@ module.exports = class DB {
 
     updateItems(items, callback = console.log) {
         let sql = `
-      INSERT INTO items (name,category,cost_price,sellable,external_id) VALUES (@name,@category,@cost_price,@sellable,@external_id)
+      INSERT INTO items (name,category,cost_price,sellable,external_id) VALUES (@name,@category,@calculated_price,@sellable,@external_id)
       ON CONFLICT (external_id) DO
       UPDATE SET cost_price=ifnull(excluded.cost_price,cost_price),sellable=ifnull(excluded.sellable,sellable),name=ifnull(excluded.name,name),category=ifnull(excluded.category,category) 
       `;
