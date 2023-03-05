@@ -132,7 +132,7 @@ module.exports = class GrocyFunctions {
                 
                 if(status) {
                     if(consumed_amount<amount_to_consume) {
-                        this.addToShoppingList(p.productId,(status)=>{
+                        this.addToShoppingList(p.product_id,(status)=>{
                             if(status) {
                                 console.log(`adding ${p.name} to shoppinglist`);
                             } else {
