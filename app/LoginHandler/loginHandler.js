@@ -301,9 +301,23 @@ function getSession(req, roles) {
 }
 
 function isLoggedIn(req) {
+    let session=sessionHandler.getSession(req);
+    if(session!==undefined) {
+        return true;
+    }
     return sessionHandler.getSession(req)!==undefined?true:false;
 }
 
+
+function parseBasicAuth(authHeader) {
+    try {
+        let base64Data=a.match(/Basic (.*)/i)[1];
+        let plain=Buffer.from(base64Data, 'base64').toString('utf8');
+        
+    } catch(err) {
+        return null;
+    }
+}
 
 function checkRoles(req,roleExpr) {
     var session = sessionHandler.getSession(req);
