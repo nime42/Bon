@@ -104,7 +104,13 @@ if(config.iZettle?.check_frequence) {
 
 app.use((req,res,next)=>{
     if(!loginHandler.isLoggedIn(req) && req.url.startsWith("/api")) {
-        res.sendStatus(401);
+        loginHandler.fromBasicAuth(req,res,(status,req,res)=>{
+            if(status) {
+                next();
+            } else {
+                res.sendStatus(401);
+            }
+        });
     } else {
         next();
     }

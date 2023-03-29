@@ -308,16 +308,45 @@ function isLoggedIn(req) {
     return sessionHandler.getSession(req)!==undefined?true:false;
 }
 
+function fromBasicAuth(req,res,callback) {
+    if(req.headers?.authorization) {
+        let [user,passwd]=parseBasicAuth(req.headers.authorization);
+        if(user!==null) {
+            db.authenticateUser(user, passwd, function (status, userId) {
+                if (status) {
+                    sessionHandler.addSession(req, res, userId);
+                    callback(true,req,res);
+
+                } else {
+                    callback(false,req,res);
+                }
+            });
+
+        }
+    } else {
+        callback(false,req,res);
+    }
+}
 
 function parseBasicAuth(authHeader) {
     try {
-        let base64Data=a.match(/Basic (.*)/i)[1];
+        let base64Data=authHeader.match(/Basic (.*)/i)[1];
         let plain=Buffer.from(base64Data, 'base64').toString('utf8');
-        
+        let m=plain.match(/^([^:]+):(.*)$/);
+        if(m) {
+            let [dummy,user,passwd]=m;
+            return [user,passwd];
+        } else {
+            return [null,null];
+        }
     } catch(err) {
-        return null;
+        return [null,null];
     }
 }
+
+
+
+
 
 function checkRoles(req,roleExpr) {
     var session = sessionHandler.getSession(req);
@@ -358,6 +387,7 @@ module.exports = {
     getSession: getSession,
     checkRoles:checkRoles,
     isLoggedIn:isLoggedIn,
+    fromBasicAuth:fromBasicAuth,
     saveSessions:saveSessions,
     resumeSessions:resumeSessions
 }
