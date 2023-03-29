@@ -162,7 +162,7 @@ module.exports = class GrocyFunctions {
 
         let nestedPrices=0;
         recipy.nested_recipies?.forEach(n=>{
-            nestedPrices+=this.calculatePriceForRecipy(n.recipy.external_id);
+            nestedPrices+=(n.servings?n.servings:1)*this.calculatePriceForRecipy(n.recipy.external_id);
         });
 
         return (productsPrice+nestedPrices)/recipy.base_servings;
