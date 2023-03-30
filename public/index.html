@@ -307,8 +307,8 @@
     <script>
         $( document). ready(function() {
             $( document ).ajaxError(function( event, jqxhr, settings, thrownError ) {
-                if(jqxhr.status===401) {
-                    logout();
+                if(jqxhr.status===401 && Globals.myLoginHandler.isLoggedIn()) {
+                        logout();
                 }
              });
         });
