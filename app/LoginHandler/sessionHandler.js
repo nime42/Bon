@@ -21,17 +21,22 @@ function getSession(req) {
 }
 
 function invalidateSession(req,res) {
+    var sessionID = req.cookies?req.cookies['LoginHandler-SessId']:null;
     res.clearCookie('LoginHandler-SessId');
-    var sessionID = ['LoginHandler-SessId'];
     delete sessions[sessionID];
 }
 
 function purge() {
     var now=new Date();
-    sessions=sessions.filter(s=> (now-s.timestamp)<maxAge*1000);
+    Object.keys(sessions).forEach(k=>{
+        let s=sessions[k];
+        if((now-s.timestamp)>maxAge*1000) {
+            delete sessions[k];
+        }
+    })
 }
 
-var maxAge=5*60*60; //age in seconds
+var maxAge=12*60*60; //age in seconds
 var intervalTimer=setInterval(purge,maxAge*1000);
 function setPurgeIntervall(seconds) {
     clearInterval(intervalTimer);
