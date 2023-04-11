@@ -683,10 +683,13 @@ class BonStrip {
         if(comment==="") {
             order.querySelector("#comment").style.display="none";
         }
+
         this.myOrders.addElem(order);
         this._sortOrders();
 
     }
+
+
 
     _sortOrders() {
         let allOthers=Globals.BonStripOrder.indexOf("*");
@@ -983,5 +986,36 @@ class BonStrip {
         }
     }
 
+    addOrders(otherOrders,factor=1) {
+        let orders=this.getOrders().orders;
+        this.myOrders.clear();
+        this.updateTotalSum();
+
+
+        otherOrders.forEach(o=>{
+            o.comment=o.special_request; //in DB it's called special_request but in bon it's called comment, my misstake :-/
+            o.id=o.item_id
+            let existing=orders.find(e=>(e.id==o.id && e.comment==o.comment))
+            if(existing) {
+                existing.quantity=Number(existing.quantity)+Number(o.quantity)*factor;
+            } else {
+                orders.push(o);
+            }
+
+        })
+
+        if(orders) {
+            orders.forEach(o=>{
+                if(o.quantity>0) {
+                    this.addOrder(o.quantity,o.name,o.comment,o.id,o.price,o.cost_price,o.category,o.izettle_product_id);
+                }
+            })
+            this.updateTotalSum();
+        }
+
+        console.log(orders,otherOrders);
+    }
+
+ 
 
 }

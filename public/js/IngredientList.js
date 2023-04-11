@@ -1,7 +1,7 @@
 class IngredientList {
   content = `
   <div style="background:${Globals.background}; padding:15px">
-    <table>
+    <table style="margin-bottom:0">
     <thead>
     <tr style="border-bottom: 2px solid ${Globals.foreground};border-collapse: collapse;">
       <th style="padding:5px;">Vare</th>
@@ -12,13 +12,18 @@ class IngredientList {
     <tbody id="ingredients">
     </tbody>
     <tfoot>
-    <tr>
-      <td>
+    <tr style="padding:0">
+      <td style="padding:0">
       <label style="font-style: italic;font-weight: normal;font-size: small;">*) Underopskrift (Udvidet:<input type="checkbox" id="expand-nested">) </label>
       </td>
     </tr>
   </tfoot>
     </table> 
+
+
+
+
+
   </div>
     `;
 
@@ -31,6 +36,7 @@ class IngredientList {
 
 
     this.myRepo = new BonRepository();
+
   }
 
   show(bonId,orders) {
@@ -53,6 +59,11 @@ class IngredientList {
       }
     );
   }
+
+
+
+
+
 
   showIngredients(ingredients,expandNested) {
     if(expandNested) {

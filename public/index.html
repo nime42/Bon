@@ -121,6 +121,7 @@
             <a href="#grocy" id="link-to-grocy"><i class="fa fa-database"> Grocy</i></a>
             <a href="#invoices" data-check-access="${ADMIN}" onclick="gotoMenu(this);Globals.myInvoiceBonWall.getBonsForInvoice();toggleMenu();"><i class="fa fa-money"></i> Fakturer</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i class="fa fa-wrench"></i> Admin</a>
+            <a href="#planning" data-check-access="${ADMIN}" onclick="gotoMenu(this);getOtherBons();toggleMenu();"><i class="fa fa-tasks"></i> Planlægning</a>
             <a href="#log-in" class="active-menu" onclick="gotoMenu(this);toggleMenu()"><i class="fa fa-key">Login</i></a>
             <span id="version" style="
                 margin-left: 15px;
@@ -302,7 +303,101 @@
         <section id="future" style="display:none">
         </section>
 
+        <section id="planning" style="display:none">
+            <div style="margin:auto;width:600px">
+            <div id="plan-bon" style="width: 300px;float:left"></div>
+            <div style="width: 300px; float:left">
+            <style>
+                #other-bons-div {
+                    margin-left: 15px;
+                    min-width:250px;
+                    background: #f1e6b2;
+                    box-shadow: 5px 5px 5px grey;
+                    padding-left: 10px;
+                    border: 2px solid #8e631f;
+                    
+                }
+                #other-bons-div ul {
+                  list-style: none;
+                }
+                #other-bons-div li {
+                  margin-bottom: -10px;
+                }
+              </style>
+              <div id="other-bons-div">
+              <label style="padding:0">Andre Bons:</label>
+              <ul id="other-bons-list">
+              </ul>
+            </div>
+        </div>
     </div>
+
+
+        </section>
+
+
+    </div>
+    <script>
+
+        
+
+        function initPlanBon() {
+            Globals.planBonStrip=new BonStrip("#plan-bon",true);
+            let planBon={
+                customer:{
+                    "forename": "Planning",
+                    "surname": "",
+                    "email": "",
+                    "phone_nr": "" 
+                },
+                delivery_date:new Date(),
+                id:0,
+                price_category:"Festival",
+                delivery_address:{
+                    "street_name": "",
+                    "street_name2": "",
+                    "street_nr": "",
+                    "zip_code": "",
+                    "city": ""
+                },
+                kitchen_info: "",
+                nr_of_servings:0,
+                payment_type:""
+
+
+            }
+        
+            Globals.planBonStrip.initFromBon(planBon);
+
+        }
+
+    function getOtherBons() {
+        let today = new Date();
+        let todayStr = today.toISOString().split('T')[0];
+
+        Globals.myConfig.myRepo.searchBons({ afterDate: todayStr,includeOrders:true }, (bons) => {
+            let otherBonsList=document.querySelector("#other-bons-list");
+            let checkedBons = Array.from(otherBonsList.querySelectorAll("input:checked")).map(e=>{e.click();return e.id});
+
+            otherBonsList.innerHTML="";
+            bons.forEach(b=> {
+                let li = document.createElement("li");
+                let text=`<b>#${b.id}</b> ${new Date(b.delivery_date).toLocaleDateString()} ${new Date(b.delivery_date).toLocaleTimeString()}`
+                li.innerHTML=`<input type="checkbox" id=${b.id} ${(checkedBons.find(e=>(e==b.id))!=undefined?"checked":"")}> ${text}`;
+                let checkbox=li.querySelector("input");
+                checkbox.onchange=()=>{
+                    if(checkbox.checked) {
+                        Globals.planBonStrip.addOrders(b.orders);
+                    } else {
+                        Globals.planBonStrip.addOrders(b.orders,-1);
+                    }
+                }
+                otherBonsList.appendChild(li)
+            })
+        })
+    }
+
+    </script>
 
     <script>
         $( document). ready(function() {
@@ -364,6 +459,9 @@
 
             document.querySelector("#login").style.display = "none";
             document.querySelector("#logout").style.display = "";
+
+
+            initPlanBon()
         })
         Globals.myLoginHandler.setForgotPasswordForm("#forgot-password");
         Globals.myLoginHandler.whenForgotPassword(() => {
