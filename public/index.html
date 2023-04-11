@@ -315,7 +315,7 @@
                     box-shadow: 5px 5px 5px grey;
                     padding-left: 10px;
                     border: 2px solid #8e631f;
-                    
+                     
                 }
                 #other-bons-div ul {
                   list-style: none;
@@ -326,8 +326,9 @@
               </style>
               <div id="other-bons-div">
               <label style="padding:0">Andre Bons:</label>
-              <ul id="other-bons-list">
-              </ul>
+              <ul id="other-bons-list" style="max-height: 450px;overflow: auto;min-height: 80px;">
+
+            </ul>
             </div>
         </div>
     </div>
@@ -377,7 +378,7 @@
 
         Globals.myConfig.myRepo.searchBons({ afterDate: todayStr,includeOrders:true }, (bons) => {
             let otherBonsList=document.querySelector("#other-bons-list");
-            let checkedBons = Array.from(otherBonsList.querySelectorAll("input:checked")).map(e=>{e.click();return e.id});
+            let checkedBons = Array.from(otherBonsList.querySelectorAll("input:checked")).map(e=>{return e.id});
 
             otherBonsList.innerHTML="";
             bons.forEach(b=> {
