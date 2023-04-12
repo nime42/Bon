@@ -50,6 +50,7 @@ class BonForm {
                           <option>Kontant</option>
                           <option>Faktura</option>
                           <option>EAN nr</option>
+                          <option>Produktion</option>
                       </select>
                   </div>
               </div>

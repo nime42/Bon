@@ -63,7 +63,7 @@ class BonWall {
                         status="approved";
                     }
                     if(status=="delivered" && onOff=="on") {
-                        if(bonStrip.getPaymentType()=="Kontant") {
+                        if(bonStrip.getPaymentType()=="Kontant" || bonStrip.getPaymentType()=="Produktion") {
                             status="closed";
                         }
                         this._fadeout(colElem,bonStrip.bonId,status,(id)=>{
