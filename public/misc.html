@@ -3,73 +3,137 @@
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">    <script src="js/globals.js"></script>
-    <link rel="stylesheet" href="css/CalendarClass.css">
-    <script src="js/CalendarClass.js"></script>
-    <link rel="stylesheet" href="css/ModalPopup.css">
-    <script src="js/ModalPopup.js"></script>
-    <script src="js/TabsClass.js"></script>
-    <script src="js/VertTabsClass.js"></script>
-    <script src="js/MessageBox.js"></script>
-    <script src="js/AutocompleteClass.js"></script>
-    <script src="js/BonStrip.js"></script>
-    <script src="js/helpers.js"></script>
-    <script src="js/BonForm.js"></script>
-    <script src="js/BonRepository.js"></script>
-    <style>
-        .nr-of {
-            font-weight: bold;
-            font-family: sans-serif;
-            width:5%;
-        }
-        .x-sign {
-            font-weight: bold;
-            font-family: sans-serif;
-            font-size:12px;
-            padding-left: 5px;
-            padding-right: 5px;
-        }
-        .item-name {
-            font-style: italic;
-            font-weight: bold;
-            font-family: sans-serif;
-        }
-
-        .item-info {
-            font-style: italic;
-            font-family: sans-serif;
-        }
 
 
+    <script>
 
-    </style>
+        class TimeLine {
+            style=`
+            <style>
+                .time {
+                    background: aqua;
+                    border-radius: 5px;
+                    padding: 5px;
+                }
+            </style>
+            `;
+            content=`${this.style}<table id="time-line"></table>`;
+
+            constructor(div,intervall, startHour) {
+                if(typeof div==="string") {
+                    this.myDiv=document.querySelector(div);
+                } else {
+                    this.myDiv=div;
+                }
+                this.myDiv.innerHTML=this.content;
+                this.myTable=this.myDiv.querySelector("table");
+
+                this.myIntervall=intervall;
+
+                if(startHour===undefined) {
+                    startHour=new Date().getHours();
+                }
+                let startDate=new Date();
+                startDate.setMinutes(0);
+                startDate.setHours(startHour);
+                let d=startDate;
+
+                while(d.getDay()===startDate.getDay()) {
+                    let t=d.getHours().toString().padStart(2,"0")+"."+d.getMinutes().toString().padStart(2,"0");
+                    let row=`
+                    <td class="time">${t}</td>
+                    <td id="time-${d.getHours()}-${d.getMinutes()}">frikadelle</td>`;
+
+                    let r=document.createElement("tr");
+                    r.innerHTML=row;
+                    this.myTable.append(r);
+
+                    d=this.addMinutes(d,intervall);
+                }
+
+
+            };
+
+            addItems(date,items) {
+                let minutes=date.getMinutes();
+                minutes-=minutes%this.myIntervall;
+                let hours=date.getHours();
+                console.log("#time-"+hours+"-"+minutes);
+                let elem=this.myTable.querySelector("#time-"+hours+"-"+minutes);
+                elem.innerHTML=items;
+            }
+
+            addMinutes(date, minutes) {
+                return new Date(date.getTime() + minutes*60000);
+            }
+
+        }
+
+
+    </script>
+
 
 </head>
 
 <body>
-    <div id="item-config">
-        <div>
-        <span><i class="fa fa-plus-square" style="font-size:20px;padding-right:4px"></i><i class="fa fa-minus-square" style="font-size:20px;padding-right:4px"></i><input type="text" class="nr-of"  name="quantity" value="1"></span>    
-        <span class="x-sign">X</span><span class="item-name">Frikadeller</span>
-        </div><br>
-        <textarea name="comment" class="item-info" placeholder="Extra info"></textarea>
-        <br>
-        <div>
-            <div style="margin-top:6px">
-                <input type="button" id="save" value="Gem">
-                <input type="button" id="delete" value="Ta bort">
-                <span>&nbsp;&nbsp;</span>
-                <input type="button" id="cancel" value="Avbryt">
-        </div>
 
+<table>
+    <style>
+
+
+
+        .time {
+            vertical-align:bottom;
+        }
+        .time-value {
+            background: aqua;
+            border-radius: 5px;
+            
+            
+        }
+        .items {
+            height:100px;
+            vertical-align:bottom;
+        }
+
+        .item {
+            background: #88d188;
+            border-radius: 5px;
+            border: 1px solid black;
+            text-align: left;
+            padding-left: 3px;
+            
+        }        
+
+        .flex-container {
+            display: flex;
+            flex-flow: column-reverse wrap;
+            max-height: 40px;
+        }
+    </style>
+
+            <tr>
+              <td class="time"><label class="time-value">12.00</label></td>
+              <td class="items">
+                <div class="flex-container">
+                    <label class="item">Test</label>
+                    <label class="item">Test2</label>
+                    <label class="item">Test3</label>
+                </div>
+            </td>
+            </tr>
+            <tr>
+              <td class="time">12.05</td>
+              <td>mozarella</td>
+            </tr>
+</table>
+
+    <div id="main">
+        
     </div>
+    
     <script>
-        var content=`
-        <div style="width:120px;height:200px; background:white">hello</div>
-        `
-        var myPopup=new ModalPopup();
-        //myPopup.show(document.querySelector("#item-config"));
-        myPopup.show(content);
-
+        //let timeLine=new TimeLine("#main",10);
     </script>
 </body>
 
