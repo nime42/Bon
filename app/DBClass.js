@@ -147,7 +147,7 @@ module.exports = class DB {
        left join companies co on c.company_id =co.id
        left join addresses co_a on co_a.id=co.address_id
        where b.id=ifnull(@bonId,b.id) and ${statusSearchConstr} and b.status2=ifnull(@status2,b.status2)
-        and date(b.delivery_date)>=ifnull(@afterDate,date(b.delivery_date,'-1 day')) and date(b.delivery_date)<=ifnull(@beforeDate,date(b.delivery_date))
+        and date(b.delivery_date,'localtime')>=ifnull(@afterDate,date(b.delivery_date,'-1 day','localtime')) and date(b.delivery_date,'localtime')<=ifnull(@beforeDate,date(b.delivery_date,'localtime'))
       order by b.delivery_date
       `;
 

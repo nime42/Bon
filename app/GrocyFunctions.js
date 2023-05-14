@@ -3,8 +3,9 @@ const fetch = require('node-fetch');
 module.exports = class GrocyFunctions {
     constructor(config) {
         this.config = config;
+        console.log("updating Grocy cache for "+config.bonInstance);
         this.updateCache(()=>{
-            console.log("updating Grocy cache");
+            console.log("updated Grocy cache for "+config.bonInstance);
         });
     }
 
