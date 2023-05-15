@@ -47,7 +47,7 @@ function getMails(mailbox, searchCriteria, markAsRead, callback = console.log) {
                     to: parsed.to.text,
                     subject: parsed.subject,
                     message: parsed.text,
-                    attachments: parsed.attachments,
+                    //attachments: parsed.attachments,
                     messageId: parsed.messageId,
                     unread: true
                   };
