@@ -136,7 +136,7 @@ function getBonWithMails(prefix,mailsSince, callBack = console.log) {
 
   let searchCriteria=['ALL', ['SUBJECT', searchSubject]];
   if(mailsSince) {
-    searchCriteria.push(["OR", ['SINCE', mailsSince],"UNSEEN"])
+    searchCriteria.push(["OR", ['SINCE', formatSearchDate(mailsSince)],"UNSEEN"])
   }
 
   getMails("INBOX", searchCriteria, false, (status, data) => {
@@ -339,6 +339,20 @@ function getLocalTimeOffsetDiff(date, timeZone) {
   return local - dateWithoutSec;
 
 
+}
+
+/**
+ * returns date in the format DD-month-YYYY
+ * @param {*} date 
+ * @returns 
+ */
+function formatSearchDate(date) {
+  if(!date) {
+    return date;
+  } else {
+    //locale en-GB adds space between components
+    return date.toLocaleDateString('en-GB',{timeZone:"UTC",month:"short", day:"2-digit", year:"numeric"}).replaceAll(" ","-");
+  }
 }
 
 
