@@ -136,9 +136,7 @@ function getBonWithMails(prefix,mailsSince, callBack = console.log) {
 
   let searchCriteria=['ALL', ['SUBJECT', searchSubject]];
   if(mailsSince) {
-    //searchCriteria.push(["OR", ['SINCE', formatSearchDate(mailsSince)],"UNSEEN"])
-    searchCriteria.push(['SINCE', formatSearchDate(mailsSince)])
-
+    searchCriteria.push(["OR", ['SINCE', formatSearchDate(mailsSince)],"UNSEEN"])
   }
 
   getMails("INBOX", searchCriteria, false, (status, data) => {
