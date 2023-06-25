@@ -22,7 +22,7 @@ module.exports = class IzettleFunctionsClass {
         self.savePurchases(purchases);
         self.consumePurchases(purchases);
         console.log(`processed ${purchases.length} Izettle purchases`);
-      }, 1);      
+      }, this.config.iZettle.lookDaysBack!==undefined?this.config.iZettle.lookDaysBack:1);      
     }
 
     if (periodic) {
@@ -77,7 +77,7 @@ module.exports = class IzettleFunctionsClass {
       httpArgs = `lastPurchaseHash=${lastPurchaseHash}`;
     } else {
       var d = new Date();
-      d.setDate(d.getDate() - daysBack);
+      d.setDate(d.getDate() - parseInt(daysBack));
       httpArgs = `startDate=${d.toISOString()}`;
     }
     let self = this;
