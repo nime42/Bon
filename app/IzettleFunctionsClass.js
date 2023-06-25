@@ -312,8 +312,8 @@ module.exports = class IzettleFunctionsClass {
     bon.customer.surname=purchase.userDisplayName;
     
     bon.delivery_date=new Date(purchase.created).toJSON();
-    bon.kitchen_info="PurchaseNr:"+purchase.purchaseNumber;
-    bon.invoice_info="Izettle";
+    bon.kitchen_info="";
+    bon.invoice_info="Izettle PurchaseNr:"+purchase.purchaseNumber;
     bon.orders=this.createOrderFromProduct(purchase);
     let pax=bon.orders.reduce((total,o)=>{
       return total+parseInt(o.quantity);
