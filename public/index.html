@@ -30,7 +30,7 @@
     <script src="js/BonCalendar.js"></script>
     <script src="js/BonStrip.js"></script>
     <script src="js/helpers.js"></script>
-    <script src="js/ItemsList.js"></script>     
+    <script src="js/ItemsList.js"></script>
     <script src="js/BonForm.js"></script>
     <script src="js/BonRepository.js"></script>
     <script src="js/BonConfig.js"></script>
@@ -56,10 +56,10 @@
         }
 
         function gotoMenu(elem) {
-            if(!elem) {
+            if (!elem) {
                 return;
             }
-            document.querySelector("#menu-header").innerText=elem.innerText;
+            document.querySelector("#menu-header").innerText = elem.innerText;
             let menuId = elem.href.split("#")[1];
             let menus = document.querySelector("#menu-elems");
             Array.from(menus.children).forEach(m => {
@@ -91,14 +91,14 @@
 
 
         function syncMenu() {
-            let url=window.location.href;
-            let m=url.match(/#.*/);
-            if(m) {
-                let menuId=m[0];
+            let url = window.location.href;
+            let m = url.match(/#.*/);
+            if (m) {
+                let menuId = m[0];
                 try {
                     document.querySelector(`a[href='${menuId}'`).onclick();
                     toggleMenu();
-                } catch(err) {}
+                } catch (err) { }
             }
         }
 
@@ -111,26 +111,42 @@
 
     <!-- Top Navigation Menu -->
     <div class="topnav">
-        <a href="#home" class="menu" onclick="toggleMenu()">RR<span id="menu-header"></span><span id="bon-instance" style="float: right;margin-right: 50%;margin-bottom: 0;font-weight: bold;">Hej</span></a>
+        <a href="#home" class="menu" onclick="toggleMenu()">RR<span id="menu-header"></span><span id="bon-instance"
+                style="float: right;margin-right: 50%;margin-bottom: 0;font-weight: bold;">Hej</span></a>
         <div id="myLinks">
-            <a href="#calendar" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i> Kalender</a>
-            <a href="#mails" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myMails.refreshMails(true);toggleMenu();"><i class="fa fa-envelope"></i> Mails</a>
-            <a href="#week" data-check-access="${ADMIN}" onclick="console.log('week');gotoMenu(this);Globals.myWeekWiew.refresh();toggleMenu();"><i class="fa fa-home"></i> Ugeoversigt</a>
-            <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i class="fa fa-cutlery"></i> Køkken idag</a>
-            <a href="#future" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i class="fa fa-sun-o"></i>køkken senere</a>
+            <a href="#calendar" data-check-access="${ADMIN} || ${USER}"
+                onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i>
+                Kalender</a>
+            <a href="#mails" data-check-access="${ADMIN} || ${USER}"
+                onclick="gotoMenu(this);Globals.myMails.refreshMails(true);toggleMenu();"><i class="fa fa-envelope"></i>
+                Mails</a>
+            <a href="#week" data-check-access="${ADMIN}"
+                onclick="console.log('week');gotoMenu(this);Globals.myWeekWiew.refresh();toggleMenu();"><i
+                    class="fa fa-home"></i> Ugeoversigt</a>
+            <a href="#kitchen" data-check-access=""
+                onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i
+                    class="fa fa-cutlery"></i> Køkken idag</a>
+            <a href="#future" data-check-access="${ADMIN} || ${USER}"
+                onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i
+                    class="fa fa-sun-o"></i>køkken senere</a>
             <a href="#grocy" id="link-to-grocy"><i class="fa fa-database"> Grocy</i></a>
-            <a href="#invoices" data-check-access="${ADMIN}" onclick="gotoMenu(this);Globals.myInvoiceBonWall.getBonsForInvoice();toggleMenu();"><i class="fa fa-money"></i> Fakturer</a>
-            <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i class="fa fa-wrench"></i> Admin</a>
-            <a href="#planning" data-check-access="${ADMIN}" onclick="gotoMenu(this);getOtherBons();toggleMenu();"><i class="fa fa-tasks"></i> Planlægning</a>
-            <a href="#log-in" class="active-menu" onclick="gotoMenu(this);toggleMenu()"><i class="fa fa-key">Login</i></a>
+            <a href="#invoices" data-check-access="${ADMIN}"
+                onclick="gotoMenu(this);Globals.myInvoiceBonWall.getBonsForInvoice();toggleMenu();"><i
+                    class="fa fa-money"></i> Fakturer</a>
+            <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i
+                    class="fa fa-wrench"></i> Admin</a>
+            <a href="#planning" data-check-access="${ADMIN}" onclick="gotoMenu(this);getOtherBons();toggleMenu();"><i
+                    class="fa fa-tasks"></i> Planlægning</a>
+            <a href="#log-in" class="active-menu" onclick="gotoMenu(this);toggleMenu()"><i
+                    class="fa fa-key">Login</i></a>
             <span id="version" style="
                 margin-left: 15px;
                 font-size: smaller;
                 font-weight: bold;
                 font-style: italic;
             ">ver %{version}%</span> <!--This will be set from deploy.sh-->
-            
-    
+
+
 
 
 
@@ -140,7 +156,7 @@
         </a>
     </div>
     <div id="new-bon" style="width: fit-content;padding: 5px;">
-   </div>
+    </div>
 
     <div id="menu-elems" style="margin-top: 5%;">
         <section id="log-in">
@@ -161,8 +177,7 @@
                     <div class="row">
                         <div class="six columns">
                             <label for="pwd">Password</label>
-                            <input name="password" class="u-full-width" type="password" placeholder="password"
-                                id="pwd">
+                            <input name="password" class="u-full-width" type="password" placeholder="password" id="pwd">
                         </div>
                     </div>
                     <div class="row">
@@ -198,9 +213,10 @@
                     <div class="row">
                         <div class="six columns">
                             <label for="user-forgot">Email</label>
-                            <input class="u-full-width" type="text" placeholder="email" id="user-forgot"  name="identity">
+                            <input class="u-full-width" type="text" placeholder="email" id="user-forgot"
+                                name="identity">
                         </div>
-                    </div> 
+                    </div>
                     <div class="row">
                         <div class="three columns">
                             <input class="button-primary" type="submit" id="send" value="Skicka">
@@ -265,7 +281,7 @@
 
                     <div class="row">
                         <div class="three columns">
-                            <input class="button-primary" type="submit"  value="Uppdater">
+                            <input class="button-primary" type="submit" value="Uppdater">
                         </div>
                         <div class="three columns">
                             <input class="button" type="button" id="cancel" value="Avbryd"
@@ -305,33 +321,35 @@
 
         <section id="planning" style="display:none">
             <div style="margin:auto;width:600px">
-            <div id="plan-bon" style="width: 300px;float:left"></div>
-            <div style="width: 300px; float:left">
-            <style>
-                #other-bons-div {
-                    margin-left: 15px;
-                    min-width:250px;
-                    background: #f1e6b2;
-                    box-shadow: 5px 5px 5px grey;
-                    padding-left: 10px;
-                    border: 2px solid #8e631f;
-                     
-                }
-                #other-bons-div ul {
-                  list-style: none;
-                }
-                #other-bons-div li {
-                  margin-bottom: -10px;
-                }
-              </style>
-              <div id="other-bons-div">
-              <label style="padding:0">Andre Bons:</label>
-              <ul id="other-bons-list" style="max-height: 450px;overflow: auto;min-height: 80px;">
+                <div id="plan-bon" style="width: 300px;float:left"></div>
+                <div style="width: 300px; float:left">
+                    <style>
+                        #other-bons-div {
+                            margin-left: 15px;
+                            min-width: 250px;
+                            background: #f1e6b2;
+                            box-shadow: 5px 5px 5px grey;
+                            padding-left: 10px;
+                            border: 2px solid #8e631f;
 
-            </ul>
+                        }
+
+                        #other-bons-div ul {
+                            list-style: none;
+                        }
+
+                        #other-bons-div li {
+                            margin-bottom: -10px;
+                        }
+                    </style>
+                    <div id="other-bons-div">
+                        <label style="padding:0">Andre Bons:</label>
+                        <ul id="other-bons-list" style="max-height: 450px;overflow: auto;min-height: 80px;">
+
+                        </ul>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
 
         </section>
@@ -340,21 +358,21 @@
     </div>
     <script>
 
-        
+
 
         function initPlanBon() {
-            Globals.planBonStrip=new BonStrip("#plan-bon",true);
-            let planBon={
-                customer:{
+            Globals.planBonStrip = new BonStrip("#plan-bon", true);
+            let planBon = {
+                customer: {
                     "forename": "Planning",
                     "surname": "",
                     "email": "",
-                    "phone_nr": "" 
+                    "phone_nr": ""
                 },
-                delivery_date:new Date(),
-                id:0,
-                price_category:"Festival",
-                delivery_address:{
+                delivery_date: new Date(),
+                id: 0,
+                price_category: "Festival",
+                delivery_address: {
                     "street_name": "",
                     "street_name2": "",
                     "street_nr": "",
@@ -362,93 +380,92 @@
                     "city": ""
                 },
                 kitchen_info: "",
-                nr_of_servings:0,
-                payment_type:""
+                nr_of_servings: 0,
+                payment_type: ""
 
 
             }
-        
+
             Globals.planBonStrip.initFromBon(planBon);
 
         }
 
-    function getOtherBons() {
-        let today = new Date();
-        let todayStr = today.toISOString().split('T')[0];
+        function getOtherBons() {
+            let today = new Date();
+            let todayStr = today.toISOString().split('T')[0];
 
-        Globals.myConfig.myRepo.searchBons({ afterDate: todayStr,includeOrders:true }, (bons) => {
-            let otherBonsList=document.querySelector("#other-bons-list");
-            let checkedBons = Array.from(otherBonsList.querySelectorAll("input:checked")).map(e=>{return e.id});
+            Globals.myConfig.myRepo.searchBons({ afterDate: todayStr, includeOrders: true }, (bons) => {
+                let otherBonsList = document.querySelector("#other-bons-list");
+                let checkedBons = Array.from(otherBonsList.querySelectorAll("input:checked")).map(e => { return e.id });
 
-            otherBonsList.innerHTML="";
-            bons.forEach(b=> {
-                let li = document.createElement("li");
-                let text=`<b>#${b.id}</b> ${new Date(b.delivery_date).toLocaleDateString()} ${new Date(b.delivery_date).toLocaleTimeString()}`
-                li.innerHTML=`<input type="checkbox" id=${b.id} ${(checkedBons.find(e=>(e==b.id))!=undefined?"checked":"")}> ${text}`;
-                let checkbox=li.querySelector("input");
-                checkbox.onchange=()=>{
-                    if(checkbox.checked) {
-                        Globals.planBonStrip.addOrders(b.orders);
-                    } else {
-                        Globals.planBonStrip.addOrders(b.orders,-1);
+                otherBonsList.innerHTML = "";
+                bons.forEach(b => {
+                    let li = document.createElement("li");
+                    let text = `<b>#${b.id}</b> ${new Date(b.delivery_date).toLocaleDateString()} ${new Date(b.delivery_date).toLocaleTimeString()}`
+                    li.innerHTML = `<input type="checkbox" id=${b.id} ${(checkedBons.find(e => (e == b.id)) != undefined ? "checked" : "")}> ${text}`;
+                    let checkbox = li.querySelector("input");
+                    checkbox.onchange = () => {
+                        if (checkbox.checked) {
+                            Globals.planBonStrip.addOrders(b.orders);
+                        } else {
+                            Globals.planBonStrip.addOrders(b.orders, -1);
+                        }
                     }
-                }
-                otherBonsList.appendChild(li)
+                    otherBonsList.appendChild(li)
+                })
             })
-        })
-    }
+        }
 
     </script>
 
     <script>
-        $( document). ready(function() {
-            $( document ).ajaxError(function( event, jqxhr, settings, thrownError ) {
-                if(jqxhr.status===401 && settings.url!="login") {
-                        logout();
+        $(document).ready(function () {
+            $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
+                if (jqxhr.status === 401 && settings.url != "login") {
+                    logout();
                 }
-             });
+            });
         });
 
 
         document.querySelector("#link-to-grocy").href = Globals.grocyLink;
         document.querySelector("#bon-instance").innerHTML = Globals.bonInstance;
-        document.querySelector("#version").style.color=Globals.foreground;
+        document.querySelector("#version").style.color = Globals.foreground;
 
 
- 
+
         Globals.myLoginHandler = new LoginHandler();
         Globals.myLoginHandler.setLoginForm("#login");
         Globals.myLoginHandler.whenLoggedIn(() => {
 
-            Globals.myConfig=new BonConfig("#admin");
+            Globals.myConfig = new BonConfig("#admin");
 
-            Globals.myCalender=new BonCalendar("#calendar-div");
+            Globals.myCalender = new BonCalendar("#calendar-div");
 
-            Globals.myMails=new BonMails("#mails");
-            Globals.myMails.refreshMails();
+            Globals.myMails = new BonMails("#mails");
 
-            Globals.myKitchenBonWall=new BonWall("#kitchen",["approved","preparing","done"]);
+            Globals.myKitchenBonWall = new BonWall("#kitchen", ["approved", "preparing", "done"]);
 
-            Globals.myInvoiceBonWall=new BonWall("#invoices",["delivered"]);
+            Globals.myInvoiceBonWall = new BonWall("#invoices", ["delivered"]);
 
-            Globals.myFutureBonWall=new BonWall("#future",["new","needInfo","approved","preparing"]);
+            Globals.myFutureBonWall = new BonWall("#future", ["new", "needInfo", "approved", "preparing"]);
 
-            
-            Globals.myWeekWiew=new WeekView("#week");
+
+            Globals.myWeekWiew = new WeekView("#week");
             Globals.myWeekWiew.setOnChange(Globals.myWeekWiew.fetchBons);
 
-            Globals.myNotifier=new Notifier("#new-bon");
+            Globals.myNotifier = new Notifier("#new-bon");
             Globals.myNotifier.setCheckInterval(3);
 
             Globals.myLoginHandler.getUserInfo((userInfo) => {
                 Globals.userInfo = userInfo;
                 Globals.myLoginHandler.checkAccess(Globals.userInfo?.roles);
 
-                if(window.location.href.match(/#.*/) && !window.location.href.match("#login-tab")) {
+                if (window.location.href.match(/#.*/) && !window.location.href.match("#login-tab")) {
                     syncMenu();
                 } else {
 
-                    if(userInfo.roles.find(r=>(r==="ADMIN"))) {
+                    if (userInfo.roles.find(r => (r === "ADMIN"))) {
                         document.querySelector('a[href="#calendar"]').onclick();
                         toggleMenu();
                     } else {
