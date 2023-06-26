@@ -444,9 +444,10 @@ module.exports = class GrocyFunctions {
             purchase_amount=recipy_pos.amount*conversion.factor;
         }
 
-        let stockPrice=averagePriceLookup[p.id]?.price?averagePriceLookup[p.id].price:0;
-        if(!stockPrice) {
-            stockPrice=lastPurchaseLookup[p.id]?.price?lastPurchaseLookup[p.id].price:0;
+        let stockPrice=lastPurchaseLookup[p.id]?.price?lastPurchaseLookup[p.id].price:undefined;
+        
+        if(stockPrice===undefined) {
+            stockPrice=averagePriceLookup[p.id]?.price?averagePriceLookup[p.id].price:0;
         }
 
         let res={

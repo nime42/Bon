@@ -335,7 +335,7 @@ app.get("/api/productFile", (req, res) => {
                     if(!isNaN(v)) {
                         worksheet.cell(row, col++).number(+Number(v).toFixed(2));
                     } else {
-                        worksheet.cell(row, col++).string(v);
+                        worksheet.cell(row, col++).string(v!==undefined?v:"");
                     }  
                 })
                 row++;
