@@ -325,6 +325,12 @@ module.exports = class GrocyFunctions {
                 last_purchased[l.product_id]=l;
             })
 
+            let average_price={};
+            objects["products_average_price"].forEach(l=>{
+                average_price[l.product_id]=l;
+            })
+
+
             let quantityUnitLookUp = {};
             objects["quantity_units"].forEach(u => {
                 quantityUnitLookUp[u.id] = u;
@@ -342,7 +348,7 @@ module.exports = class GrocyFunctions {
                 if (recipePosLookup[recipe_id] == undefined) {
                     recipePosLookup[recipe_id] = [];
                 }
-                recipePosLookup[recipe_id].push(this.parseIngredient(p,productsLookUp,quantityUnitsConversionLookup,quantityUnitLookUp,last_purchased));
+                recipePosLookup[recipe_id].push(this.parseIngredient(p,productsLookUp,quantityUnitsConversionLookup,quantityUnitLookUp,last_purchased,average_price));
             })
 
 
@@ -383,7 +389,8 @@ module.exports = class GrocyFunctions {
             "recipes_nestings",
             "quantity_units",
             "quantity_unit_conversions",
-            "products_last_purchased"
+            "products_last_purchased",
+            "products_average_price"
         ];
         let res = {}
         let requests = objects.length;
@@ -424,7 +431,7 @@ module.exports = class GrocyFunctions {
 
 
 
-    parseIngredient(recipy_pos,productLookUp,conversionLookup,quantityUnitLookUp,purchaseLookup) {
+    parseIngredient(recipy_pos,productLookUp,conversionLookup,quantityUnitLookUp,lastPurchaseLookup,averagePriceLookup) {
         let p=productLookUp[recipy_pos.product_id];
         //console.log(recipy_pos);
         //console.log(p);
@@ -436,6 +443,12 @@ module.exports = class GrocyFunctions {
         if(conversion!=undefined) {
             purchase_amount=recipy_pos.amount*conversion.factor;
         }
+
+        let stockPrice=averagePriceLookup[p.id]?.price?averagePriceLookup[p.id].price:0;
+        if(!stockPrice) {
+            stockPrice=lastPurchaseLookup[p.id]?.price?lastPurchaseLookup[p.id].price:0;
+        }
+
         let res={
             name:p.name,
             product_id:p.id,
@@ -445,7 +458,7 @@ module.exports = class GrocyFunctions {
             conversion:conversion,
             purchase_amount:purchase_amount,
             variable_amount:recipy_pos.variable_amount,
-            stock_price:(purchaseLookup[p.id]?.price?purchaseLookup[p.id]?.price:0)*(recipy_pos.amount?recipy_pos.amount:0)
+            stock_price:(stockPrice)*(recipy_pos.amount?recipy_pos.amount:0)
         }
         //console.log(res);
         return res;
