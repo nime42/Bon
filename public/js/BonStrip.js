@@ -785,12 +785,20 @@ class BonStrip {
             quantity=quantity!=undefined?Number(quantity):1;
             totCostPrice+=costPrice*quantity;
             totPrice+=price*quantity;
+            let id=order.querySelector("#item-id").value;
+            if(id=="null") {
+                id=null;
+            }
+            let izettle_product_id=order.querySelector("#izettle-product-id").value;
+            if(izettle_product_id=="null") {
+                izettle_product_id=null;
+            }
            return {
             quantity:order.querySelector("#quantity").innerText,
             name:order.querySelector("#order-name").innerText,
             comment:order.querySelector("#comment").innerText,
-            id:order.querySelector("#item-id").value,
-            izettle_product_id:order.querySelector("#izettle-product-id").value,
+            id:id,
+            izettle_product_id:izettle_product_id,
             price:price,
             cost_price:costPrice
             }
@@ -995,7 +1003,7 @@ class BonStrip {
         otherOrders.forEach(o=>{
             o.comment=o.special_request; //in DB it's called special_request but in bon it's called comment, my misstake :-/
             o.id=o.item_id
-            let existing=orders.find(e=>(e.id==o.id && e.comment==o.comment))
+            let existing=orders.find(e=>((e.id==o.id ||(e.id==null && e.izettle_product_id==o.izettle_product_id)) && e.comment==o.comment))
             if(existing) {
                 existing.quantity=Number(existing.quantity)+Number(o.quantity)*factor;
             } else {
