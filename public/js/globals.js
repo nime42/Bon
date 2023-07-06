@@ -5,7 +5,7 @@ class Globals {
     static shadowColor="#446e74";
 
 
-    static grocyLink="${config.grocy.url}"; //these values is replaced from resources/config.js by replaceFromConfig.js
+    static grocyLink="${config.grocy.url}/shoppinglist"; //these values is replaced from resources/config.js by replaceFromConfig.js
     static bonPrefix="${config.bonPrefix}";
     static bonInstance="${config.bonInstance}";
 
