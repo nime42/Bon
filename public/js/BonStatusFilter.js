@@ -93,4 +93,9 @@ class BonStatusFilter {
         })
         return res; 
     }
+
+    getActiveStatuses() {
+        let statuses=this.getStatuses();
+        return Object.keys(statuses).filter(e=>(statuses[e]));
+    }
  }

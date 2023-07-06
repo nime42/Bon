@@ -121,7 +121,7 @@
                 onclick="gotoMenu(this);Globals.myMails.refreshMails(true);toggleMenu();"><i class="fa fa-envelope"></i>
                 Mails</a>
             <a href="#week" data-check-access="${ADMIN}"
-                onclick="console.log('week');gotoMenu(this);Globals.myWeekWiew.refresh();toggleMenu();"><i
+                onclick="gotoMenu(this);Globals.myWeekWiew.refresh();toggleMenu();"><i
                     class="fa fa-home"></i> Ugeoversigt</a>
             <a href="#kitchen" data-check-access=""
                 onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i
@@ -135,7 +135,7 @@
                     class="fa fa-money"></i> Fakturer</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i
                     class="fa fa-wrench"></i> Admin</a>
-            <a href="#planning" data-check-access="${ADMIN}" onclick="gotoMenu(this);getOtherBons();toggleMenu();"><i
+            <a href="#planning" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);getOtherBons();toggleMenu();"><i
                     class="fa fa-tasks"></i> Planlægning</a>
             <a href="#log-in" class="active-menu" onclick="gotoMenu(this);toggleMenu()"><i
                     class="fa fa-key">Login</i></a>
@@ -321,8 +321,9 @@
 
         <section id="planning" style="display:none">
             <div style="margin:auto;width:600px">
-                <div id="plan-bon" style="width: 300px;float:left"></div>
-                <div style="width: 300px; float:left">
+                <div id="planning-status-filter"></div>
+                <div id="plan-bon" style="min-width: 300px;float:left"></div>
+                <div style="float:left">
                     <style>
                         #other-bons-div {
                             margin-left: 15px;
@@ -344,9 +345,7 @@
                     </style>
                     <div id="other-bons-div">
                         <label style="padding:0">Andre Bons:</label>
-                        <ul id="other-bons-list" style="max-height: 450px;overflow: auto;min-height: 80px;">
-
-                        </ul>
+                        <ul id="other-bons-list" style="max-height: 450px;overflow: auto;min-height: 80px;"></ul>
                     </div>
                 </div>
             </div>
@@ -361,6 +360,25 @@
 
 
         function initPlanBon() {
+            Globals.planStatusFilter=new BonStatusFilter(document.querySelector("#planning-status-filter"));
+            Globals.planStatusFilter.setStatus("closed",false);
+            Globals.planStatusFilter.setStatus("invoiced",false);
+            
+            Globals.planStatusFilter.setOnStatusChange((changedStatus, statusValues)=>{
+                if(!statusValues[changedStatus]) {
+                    let otherBonsList = document.querySelector("#other-bons-list");
+                    let elemsWithStatus=otherBonsList.getElementsByClassName("my_status_"+changedStatus);
+                    Array.from(elemsWithStatus).filter(e=>true).forEach(e=>{
+                        let checkbox=e.querySelector("input");
+                        if(checkbox.checked) {
+                            checkbox.checked=false;
+                            checkbox.onchange();
+                        }
+
+                    });
+                }
+                getOtherBons();
+            });
             Globals.planBonStrip = new BonStrip("#plan-bon", true);
             let planBon = {
                 customer: {
@@ -393,16 +411,19 @@
         function getOtherBons() {
             let today = new Date();
             let todayStr = today.toISOString().split('T')[0];
+            let statuses=Globals.planStatusFilter.getActiveStatuses();
 
-            Globals.myConfig.myRepo.searchBons({ afterDate: todayStr, includeOrders: true }, (bons) => {
+            Globals.myConfig.myRepo.searchBons({includeOrders: true ,status:statuses}, (bons) => {
                 let otherBonsList = document.querySelector("#other-bons-list");
                 let checkedBons = Array.from(otherBonsList.querySelectorAll("input:checked")).map(e => { return e.id });
 
                 otherBonsList.innerHTML = "";
                 bons.forEach(b => {
                     let li = document.createElement("li");
+                    li.classList.add("my_status_"+b.status);
                     let text = `<b>#${b.id}</b> ${new Date(b.delivery_date).toLocaleDateString()} ${new Date(b.delivery_date).toLocaleTimeString()}`
                     li.innerHTML = `<input type="checkbox" id=${b.id} ${(checkedBons.find(e => (e == b.id)) != undefined ? "checked" : "")}> ${text}`;
+                    li.style.background=Globals.Statuses[b.status].color;
                     let checkbox = li.querySelector("input");
                     checkbox.onchange = () => {
                         if (checkbox.checked) {
@@ -465,7 +486,7 @@
                     syncMenu();
                 } else {
 
-                    if (userInfo.roles.find(r => (r === "ADMIN"))) {
+                    if (Globals.myLoginHandler.hasRole(userInfo,"ADMIN")) {
                         document.querySelector('a[href="#calendar"]').onclick();
                         toggleMenu();
                     } else {
@@ -473,7 +494,13 @@
                         toggleMenu();
                     }
                 }
+
+                if (Globals.myLoginHandler.hasRole(userInfo,"ADMIN")) {
+                    Globals.planBonStrip.showCostPrices(true);
+                }
             });
+
+            
 
             document.querySelector("#login").style.display = "none";
             document.querySelector("#logout").style.display = "";

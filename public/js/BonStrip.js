@@ -363,7 +363,7 @@ class BonStrip {
             if(izettle_product_id=="null") {izettle_product_id=null;}
             if(self.currentOrder) {
                 self.currentOrder.querySelector("#quantity").innerText=quantity;
-                self.currentOrder.querySelector("#total-cost").innerText=(quantity*price)+" kr";
+                self.currentOrder.querySelector("#total-cost").innerText=(quantity*price).toFixed(2)+ (this.showCostPrice?" ("+(quantity*cost_price).toFixed(2)+")":"") + " kr";
                 if(self.hidePrice) {
                     self.currentOrder.querySelector("#total-cost").style.display="none";
                 }
@@ -635,8 +635,9 @@ class BonStrip {
 
     addOrder(quantity,name,comment,id,price,cost_price,category,izettle_product_id) {
         let totalCost=(quantity*price).toFixed(2);
+        let totalCostPrice=(quantity*cost_price).toFixed(2);
         let tmp=`
-        <span id="quantity" class="nr-of">${quantity}</span><span class="x-sign">X</span><span id="order-name" class="order-name">${name}</span><span id="total-cost" class="price-box">${totalCost} kr</span><br>
+        <span id="quantity" class="nr-of">${quantity}</span><span class="x-sign">X</span><span id="order-name" class="order-name">${name}</span><span id="total-cost" class="price-box">${totalCost} ${this.showCostPrice?" ("+totalCostPrice+")":""} kr</span><br>
         <span id="comment" class="order-info">${comment}</span>
         <input type="hidden" id="item-id" value="${id}">
         <input type="hidden" id="izettle-product-id" value="${izettle_product_id}">
@@ -772,6 +773,10 @@ class BonStrip {
         }
     }
 
+    showCostPrices(trueFalse) {
+        this.showCostPrice=trueFalse;
+    }
+
     getOrders() {
         let totCostPrice=0;
         let totPrice=0;
@@ -816,20 +821,27 @@ class BonStrip {
     }
 
     updateTotalSum() {
-        let totSum=this.calculateTotalSum();
-        this.myDiv.querySelector("#total-sum").innerHTML=totSum.toFixed(2)+" kr";
+        let totSums=this.calculateTotalSum();
+        let tot=`${totSums.totalCost.toFixed(2)} ${this.showCostPrice?" ("+totSums.totalCostPrice.toFixed(2)+")":""} kr`
+        this.myDiv.querySelector("#total-sum").innerHTML=tot;
     }
 
-    calculateTotalSum() {
-        let sum=this.getOrders().orders.reduce((tot,order)=>{
-            let s=(order.quantity*order.price);
-            if(isNaN(s)) {
-                s=0;
-            }
-            return tot+s;
-        },0);
-        return sum;
 
+
+    calculateTotalSum() {
+        let totalCost=0;
+        let totalCostPrice=0;
+        this.getOrders().orders.forEach(order=>{
+            let cost=(order.quantity*order.price);
+            if(isNaN(cost)) {cost=0};
+            totalCost+=cost;
+            let costPrice=(order.quantity*order.cost_price);
+            if(isNaN(costPrice)) {costPrice=0};
+            totalCostPrice+=costPrice;
+
+        })
+        return {totalCost:totalCost,totalCostPrice:totalCostPrice}
+        
 
     }
 
@@ -1003,7 +1015,7 @@ class BonStrip {
         otherOrders.forEach(o=>{
             o.comment=o.special_request; //in DB it's called special_request but in bon it's called comment, my misstake :-/
             o.id=o.item_id
-            let existing=orders.find(e=>((e.id==o.id ||(e.id==null && e.izettle_product_id==o.izettle_product_id)) && e.comment==o.comment))
+            let existing=orders.find(e=>(((e.id!=null && e.id==o.id) ||(e.id==null && e.izettle_product_id==o.izettle_product_id)) && e.comment==o.comment))
             if(existing) {
                 existing.quantity=Number(existing.quantity)+Number(o.quantity)*factor;
             } else {
@@ -1021,7 +1033,6 @@ class BonStrip {
             this.updateTotalSum();
         }
 
-        console.log(orders,otherOrders);
     }
 
  

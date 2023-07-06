@@ -112,7 +112,7 @@ module.exports = class DB {
 
     searchBons(searchParams, includeOrders, callback = console.log) {
 
-        let statuses = ['new', 'needInfo', 'approved', 'preparing', 'done', 'delivered', 'invoiced', 'offer'];
+        let statuses = ['new', 'needInfo', 'approved', 'preparing', 'done', 'delivered', 'invoiced',"closed", 'offer'];
         let statusSearchConstr;
         if (searchParams.status) {
             let elems = [];
@@ -647,10 +647,10 @@ module.exports = class DB {
         let izettleStmt=this.db.prepare(izettleSQl);
 
         orders.forEach(o=> {
-            if(o.id!="") {
+            if(o.id!=null && o.id!="") {
                 let row=grocyStmt.get(o.id);
                 o.external_id=row?.external_id;
-            } else if (o.izettle_product_id!="") {
+            } else if (o.izettle_product_id!=null && o.izettle_product_id!="") {
                 let row=izettleStmt.get(o.izettle_product_id);
                 o.external_id=row?.external_id;
             }
