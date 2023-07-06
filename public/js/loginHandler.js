@@ -415,6 +415,14 @@ class LoginHandler {
 
     }
 
+    hasRole(userInfo,role) {
+        if (userInfo.roles.find(r => (r === role))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     checkAccess(roles, elem) {
         let root = document;
         if (elem) {
