@@ -9,7 +9,6 @@ class TableEnhancer {
       let x, w;
       const mouseMove = (e) => {
         const dx = e.clientX - x;
-        console.log(dx, `${w + dx}px`);
         h.style.width = `${w + dx}px`;
       };
       const mouseUp = (e) => {

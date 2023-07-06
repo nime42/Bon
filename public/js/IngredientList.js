@@ -136,7 +136,6 @@ class IngredientList {
 
     let body = this.myDiv.querySelector("#ingredients");
     body.innerHTML = "";
-    console.log(unique);
     uniqueProducts.forEach(e=>{
       let r=this.createRow(e);
       body.append(r);
@@ -179,7 +178,6 @@ class IngredientList {
   }
 
   expandNestedRecipies(quantity,nested) {
-    console.log(quantity,nested);
     let res=[]
     nested.forEach(n=>{
       if(n.recipy.nestedRecipies.length>0) {
