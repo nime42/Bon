@@ -336,7 +336,7 @@ module.exports = class IzettleFunctionsClass {
       }
       let order={
         comment: "",
-        cost_price: 0,
+        cost_price: product.cost_price!=null?product.cost_price:0,
         id: null,
         izettle_product_id: product.id,
         price: p.unitPrice/100.0,
@@ -350,7 +350,7 @@ module.exports = class IzettleFunctionsClass {
 
   getProduct(product) {
     let sql=`
-    select p.*,i.external_id from izettle_products p
+    select p.*,i.external_id,i.cost_price from izettle_products p
     left join items i on p.grocy_item_id =i.id
     where p.name=?
     `;
