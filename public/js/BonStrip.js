@@ -224,6 +224,8 @@ class BonStrip {
         <i id="show-mails" class="fa fa-envelope" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Send mail til kunden!"></i>        
         <i id="notify-kitchen" class="fa fa-paper-plane" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Send en besked til køkkenet!";margin-right: 10px;></i>
         <i id="ingredients-info" class="fa fa-info-circle" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="ingredienser!"></i>        
+        <i id="move-bon" class="fa fa-exchange fa-rotate-90" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Flytte til anden server!"></i>
+        <select id="other-bon-instances" style="display:none;"></select>
         <div id="items-list" style="display:none"></div>
         <div id="mail-list" style="display:none"></div>
         </div>
@@ -898,6 +900,7 @@ class BonStrip {
     }
 
     setPaymentType(pType) {
+        this.isProductionBon(pType);
         this.myDiv.querySelector("#payment-type").innerHTML=pType;
     }
 
@@ -982,7 +985,7 @@ class BonStrip {
 
     updatePaymentTypeOnChange(paymentElem) {
         let f=()=> {
-            this.myDiv.querySelector("#payment-type").innerHTML=paymentElem.value;
+            this.setPaymentType(paymentElem.value);
         }
         paymentElem.onchange=f;
     }
@@ -1035,6 +1038,66 @@ class BonStrip {
 
     }
 
- 
+    isMoveable(bool,moveFunction,bonInstances) {
+        if(bool) {
+            this.myDiv.querySelector("#move-bon").style.display="";
+            this.myDiv.querySelector("#move-bon").onclick=() => {
+                let otherBonInstances=this.myDiv.querySelector("#other-bon-instances");
+                otherBonInstances.onchange=(e)=>{
+                    let bonPrefix=e.target.value;
+                    let bonServer=otherBonInstances.options[otherBonInstances.selectedIndex].text;
+                    setTimeout(()=>{ //so select element changes before confirm window is seen.
+                        if(confirm(`Vil du flytte bon ${this.bonId} til Bon-server ${bonServer}?`)) {
+                            this.myRepo.moveBon(this.bonId,bonPrefix,false,(status,data)=>{
+                                moveFunction(status,data);
+                                otherBonInstances.style.display="none";
+                            })
+                            
+                        }
+                    },100);
+                    
+                    
+                };
+
+                if(otherBonInstances.style.display==="none") {
+                    let instances=[];
+                    if(bonInstances instanceof Function) {
+                        instances=bonInstances();
+                    } else {
+                        instances=bonInstances;
+                    }
+                    otherBonInstances.style.display="";
+                    otherBonInstances.innerHTML="";
+                    let f=document.createElement("option");
+                    f.text="vælg Bon-server...";
+                    f.style.display="none";
+                    otherBonInstances.add(f);
+                    instances.forEach(i=>{
+                        let o=document.createElement("option");
+                        o.text=i.instance;
+                        o.value=i.prefix;
+                        otherBonInstances.add(o);
+                    });
+
+                } else {
+                    otherBonInstances.style.display="none";
+                }
+            }           
+        } else {
+            this.myDiv.querySelector("#move-bon").style.display="none";
+            this.myDiv.querySelector("#other-bon-instances").style.display="none";
+        }
+    }
+
+
+    isProductionBon(payment_type) {
+
+        let bonDiv=this.myDiv.querySelector("#bon");
+        if(payment_type=="Produktion") {
+            bonDiv.style.background="lightblue";
+        } else {
+            bonDiv.style.background=this.background;
+        }
+    }
 
 }

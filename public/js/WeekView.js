@@ -156,6 +156,12 @@ class WeekView {
             }
         })
 
+        this.myInstances=[];
+        this.myBonStrip.isMoveable(true,(status,data)=>{
+            this.myPopUp.hide();
+            this.refresh();
+        },()=>{return this.myInstances});
+
         this.myStatusFilter=new BonStatusFilter(this.myDiv.querySelector("#status-filter"));
         this.myStatusFilter.setOnStatusChange((changedStatus, statusValues)=>{
             let show=statusValues[changedStatus];
@@ -233,10 +239,12 @@ class WeekView {
 
 
     fetchBons(monday) {
+        this.myInstances=[];
         this.myRepo.getBonsForWeek(monday, (bonInstances) => {
             let tbody = this.myDiv.querySelector("tbody");
             tbody.innerHTML = "";
             bonInstances.forEach(i => {
+                this.myInstances.push({instance:i.instance,prefix:i.prefix});
                 let tr = document.createElement("tr");
                 tr.innerHTML = this.instanceRow;
                 tr.id = i.prefix;
@@ -300,7 +308,7 @@ class WeekView {
         let [prefix,id]=bon.id.split("-");
         let color=Globals.Statuses[bon.status]?.color;
         let time=new Date(bon.delivery_date).toLocaleTimeString("default",{ hour: '2-digit', minute: '2-digit' });
-        let div=`<div id='${bon.id}' class="entry status-${bon.status}" style="background: ${color}; color: black;">${time},#${id},P:${bon.nr_of_servings}<li class="fa fa-envelope mail" style="display:none"></li></div>`
+        let div=`<div id='${bon.id}' class="entry status-${bon.status}" style="background: ${color}; color: black;"><li class="fa fa-wrench" style="display:${bon.payment_type==="Produktion"?"":"none"}"></li>${time},#${id},P:${bon.nr_of_servings}<li class="fa fa-envelope mail" style="display:none"></li></div>`
         let entries=Array.from(col.childNodes);
         if(entries.length===0) {
             col.insertAdjacentHTML("beforeend",div);

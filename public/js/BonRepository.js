@@ -196,6 +196,26 @@ class BonRepository {
         $.get(url,callback);
     }
 
+
+
+    moveBon(id,prefix,force,callback) {
+        let url="api/moveBon/";
+        let body={
+            bonId:id,
+            prefix:prefix,
+            force:force
+        }
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(body),
+            success: function(data,status,xhr) {callback(true,data);},
+            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            contentType: "application/json"
+          });
+    }
+
+
     checkBonStock(callback) {
         let url="api/checkStock";
 

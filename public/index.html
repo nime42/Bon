@@ -498,6 +498,10 @@
                 if (Globals.myLoginHandler.hasRole(userInfo,"ADMIN")) {
                     Globals.planBonStrip.showCostPrices(true);
                 }
+
+                if (!Globals.myLoginHandler.hasRole(userInfo,"ADMIN")) {
+                    Globals.myWeekWiew.myBonStrip.isMoveable(false);
+                }
             });
 
             

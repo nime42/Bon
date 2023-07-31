@@ -136,7 +136,7 @@ module.exports = class DB {
         })
         let sql = `
       select 
-        b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.invoice_info,b.kitchen_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,b.invoice_date,
+        b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.service_type,b.invoice_info,b.kitchen_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,b.invoice_date,
         a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,
         c.forename,c.surname,c.email,c.phone_nr,
         co.name,co.ean_nr,
@@ -214,9 +214,18 @@ module.exports = class DB {
         try {
             this.db.prepare(sql).run(bonId);
 
-            callback(true, null);
+            if (callback === null) {
+                return true;
+            } else {
+                callback(true, null);
+            }
+
         } catch (err) {
-            callback(false, err);
+            if (callback === null) {
+                throw err;
+            } else {
+                callback(false, err);
+            }  
         }
     }
 
@@ -419,9 +428,18 @@ module.exports = class DB {
             "SELECT * FROM items order by category is null,category,name is null,name;";
         try {
             const rows = this.db.prepare(sql).all();
-            callback(true, rows);
+
+            if (callback === null) {
+                return rows;
+            } else {
+                callback(true, rows);
+            }
         } catch (err) {
-            callback(false, err);
+            if (callback === null) {
+                throw err;
+            } else {
+                callback(false, err);
+            }
         }
     }
 

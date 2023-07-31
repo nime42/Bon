@@ -805,6 +805,28 @@ app.get("/api/getBonsForWeek",(req,res)=>{
 
 })
 
+app.post("/api/moveBon", (req, res) => {
+    if (!loginHandler.checkRoles(req, "${ADMIN}")) {
+        res.sendStatus(401);
+        return;
+    }
+    let id=req.body.bonId;
+    let prefix=req.body.prefix;
+    let force=req.body.force;
+    allBonInstances.moveBon(id,prefix,force,(status,result)=>{
+        if(status) {
+            res.json(result);
+        } else {
+            res.sendStatus(500);
+        }
+    });
+}
+)
+/*setTimeout(()=>{
+    allBonInstances.moveBon("test-294","trailer",true);
+},2500);*/
+
+
 app.get("/api/checkStock",(req,res)=>{
     if(!loginHandler.checkRoles(req,"${ADMIN}")) {
         res.sendStatus(401);

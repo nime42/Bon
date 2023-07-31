@@ -151,4 +151,46 @@ module.exports = class OtherBonsHandler {
 
     }
 
+    moveBon(bonId,toInstancePrefix,force,callback) {
+        bonId = bonId + "";
+        let prefix = this.defaultBonPrefix;
+        let parts = bonId.split("-");
+        if (parts.length === 2) {
+            bonId = parts[1];
+            prefix = parts[0];
+        }
+        let fromBonInstance = this.bonInstances[prefix];
+        let toBonInstance = this.bonInstances[toInstancePrefix];
+
+        let newOrders=[];
+        let missing=[];
+
+
+        let [bon]=fromBonInstance.db.searchBons({bonId: bonId},true,null);
+        let orders=bon.orders;
+
+        let toItems=toBonInstance.db.getItems(null);
+        orders.forEach(o=>{
+            let item=toItems.find(i=>(i.name===o.name && i.category===o.category))
+            if(item) {
+                newOrders.push({...o,id:item.id,external_id:item.external_id,comment:o.special_request})
+            } else {
+                missing.push(o);
+            }
+        })
+        bon.orders=newOrders;
+        let newBonId=toBonInstance.db.createBon(bon,null);
+        fromBonInstance.db.delBon(bonId,null);
+        callback(true,{
+            newBon:{
+                bonId:newBonId,
+                prefix:toInstancePrefix
+            },
+            oldBon:{
+                bonId:bonId,
+                prefix:prefix
+            }
+        });
+    }
+
 }
