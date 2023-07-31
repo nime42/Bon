@@ -458,7 +458,7 @@ module.exports = class GrocyFunctions {
             qu_id_purchase:quantityUnitLookUp[recipy_pos.qu_id],
             conversion:conversion,
             purchase_amount:purchase_amount,
-            variable_amount:recipy_pos.variable_amount,
+            variable_amount:recipy_pos.variable_amount!=null?recipy_pos.variable_amount:"",
             stock_price:(stockPrice)*(recipy_pos.amount?recipy_pos.amount:0)
         }
         //console.log(res);
