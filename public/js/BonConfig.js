@@ -860,8 +860,8 @@ class BonConfig {
 
             let newButton=this.myMessages.querySelector("#new-message");
             newButton.onclick=()=>{
-                let newMessage = prompt("indtast navn til ny besked");
-                if(newMessage.trim()!=="") {
+                let newMessage = prompt("indtast navn til ny besked")?.trim();
+                if(newMessage!==undefined && newMessage!=="") {
 
                     this.myRepo.addMessage(newMessage, (status,message) => {
                         if (status) {
