@@ -154,7 +154,7 @@ class CalendarClass {
     this.init(newDate.getFullYear(), newDate.getMonth());
   }
 
-  addEvent(date, header, color, misc, iconClassTokens) {
+  addEvent(date, header, color, misc, icons) {
     if (date.getFullYear() != this.currentYear || date.getMonth() != this.currentMonth) {
       return false;
     }
@@ -169,13 +169,18 @@ class CalendarClass {
 
     event.innerHTML = header;
 
-    if(iconClassTokens) {
-      let icon=document.createElement("li"); 
-      iconClassTokens.forEach(t=> {
-        icon.classList.add(t);
-      })
-      event.appendChild(icon);     
-    }
+    icons?.forEach(iconClassTokens=>{
+      if(iconClassTokens) {
+        let icon=document.createElement("li"); 
+        iconClassTokens.forEach(t=> {
+          icon.classList.add(t);
+        })
+        event.appendChild(icon);     
+      }
+    });
+
+
+  
 
     event.myData = {
       eventTime: date,

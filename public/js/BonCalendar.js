@@ -25,8 +25,8 @@ class BonCalendar {
             self.myBonForm.initFromDate(date,(event,arg1,arg2,arg3) => {
                 if(event==="saved") {
                     let bon=arg1;
-                    let [label,statusColor]=self.myBonForm.createBonLabelAndcolor(bon);
-                    self.myCalendar.addEvent(bon.delivery_date,label,statusColor,bon);
+                    let [label,statusColor,icons]=self.myBonForm.createBonLabelAndcolor(bon);
+                    self.myCalendar.addEvent(bon.delivery_date,label,statusColor,bon,icons);
                 }
 
 
@@ -36,16 +36,13 @@ class BonCalendar {
 
         this.myCalendar.setOnEventClick((eventElem, eventData) => {
             self.myBonForm.initFromBonId(eventData.misc.id,(event,arg1,arg2,arg3) => {
-                let label,statusColor,mailIcon;
+                let label,statusColor,icons;
                 let bon=arg1?arg1:eventData.misc;
-                if(self.haveUnSeenMail(bon.id)) {
-                    mailIcon=["fa","fa-envelope"];
-                }
                 switch(event) {
                     case "saved":
                     case "canceled":
-                        [label,statusColor]=self.myBonForm.createBonLabelAndcolor(bon);
-                        self.myCalendar.updateEvent(eventElem,bon.delivery_date,label,statusColor,bon,mailIcon);
+                        [label,statusColor,icons]=self.myBonForm.createBonLabelAndcolor(bon,self.haveUnSeenMail(bon.id));
+                        self.myCalendar.updateEvent(eventElem,bon.delivery_date,label,statusColor,bon,icons);
                         break;
                     case "copied":
                         [label,statusColor]=self.myBonForm.createBonLabelAndcolor(bon);
@@ -73,8 +70,8 @@ class BonCalendar {
                 bons.forEach(b => {
                     if(statuses[b.status]) {
                         b.delivery_date = new Date(b.delivery_date);
-                        let [label, statusColor] = self.myBonForm.createBonLabelAndcolor(b);
-                        self.myCalendar.addEvent(b.delivery_date, label, statusColor, b);
+                        let [label, statusColor,icons] = self.myBonForm.createBonLabelAndcolor(b);
+                        self.myCalendar.addEvent(b.delivery_date, label, statusColor, b,icons);
                     }
                 });
                 p.hide();
@@ -108,7 +105,11 @@ class BonCalendar {
             ids.forEach(i=>{
                 let event=this.getAllEvents().find(e=>(e.data.misc.id==i))
                 if(event) {
-                    this.myCalendar.updateEvent(event.elem,event.data.eventTime,event.data.header,event.data.color,event.data.misc,["fa","fa-envelope"]);
+                    let icons=[["fa","fa-envelope"]];
+                    if(event.data.misc.payment_type==="Produktion") {
+                        icons.push(["fa","fa-wrench"]);
+                    }
+                    this.myCalendar.updateEvent(event.elem,event.data.eventTime,event.data.header,event.data.color,event.data.misc,icons);
                 }
             });
         })

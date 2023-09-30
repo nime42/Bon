@@ -472,7 +472,7 @@ class BonForm {
     return select.value;
   }
 
-  createBonLabelAndcolor(bon) {
+  createBonLabelAndcolor(bon,haveUnseenMail) {
     let statusColor = this.getStatusColor(bon.status);
     let timeStr =
       bon.delivery_date.getHours().toString().padStart(2, "0") +
@@ -485,8 +485,17 @@ class BonForm {
       ",P:" +
       (bon.nr_of_servings != "" ? bon.nr_of_servings : 0);
     
+    let icons=[];
+    if(haveUnseenMail) {
+      let mailIcon=["fa","fa-envelope"];
+      icons.push(mailIcon);
+    }
+    if(bon.payment_type=== "Produktion") {
+      let wrench=["fa","fa-wrench"];
+      icons.push(wrench);
+    }
 
-      return [label, statusColor];
+      return [label, statusColor,icons];
   }
 
 
