@@ -19,6 +19,7 @@ class Globals {
     }
     static BonStripOrder= [
             "*",
+            "06 Emballage",
             "Emballage",
             "x-Levering",
             "x- Service"
