@@ -258,12 +258,11 @@ function buildBon(entries) {
   bon.invoice_info = entries["invoice_info"];
   try {
     //streetname and streetnumber is in the same field, try to parse them apart
-    let street_nr = bon.delivery_address.street_name.match(/(\d)+ ?[A-Z]?/);
-    if (street_nr) {
-      bon.delivery_address.street_nr = street_nr[0];
-      bon.delivery_address.street_name = bon.delivery_address.street_name
-        .replace(bon.delivery_address.street_nr, "")
-        .trim();
+    //Just split the adress by the first numerical value
+    let parsedAdr=bon.delivery_address.street_name.match(/^([^0-9]*) ?(.*)$/);
+    if(parsedAdr) {
+      bon.delivery_address.street_name = parsedAdr[1].trim();
+      bon.delivery_address.street_nr = parsedAdr[2].trim();
     }
   } catch (err) {}
   try {

@@ -143,7 +143,7 @@ class BonForm {
                   <div class="bon-column">
                       <input type="text" id="street_name" name="street_name" placeholder="Gade" autocomplete="nope">
                   </div>
-                  <div class="bon-column" style="width:15%">
+                  <div class="bon-column" style="width:30%">
                       <input type="text" id="street_nr" name="street_nr" placeholder="nr" autocomplete="nope">
                   </div>
 
@@ -151,7 +151,7 @@ class BonForm {
 
 
               <div class="bon-row indent">
-                  <div class="bon-column" style="width:15%">
+                  <div class="bon-column" style="width:20%">
                       <input type="text" id="zip_code" name="zip_code" placeholder="Postnr" autocomplete="nope">
                   </div>
                   <div class="bon-column">
