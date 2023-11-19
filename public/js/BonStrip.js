@@ -982,11 +982,16 @@ class BonStrip {
         paxElem.oninput=f;
     }
 
-    updatePaymentTypeOnChange(paymentElem) {
+    updatePaymentTypeOnChange(paymentElem,extra) {
         let f=()=> {
             this.setPaymentType(paymentElem.value);
         }
-        paymentElem.onchange=f;
+        if(extra) {
+            paymentElem.onchange=()=>{
+                f(),extra()};
+        } else {
+            paymentElem.onchange=f;    
+        }
     }
 
     updateKitchenSelectsOnChange(kitchenSelectsElem) {

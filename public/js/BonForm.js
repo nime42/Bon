@@ -322,8 +322,15 @@ class BonForm {
       form.querySelector("#kitchen_info")
     );
     this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"));
-    this.myBonStrip.updatePaymentTypeOnChange(
-      form.querySelector("#payment-types")
+    this.myBonStrip.updatePaymentTypeOnChange(form.querySelector("#payment-types"),()=>{
+      if(form.querySelector("#payment-types").value==="Produktion") {
+        //If user chooses Produktion set price to Produktion also
+        let elem=form.querySelector("#price-categories");
+        elem.value="Produktion"
+        elem.dispatchEvent(new Event('change'))
+      }
+      
+    }
     );
     this.myBonStrip.updateKitchenSelectsOnChange(
       form.querySelector("#kitchen_selects")
