@@ -15,10 +15,9 @@ class BonStrip {
     #bon-id {
         padding-top: 5px;
         padding-bottom: 5px;
-        font-style: italic;
         font-weight: bold;
         font-size: large;
-        font-family: cursive;
+        font-family: san-serif;
     }
     #customer {
         padding-left: 15px;
