@@ -37,17 +37,17 @@ class Globals {
         approved:{
             name:"approved",
             label:"Godkendt",
-            color:"lightgreen"
+            color:"PaleGreen"
         },
         preparing:{
             name:"preparing",
             label:"Prep",
-            color:"lightgreen"
+            color:"PaleGreen"
         },
         done:{
             name:"done",
             label:"Klar",
-            color:"lightgreen"
+            color:"Lime"
         },
         delivered:{
             name:"delivered",
