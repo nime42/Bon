@@ -259,7 +259,7 @@ function buildBon(entries) {
   try {
     //streetname and streetnumber is in the same field, try to parse them apart
     //Just split the adress by the first numerical value
-    let parsedAdr=bon.delivery_address.street_name.match(/^([^0-9]*) ?(.*)$/);
+    let parsedAdr=bon.delivery_address.street_name.match(/^([^0-9]*) ?(.*)(\n|$)/);
     if(parsedAdr) {
       bon.delivery_address.street_name = parsedAdr[1].trim();
       bon.delivery_address.street_nr = parsedAdr[2].trim();
