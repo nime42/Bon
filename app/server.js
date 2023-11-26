@@ -648,7 +648,9 @@ function mailConfirmations(confirmMessage,orders,callback) {
     let dateFormat=config.mailManager.incomingMails.dateFormat;
     let subjectMessage=config.mailManager.incomingMails.confirmSubject;
 
-    let order=orders.shift();
+    let order=orders[0];
+    let rest=orders.slice(1);
+
     let bon=DB.searchBons({bonId:order.bonId},true,null)[0]
     
 
@@ -661,11 +663,11 @@ function mailConfirmations(confirmMessage,orders,callback) {
                 console.log("mailConfirmations", err);
                 callback(false, err)
             } else {
-                mailConfirmations(orders, callback);
+                mailConfirmations(rest, callback);
             }
         });
     } else {
-        mailConfirmations(orders, callback);
+        mailConfirmations(rest, callback);
     }      
 
 
@@ -679,7 +681,8 @@ function mailIncomingOrders(orders,callback) {
         callback(true);
         return;
     }
-    let order=orders.shift();
+    let order=orders[0];
+    let rest=orders.slice(1);
     let subject="#Bon:"+config.bonPrefix+"-"+order.bonId+":";
     let message=order.orgMessage;
 
@@ -688,7 +691,7 @@ function mailIncomingOrders(orders,callback) {
             console.log("mailIncomingOrders",err);
             callback(false,err)
         } else {
-            mailIncomingOrders(orders,callback)
+            mailIncomingOrders(rest,callback)
         }
     });          
 }
