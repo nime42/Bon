@@ -40,7 +40,26 @@ function sendMail(from,to,cc,bcc,subject,text,html, callback) {
       transporter.sendMail(mailOptions, callback);      
 }
 
+function sendMailWithReceipt(from,to,cc,bcc,subject,text,html, callback) {
+  sendMail(from,to,cc,bcc,subject,text,html,(err)=>{
+    if(err) {
+      callback(err);
+    } else {
+      let receipt="SENT:"+subject;
+      sendMail(from,from,cc,bcc,receipt,text,html,(err)=> {
+        if(err) {
+          console.err("failed to send receipt:"+receipt,err);
+          callback(err);
+        } else {
+          callback(null);
+        }
+      });
+    }
+  })
+}
+
 module.exports = {
     init:init,
-    sendMail:sendMail
+    sendMail:sendMail,
+    sendMailWithReceipt:sendMailWithReceipt
 }

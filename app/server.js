@@ -6,6 +6,7 @@ var https = require('https');
 var app = express();
 require('log-timestamp');
 
+
 process.on('unhandledRejection', (reason, promise) => {
     console.log('Unhandled Rejection at:', reason.stack || reason)
   });
@@ -53,7 +54,6 @@ if(config.app.https) {
 
 var DBClass=require('./DBClass.js');
 var DB=new DBClass('./resources/bon.db');
-
 
 var mailSender=require("./mailSender.js");
 mailSender.init(config.mail);
@@ -124,6 +124,7 @@ try {
 }
 var VismaFunctions=require("./VismaFunctions.js");
 const { otherBons } = require('../resources/config.js');
+const BonUtils = require('./BonUtils.js');
 var Visma=new VismaFunctions(vismaConfig,DB);
 //Visma.createInvoiceDraft(1022);
 //Visma.getCustomer("lasc@kea.dk","KEA");
@@ -604,23 +605,15 @@ app.post("/api/sendBonMail/",(req,res) => {
     let message=req.body.message;
     let subject="#Bon:"+prefix+"-"+id+":";
     let to=req.body.email;
-
-    mailSender.sendMail(config.mail.user,to,undefined,undefined,subject,message,undefined, function(err) {
+    mailSender.sendMailWithReceipt(config.mail.user,to,undefined,undefined,subject,message,undefined, function(err) {
         if(err!==null) {
             console.log(err);
             res.sendStatus(500);
         } else {
-            
-            mailSender.sendMail(config.mail.user,config.mail.user,undefined,undefined,"SENT:"+subject,message,undefined, function(err) {
-                if(err!==null) {
-                    console.log(err);
-                    res.sendStatus(500);
-                } else {
-                    res.sendStatus(200);
-                }
-            });          
+            res.sendStatus(200);
         }
-    });
+    })
+
 
 })
 
@@ -645,6 +638,40 @@ app.get("/api/bonMails/:id",(req,res) => {
         }        
     })
 })
+
+function mailConfirmations(confirmMessage,orders,callback) {
+    if(orders.length===0) {
+        callback(true);
+        return; 
+    }
+
+    let dateFormat=config.mailManager.incomingMails.dateFormat;
+    let subjectMessage=config.mailManager.incomingMails.confirmSubject;
+
+    let order=orders.shift();
+    let bon=DB.searchBons({bonId:order.bonId},true,null)[0]
+    
+
+    let subject="#Bon:"+config.bonPrefix+"-"+order.bonId+":"+(subjectMessage?subjectMessage:"");
+    let message=BonUtils.expandMessageFromBon(confirmMessage,bon,dateFormat);
+
+    if (bon.customer.email) {
+        mailSender.sendMail(config.mail.user, bon.customer.email, undefined, undefined, subject, message, undefined, function (err) {
+            if (err !== null) {
+                console.log("mailConfirmations", err);
+                callback(false, err)
+            } else {
+                mailConfirmations(orders, callback);
+            }
+        });
+    } else {
+        mailConfirmations(orders, callback);
+    }      
+
+
+
+
+}
 
 
 function mailIncomingOrders(orders,callback) {
@@ -674,6 +701,8 @@ function manageIncomingOrders(callback) {
     }
 
     if (config.mailManager.incomingMails) {
+        let confirmMessage=DB.getMessage(config.mailManager.incomingMails.confirmTemplate)?.message?.trim();
+
         try {
             isManagingIncomingOrders = true;
             mailManager.getIncomingOrders(config.mailManager.incomingMails.subjectContains, (status, orders) => {
@@ -683,7 +712,17 @@ function manageIncomingOrders(callback) {
                         let bonId = DB.createBon(o.bon, null);
                         mailOrders.push({ bonId: bonId, orgMessage: o.orgMessage });
                     })
-                    mailIncomingOrders(mailOrders, callback);
+
+                    mailIncomingOrders(mailOrders, (status)=> {
+                        if(status) {
+                            if(confirmMessage) {
+                                mailConfirmations(confirmMessage,mailOrders,callback);
+                            }   
+                        } else {
+                            console.log("MailIncomingorders failed",status);
+                            callback(status);
+                        }
+                    });
                 } else {
                     callback(status);
                 }
@@ -701,7 +740,7 @@ function manageIncomingOrders(callback) {
 }
 
 if(config.mailManager.incomingMails) {
-
+    let confirmMessage=DB.getMessage(config.mailManager.incomingMails.confirmTemplate)?.message;
     let checkPeriod=parseInt(config.mailManager.incomingMails.checkPeriodic);
     if(!Number.isInteger(checkPeriod)) {
         console.error("Can't check incoming mails: config.mailManager.incomingMails.checkperiodic is not a number or is missing!");
@@ -1009,7 +1048,4 @@ app.post("/api/getGrocyProductsForOrders", (req, res) => {
 });
 
 app.post("/api/createInvoiceDraft", (req, res) => {});
-
-  
-
 

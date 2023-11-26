@@ -243,19 +243,19 @@ function getIncomingOrders(subjectContains, callback) {
 function buildBon(entries) {
   let bon = bonUtils.getEmptyBon();
   bon.status = "new";
-  bon.customer.forename = entries["forename"];
-  bon.customer.surname = entries["surname"];
-  bon.customer.email = entries["email"];
-  bon.customer.phone_nr = entries["phone_nr"];
-  bon.customer.company.name = entries["company_name"];
-  bon.nr_of_servings = entries["nr_of_servings"];
+  bon.customer.forename = entries["forename"]?.trim();
+  bon.customer.surname = entries["surname"]?.trim();
+  bon.customer.email = entries["email"]?.trim();
+  bon.customer.phone_nr = entries["phone_nr"]?.trim();
+  bon.customer.company.name = entries["company_name"]?.trim();
+  bon.nr_of_servings = entries["nr_of_servings"]?.trim();
   bon.kitchen_selects = entries["kitchen_selects"] !== undefined ? 1 : 0;
   bon.price_category = "Catering";
   bon.delivery_date = parseDeliveryDate(entries);
-  bon.delivery_address.street_name = entries["delivery_address"];
-  bon.delivery_address.zip_code = entries["delivery_zipcode"];
-  bon.customer_info = entries["customer_info"];
-  bon.invoice_info = entries["invoice_info"];
+  bon.delivery_address.street_name = entries["delivery_address"]?.trim();
+  bon.delivery_address.zip_code = entries["delivery_zipcode"]?.trim();
+  bon.customer_info = entries["customer_info"]?.trim();
+  bon.invoice_info = entries["invoice_info"]?.trim();
   try {
     //streetname and streetnumber is in the same field, try to parse them apart
     //Just split the adress by the first numerical value

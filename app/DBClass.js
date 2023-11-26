@@ -598,6 +598,14 @@ module.exports = class DB {
             callback(false, err);
         }
     }
+
+    getMessage(name) {
+        let sql="SELECT * FROM messages WHERE name=?";
+        const row = this.db.prepare(sql).get(name);
+        return row;
+    }
+
+
     createMessage(message,callback = console.log) {
         let sql ="INSERT INTO messages(name,message,sortorder) values(?,?,?)";
         try {
