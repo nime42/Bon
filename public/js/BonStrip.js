@@ -515,6 +515,8 @@ class BonStrip {
             values.foreName=this.myDiv.querySelector("#forename").innerText;
             values.surName=this.myDiv.querySelector("#surname").innerText;
             values.pax=this.myDiv.querySelector("#pax").innerHTML;
+            values.bonId=this.bonId;
+            values.bonPrefix=Globals.bonPrefix;
 
         }
 

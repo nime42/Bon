@@ -798,6 +798,8 @@ class BonConfig {
 
 
     valuesExample={
+        bonId:"42",
+        bonPrefix:Globals.bonPrefix,
         deliveryAdr: "Gadegaden 2\n11111 Byn",
         deliveryDate: "2022-11-22",
         deliveryTime: "12:00",
