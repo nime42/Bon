@@ -54,7 +54,7 @@ module.exports = class BonUtils {
     let deliveryDate=new Date(bon.delivery_date);
 
     if(config.mailManager.incomingMails.fromTimeZone) {
-      deliveryDate=getLocalTimeOffsetDiff(deliveryDate,config.mailManager.incomingMails.fromTimeZone);
+      deliveryDate=this.adjustForTimeZone(deliveryDate,config.mailManager.incomingMails.fromTimeZone);
     }
 
     let values={
@@ -102,7 +102,7 @@ static getLocalTimeOffsetDiff(date, timeZone) {
 
 static adjustForTimeZone(date,timeZone) {
   let d=new Date(date);
-  d.setTime(d.getTime()+getLocalTimeOffsetDiff(d,timeZone));
+  d.setTime(d.getTime()+this.getLocalTimeOffsetDiff(d,timeZone));
   return d;
 }
 
