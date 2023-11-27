@@ -53,6 +53,10 @@ module.exports = class BonUtils {
 
     let deliveryDate=new Date(bon.delivery_date);
 
+    if(config.mailManager.incomingMails.fromTimeZone) {
+      deliveryDate=getLocalTimeOffsetDiff(deliveryDate,config.mailManager.incomingMails.fromTimeZone);
+    }
+
     let values={
       bonId:bon.id,
       bonPrefix:config.bonPrefix,
@@ -74,6 +78,34 @@ module.exports = class BonUtils {
     return expandedMessage;
 
   }
+
+
+/**
+ * Get the time difference between a local date and another timezone.
+ *
+ * Could be usefull if you get date as a string without timezone but you know what timezone it come from
+ * let d=new Date(dateString);
+ * d.setTime(d-getLocalTimeOffsetDiff(d,"Europe/Copenhagen"));
+ * @param {Date} date
+ * @param {String} timeZone - A TZ database name (see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+ * @returns {Integer} difference in milliseconds
+ */
+static getLocalTimeOffsetDiff(date, timeZone) {
+  let dateWithoutSec = new Date(date);
+  dateWithoutSec.setSeconds(0, 0);
+  let local = new Date(
+    dateWithoutSec.toLocaleString("default", { timeZone: timeZone })
+  );
+  local.setSeconds(0, 0);
+  return local - dateWithoutSec;
+}
+
+static adjustForTimeZone(date,timeZone) {
+  let d=new Date(date);
+  d.setTime(d.getTime()+getLocalTimeOffsetDiff(d,timeZone));
+  return d;
+}
+
      
 }
 
