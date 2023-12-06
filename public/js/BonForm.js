@@ -350,9 +350,34 @@ class BonForm {
       });
     };
 
+    let needUpdate=()=>{
+        let props = Helper.getFormProps(form);
+        let bon = self._createBon(props);
+        return !Helper.isBonEqual(this.orgBon,bon)
+    }
+
     buttons.querySelector("#cancel").onclick = function (e) {
-      self.onFormClose && self.onFormClose("canceled");
-      self.myPopupObj.hide();
+      if(needUpdate()) {
+        MessageBox.popup("Vil du gemme dine ændringer?", {
+          b1: {
+            text: "Ja",
+            onclick: () => {
+              buttons.querySelector("#save").click();
+
+            },
+          },
+          b2: { text: "Nej",
+          onclick:()=>{
+            self.onFormClose && self.onFormClose("canceled");
+            self.myPopupObj.hide();
+          }
+        },
+        });
+      } else {
+        self.onFormClose && self.onFormClose("canceled");
+            self.myPopupObj.hide();
+      }
+
     };
 
     buttons.querySelector("#delete").onclick = function (e) {
@@ -757,6 +782,7 @@ class BonForm {
     } else {
 
       this.myRepoObj.getOrders(bon.id, (orders) => {
+        bon.orders=orders; //OBS this will update the incoming bon-object
         orders.forEach((o) => {
           this.myBonStrip.addOrder(
             o.quantity,
@@ -827,6 +853,7 @@ class BonForm {
     this.onFormClose = onClose;
     this.currentId = bon.id;
     this._bonToForm(bon, "#order");
+    this.orgBon=bon;
     this.myDiv.querySelectorAll(".for-update").forEach((e) => {
       e.style.display = "";
     });
@@ -863,6 +890,7 @@ class BonForm {
     });
     this.customer_mail_autocomplete.clearOptions();
   }
+
 
   getForm() {
     return this.myDiv;

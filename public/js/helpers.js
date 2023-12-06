@@ -131,6 +131,43 @@ static replaceAllFromValues(text, values) {
     }
   }
 
+
+/**
+ * Check if two bons are equal
+ * @param {*} bon1 
+ * @param {*} bon2 
+ * @returns 
+ */
+  static isBonEqual(bon1,bon2) {
+      if(bon1 instanceof Date || bon2 instanceof Date) {
+        return new Date(bon1)?.toString()==new Date(bon2)?.toString()
+      }
+      if(bon1 instanceof Array) {
+        if(bon1.length!=bon2?.length) {
+          return false;
+        }
+        for(let i=0;i<bon1.length;i++) {
+          if(!this.isBonEqual(bon1[i],bon2[i])) {
+            return false;
+          }
+        }
+        return true;
+      }
+      if(bon1 instanceof Object) {
+        let keys=Object.keys(bon1);
+        for(let i=0;i<keys.length;i++) {
+          let k=keys[i];
+          if(!this.isBonEqual(bon1[k],bon2[k])) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      return bon1==bon2 || bon2==undefined;
+
+  }
+
 }
 
 
