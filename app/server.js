@@ -188,6 +188,33 @@ app.get("/api/bonSummaryFile",(req,res) => {
         return;        
     }
 
+    let safeString=(string)=>{
+        if(string===undefined || string===null) {
+            return ""
+        } else {
+            return string;
+        }
+    }
+
+    let safeNumber=(num)=>{
+ 
+        if(typeof num === 'number') {
+            return Math.round(num*100)/100;
+        }
+
+        if(num===undefined || num===null) {
+            return 0;
+        }
+        num=num.replace(",",".");
+        num=Number(num);
+        if(isNaN(num)) {
+            return 0;
+        } else {
+            return Math.round(num*100)/100;
+        }
+        
+    }
+
 
     let rows=[];
     let headers=[
@@ -231,30 +258,27 @@ app.get("/api/bonSummaryFile",(req,res) => {
     bons.forEach(b=>{
         col=1;
         row++;
-        worksheet.cell(row, col++).string("#"+config.bonPrefix+"-"+b.id);
+        worksheet.cell(row, col++).string(safeString("#"+config.bonPrefix+"-"+b.id));
 
         if(b.delivery_date) {
             worksheet.cell(row, col++).date(new Date(b.delivery_date));
         } else {
             worksheet.cell(row, col++).string("");
         }
-        worksheet.cell(row, col++).string(b.status);
-        if(!isNaN(b.nr_of_servings)) {
-            worksheet.cell(row, col++).number(b.nr_of_servings?b.nr_of_servings:0);
-        } else {
-            worksheet.cell(row, col++).string(b.nr_of_servings?b.nr_of_servings:"0");
-        }
+        worksheet.cell(row, col++).string(safeString(b.status));
+        worksheet.cell(row, col++).number(safeNumber(b.nr_of_servings));
+ 
         worksheet.cell(row, col++).string(b.kitchen_selects?"Ja":"Nej");
-        worksheet.cell(row, col++).string(b.customer_collects?"Afhentes":b.delivery_adr);
-        worksheet.cell(row, col++).string(b.name);
-        worksheet.cell(row, col++).string(b.email);
-        worksheet.cell(row, col++).string(b.phone_nr);
-        worksheet.cell(row, col++).string(b.company);
-        worksheet.cell(row, col++).string(b.ean_nr);
-        worksheet.cell(row, col++).string(b.payment_type!=null?b.payment_type:'');
-        worksheet.cell(row, col++).string(b.price_category);
-        worksheet.cell(row, col++).number(b.cost_price?(Math.round(b.cost_price*100)/100):0);
-        worksheet.cell(row, col++).number(b.price?(Math.round(b.price*100)/100):0);
+        worksheet.cell(row, col++).string(b.customer_collects?"Afhentes":safeString(b.delivery_adr));
+        worksheet.cell(row, col++).string(safeString(b.name));
+        worksheet.cell(row, col++).string(safeString(b.email));
+        worksheet.cell(row, col++).string(safeString(b.phone_nr));
+        worksheet.cell(row, col++).string(safeString(b.company));
+        worksheet.cell(row, col++).string(safeString(b.ean_nr));
+        worksheet.cell(row, col++).string(safeString(b.payment_type));
+        worksheet.cell(row, col++).string(safeString(b.price_category));
+        worksheet.cell(row, col++).number(safeNumber(b.cost_price));
+        worksheet.cell(row, col++).number(safeNumber(b.price));
         if(b.invoice_date) {
             worksheet.cell(row, col++).date(new Date(b.invoice_date));
         } else {
@@ -283,13 +307,13 @@ app.get("/api/bonSummaryFile",(req,res) => {
    orders.forEach(o=>{
     col=1;
     row++;
-    ordersWorksheet.cell(row, col++).string("#"+config.bonPrefix+"-"+o.bon_id);
-    ordersWorksheet.cell(row, col++).string(o.category);
-    ordersWorksheet.cell(row, col++).string(o.name);
-    ordersWorksheet.cell(row, col++).number(o.quantity);
-    ordersWorksheet.cell(row, col++).number(o.cost_price?(Math.round(o.cost_price*100)/100):0);
-    ordersWorksheet.cell(row, col++).number(o.price?(Math.round(o.price*100)/100):0);
-    ordersWorksheet.cell(row, col++).string(o.special_request);
+    ordersWorksheet.cell(row, col++).string(safeString("#"+config.bonPrefix+"-"+o.bon_id));
+    ordersWorksheet.cell(row, col++).string(safeString(o.category));
+    ordersWorksheet.cell(row, col++).string(safeString(o.name));
+    ordersWorksheet.cell(row, col++).number(safeNumber(o.quantity));
+    ordersWorksheet.cell(row, col++).number(safeNumber(o.cost_price));
+    ordersWorksheet.cell(row, col++).number(safeNumber(o.price));
+    ordersWorksheet.cell(row, col++).string(safeString(o.special_request));
    });
    
 
@@ -338,42 +362,42 @@ app.get("/api/bonSummaryFile",(req,res) => {
     allInfo.forEach(b=>{
         col=1;
         row++;
-        allWorksheet.cell(row, col++).string("#"+config.bonPrefix+"-"+b.id);
+        allWorksheet.cell(row, col++).string(safeString("#"+config.bonPrefix+"-"+b.id));
 
         if(b.delivery_date) {
             allWorksheet.cell(row, col++).date(new Date(b.delivery_date));
         } else {
             allWorksheet.cell(row, col++).string("");
         }
-        allWorksheet.cell(row, col++).string(b.status);
+        allWorksheet.cell(row, col++).string(safeString(b.status));
         if(!isNaN(b.nr_of_servings)) {
-            allWorksheet.cell(row, col++).number(b.nr_of_servings?b.nr_of_servings:0);
+            allWorksheet.cell(row, col++).number(safeNumber(b.nr_of_servings));
         } else {
-            allWorksheet.cell(row, col++).string(b.nr_of_servings?b.nr_of_servings:"0");
+            allWorksheet.cell(row, col++).string(safeString(b.nr_of_servings));
         }
         allWorksheet.cell(row, col++).string(b.kitchen_selects?"Ja":"Nej");
         allWorksheet.cell(row, col++).string(b.customer_collects?"Afhentes":b.delivery_adr);
-        allWorksheet.cell(row, col++).string(b.name);
-        allWorksheet.cell(row, col++).string(b.email);
-        allWorksheet.cell(row, col++).string(b.phone_nr);
-        allWorksheet.cell(row, col++).string(b.company);
-        allWorksheet.cell(row, col++).string(b.ean_nr);
-        allWorksheet.cell(row, col++).string(b.payment_type!=null?b.payment_type:'');
-        allWorksheet.cell(row, col++).string(b.price_category);
-        allWorksheet.cell(row, col++).number(b.cost_price?(Math.round(b.cost_price*100)/100):0);
-        allWorksheet.cell(row, col++).number(b.price?(Math.round(b.price*100)/100):0);
+        allWorksheet.cell(row, col++).string(safeString(b.name));
+        allWorksheet.cell(row, col++).string(safeString(b.email));
+        allWorksheet.cell(row, col++).string(safeString(b.phone_nr));
+        allWorksheet.cell(row, col++).string(safeString(b.company));
+        allWorksheet.cell(row, col++).string(safeString(b.ean_nr));
+        allWorksheet.cell(row, col++).string(safeString(b.payment_type));
+        allWorksheet.cell(row, col++).string(safeString(b.price_category));
+        allWorksheet.cell(row, col++).number(safeNumber(b.cost_price));
+        allWorksheet.cell(row, col++).number(safeNumber(b.price));
         if(b.invoice_date) {
             allWorksheet.cell(row, col++).date(new Date(b.invoice_date));
         } else {
             allWorksheet.cell(row, col++).string("");
         }
 
-        allWorksheet.cell(row, col++).string(b.product_category).style(productInfoStyle);
-        allWorksheet.cell(row, col++).string(b.product).style(productInfoStyle);
-        allWorksheet.cell(row, col++).number(b.quantity).style(productInfoStyle);
-        allWorksheet.cell(row, col++).number(b.product_cost_price?(Math.round(b.product_cost_price*100)/100):0).style(productInfoStyle);
-        allWorksheet.cell(row, col++).number(b.product_price?(Math.round(b.product_price*100)/100):0).style(productInfoStyle);
-        allWorksheet.cell(row, col++).string(b.special_request!=null?b.special_request:'').style(productInfoStyle);
+        allWorksheet.cell(row, col++).string(safeString(b.product_category)).style(productInfoStyle);
+        allWorksheet.cell(row, col++).string(safeString(b.product)).style(productInfoStyle);
+        allWorksheet.cell(row, col++).number(safeNumber(b.quantity)).style(productInfoStyle);
+        allWorksheet.cell(row, col++).number(safeNumber(b.product_cost_price)).style(productInfoStyle);
+        allWorksheet.cell(row, col++).number(safeNumber(b.product_price)).style(productInfoStyle);
+        allWorksheet.cell(row, col++).string(safeString(b.special_request)).style(productInfoStyle);
 
    })
 
