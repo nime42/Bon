@@ -110,6 +110,50 @@ module.exports = class DB {
 
     }
 
+    getBonsJoinedWithOrders(bonId) {
+        let sql=`
+        with all_bons as (
+            with boninfo as (select 
+                  b.id,b.delivery_date,b.status,b.nr_of_servings,
+                  b.price_category,b.payment_type,
+                  b.kitchen_selects,b.customer_collects,
+                  b.invoice_date,
+                  case b.customer_collects 
+                  when true then ''
+                  else trim(a.street_name2||' '||a.street_name||' '||a.street_nr||', '||a.zip_code||' '||a.city) end as delivery_adr,
+                  a.street_name2,
+                  a.street_name,
+                  a.street_nr,
+                  a.zip_code,
+                  a.city,
+                  c.forename ||' '||c.surname as name,
+                  c.email,c.phone_nr,
+                  co.name as company,co.ean_nr,
+                  o.quantity * o.price as price,
+                  o.quantity * o.cost_price cost_price
+                from bons b
+                 left join addresses a on b.delivery_address_id=a.id
+                 left join customers c on b.customer_id =c.id
+                 left join companies co on c.company_id =co.id
+                 left join addresses co_a on co_a.id=co.address_id
+                 left join orders o on b.id=o.bon_id)
+                select id,delivery_date,status ,nr_of_servings,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,coalesce(sum(price),0) as total_price,coalesce(sum(cost_price),0) as total_cost_price,invoice_date from boninfo
+                group by id 
+            ),
+            all_orders as (
+            select o.bon_id,coalesce(i.name,ip.name) as name,coalesce(i.category,ip.category) as category,o.*,i.external_id from orders o 
+                    left join items i on o.item_id=i.id
+                    left join (select *,'izettle' as category from izettle_products) ip on o.izettle_product_id = ip.id
+                    
+            )
+            select b.*,coalesce(o.category,'') as product_category,coalesce(o.name,'') as product,coalesce(o.quantity,0) as quantity,coalesce(o.price,0) as product_price,coalesce(o.cost_price,0) as product_cost_price,o.special_request from all_bons b
+            left join all_orders o on b.id=o.bon_id
+            where coalesce(?,b.id)=b.id
+                group by id order by id desc 
+        `;
+        return this.db.prepare(sql).all(bonId);
+    }
+
     searchBons(searchParams, includeOrders, callback = console.log) {
 
         let statuses = ['new', 'needInfo', 'approved', 'preparing', 'done', 'delivered', 'invoiced',"closed", 'offer'];
@@ -559,7 +603,7 @@ module.exports = class DB {
         let sql = `select coalesce(i.name,ip.name) as name,coalesce(i.category,ip.category) as category,o.*,i.external_id from orders o 
         left join items i on o.item_id=i.id
         left join (select *,'izettle' as category from izettle_products) ip on o.izettle_product_id = ip.id
-        where bon_id=? order by sorting_order`;
+        where bon_id=coalesce(?,bon_id) order by sorting_order`;
 
         try {
             const rows = this.db.prepare(sql).all(bonId);

@@ -218,7 +218,7 @@ app.get("/api/bonSummaryFile",(req,res) => {
           bold: true
         }
       });
-    const worksheet = workbook.addWorksheet('Sheet 1');
+    const worksheet = workbook.addWorksheet('Bons');
     worksheet.column(2).setWidth(18);
     worksheet.column(16).setWidth(18);
     let row=1;
@@ -263,6 +263,123 @@ app.get("/api/bonSummaryFile",(req,res) => {
         
 
    })
+
+   const ordersWorksheet = workbook.addWorksheet('Orders');
+   let orderHeaders=[
+        "Bon-id",
+        "Kategorie",
+        "Produkt",
+        "Antal",
+        "Købspris",
+        "Pris",
+        "Extra info"
+    ];
+    row=1;
+    col=1;
+    orderHeaders.forEach(h => {
+        ordersWorksheet.cell(row, col++).string(h).style(headerStyle);
+    });
+   let orders=DB.getOrders();
+   orders.forEach(o=>{
+    col=1;
+    row++;
+    ordersWorksheet.cell(row, col++).string("#"+config.bonPrefix+"-"+o.bon_id);
+    ordersWorksheet.cell(row, col++).string(o.category);
+    ordersWorksheet.cell(row, col++).string(o.name);
+    ordersWorksheet.cell(row, col++).number(o.quantity);
+    ordersWorksheet.cell(row, col++).number(o.cost_price?(Math.round(o.cost_price*100)/100):0);
+    ordersWorksheet.cell(row, col++).number(o.price?(Math.round(o.price*100)/100):0);
+    ordersWorksheet.cell(row, col++).string(o.special_request);
+   });
+   
+
+   const allWorksheet = workbook.addWorksheet('Bons+Orders');
+   let allHeaders=[
+    "Id",
+    "Leveringsdato",
+    "Status",
+    "Pax",
+    "Køkkenet vælger",
+    "Leveringsadresse",
+    "Navn",
+    "Mail",
+    "Telefon",
+    "Firma",
+    "EAN",
+    "Betaling",
+    "Priskategorie",
+    "Købspris(totalt)",
+    "Pris(totalt)",
+    "Fakturadato",
+    "Kategorie",
+    "Produkt",
+    "Antal",
+    "Købspris(produkt)",
+    "Pris(produkt)",
+    "Extra info"
+    ];
+    row=1;
+    col=1;
+    allHeaders.forEach(h => {
+        allWorksheet.cell(row, col++).string(h).style(headerStyle);
+    });
+
+
+    let productInfoStyle = workbook.createStyle({
+        fill: {
+          type: 'pattern',
+          patternType: 'solid',
+          bgColor: '#FFFF00',
+          fgColor: '#FFFF00',
+        }
+      });
+
+    let allInfo=DB.getBonsJoinedWithOrders();
+    allInfo.forEach(b=>{
+        col=1;
+        row++;
+        allWorksheet.cell(row, col++).string("#"+config.bonPrefix+"-"+b.id);
+
+        if(b.delivery_date) {
+            allWorksheet.cell(row, col++).date(new Date(b.delivery_date));
+        } else {
+            allWorksheet.cell(row, col++).string("");
+        }
+        allWorksheet.cell(row, col++).string(b.status);
+        if(!isNaN(b.nr_of_servings)) {
+            allWorksheet.cell(row, col++).number(b.nr_of_servings?b.nr_of_servings:0);
+        } else {
+            allWorksheet.cell(row, col++).string(b.nr_of_servings?b.nr_of_servings:"0");
+        }
+        allWorksheet.cell(row, col++).string(b.kitchen_selects?"Ja":"Nej");
+        allWorksheet.cell(row, col++).string(b.customer_collects?"Afhentes":b.delivery_adr);
+        allWorksheet.cell(row, col++).string(b.name);
+        allWorksheet.cell(row, col++).string(b.email);
+        allWorksheet.cell(row, col++).string(b.phone_nr);
+        allWorksheet.cell(row, col++).string(b.company);
+        allWorksheet.cell(row, col++).string(b.ean_nr);
+        allWorksheet.cell(row, col++).string(b.payment_type!=null?b.payment_type:'');
+        allWorksheet.cell(row, col++).string(b.price_category);
+        allWorksheet.cell(row, col++).number(b.cost_price?(Math.round(b.cost_price*100)/100):0);
+        allWorksheet.cell(row, col++).number(b.price?(Math.round(b.price*100)/100):0);
+        if(b.invoice_date) {
+            allWorksheet.cell(row, col++).date(new Date(b.invoice_date));
+        } else {
+            allWorksheet.cell(row, col++).string("");
+        }
+
+        allWorksheet.cell(row, col++).string(b.product_category).style(productInfoStyle);
+        allWorksheet.cell(row, col++).string(b.product).style(productInfoStyle);
+        allWorksheet.cell(row, col++).number(b.quantity).style(productInfoStyle);
+        allWorksheet.cell(row, col++).number(b.product_cost_price?(Math.round(b.product_cost_price*100)/100):0).style(productInfoStyle);
+        allWorksheet.cell(row, col++).number(b.product_price?(Math.round(b.product_price*100)/100):0).style(productInfoStyle);
+        allWorksheet.cell(row, col++).string(b.special_request!=null?b.special_request:'').style(productInfoStyle);
+
+   })
+
+
+
+
    workbook.write('bons.xlsx',res);
 })
 
