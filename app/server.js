@@ -318,6 +318,8 @@ app.get("/api/bonSummaryFile",(req,res) => {
    
 
    const allWorksheet = workbook.addWorksheet('Bons+Orders');
+   allWorksheet.column(2).setWidth(18);
+   allWorksheet.column(16).setWidth(18);
    let allHeaders=[
     "Id",
     "Leveringsdato",
