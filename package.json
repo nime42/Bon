@@ -9,11 +9,11 @@
     "excel4node": "^1.7.2",
     "express": "^4.17.2",
     "fs": "0.0.1-security",
-    "imap": "^0.8.19",
+    "imap": "^0.8.17",
     "log-timestamp": "^0.3.0",
     "mailparser": "^3.5.0",
     "morgan": "^1.10.0",
-    "node-fetch": "2.0.0",
+    "node-fetch": "^2.6.11",
     "nodemailer": "^6.7.3",
     "rotating-file-stream": "2.1.6",
     "swagger-ui-express": "^4.3.0"
