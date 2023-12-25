@@ -149,7 +149,7 @@ module.exports = class DB {
             select b.*,coalesce(o.category,'') as product_category,coalesce(o.name,'') as product,coalesce(o.quantity,0) as quantity,coalesce(o.price,0) as product_price,coalesce(o.cost_price,0) as product_cost_price,o.special_request from all_bons b
             left join all_orders o on b.id=o.bon_id
             where coalesce(?,b.id)=b.id
-                group by id order by id desc 
+                order by id desc 
         `;
         return this.db.prepare(sql).all(bonId);
     }
