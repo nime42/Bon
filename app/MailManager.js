@@ -98,6 +98,18 @@ function removeQuotedText(message) {
   return message.replace(/(^.*<.*@.*>.*$)*\n{0,2}(^>.*$)/gm, "").trim();
 }
 
+/**
+ * If the original message is included in the mail, following the text "-----Original Message-----" or in local language
+ * "-----Oprindelig meddelelse-----" the return the mail without this
+ * @param {*} message 
+ * @returns 
+ */
+function removeOriginalMessage(message) {
+  //I assuming that there allways is 5 "-" before and after "Original message" and that "Original Message" allways translates to
+  //two words in local language.
+  return message.split(/-----\w+ \w+-----/)[0];
+}
+
 function getBonMails(prefix, id, markAsRead, callback = console.log) {
   let searchSubject = "#Bon:" + prefix + "-" + id + ":";
   getMails(
@@ -109,6 +121,7 @@ function getBonMails(prefix, id, markAsRead, callback = console.log) {
         let res = data.sort((a, b) => a.date - b.date);
         res.forEach((e) => {
           e.message = removeQuotedText(e.message);
+          e.message = removeOriginalMessage(e.message);
         });
         callback(status, res);
       } else {
