@@ -36,7 +36,7 @@ class Notifier {
                 aElem.innerHTML="#"+bonId;
                 aElem.onclick=()=>{
                     if(res.message.trim()!=="") {
-                    MessageBox.popup(res.message, {
+                    MessageBox.popup(res.message.replaceAll("\n","<br>"), {
                         b1: {
                           text: "gå til Bon",
                           onclick: () => {
