@@ -310,7 +310,7 @@ class BonStrip {
         let orderConfigDiv=`
         <div id="order-config" class="order-config-style" style="width:350px;background:${this.background};padding:10px;border-radius: 10px;border: 2px solid ${this.foreground};">   
             <div class="order-config-style">
-            <span><i id="plus" class="plus-minus fa fa-plus-square" style="font-size:20px"></i><i id="minus" class="plus-minus fa fa-minus-square" style="font-size:20px"></i><input type="text" class="nr-of" size="3" name="quantity" id="quantity" "value="1"></span>    
+            <span><i id="plus" class="plus-minus fa fa-plus-square" style="font-size:30px"></i>&nbsp;&nbsp;<i id="minus" class="plus-minus fa fa-minus-square" style="font-size:30px"></i><input type="text" class="nr-of" size="3" name="quantity" id="quantity" "value="1"></span>    
             <span class="x-sign">X</span><span class="order-name" id="order-name"></span>
             </div><br>
             <textarea name="comment" placeholder="Extra info" id="comment" ></textarea>
