@@ -286,12 +286,16 @@ class BonRepository {
     }
 
 
-    notifyBon(bonId,callback) {
+    notifyBon(bonId,message,callback) {
         let url="api/notifyBon/"+bonId;
         $.ajax({
             type: "PUT",
             url: url,
-            complete: callback
+            data: JSON.stringify({message:message}),
+            complete: callback,
+            dataType: "json",
+            contentType: "application/json"
+
           });
     }
 

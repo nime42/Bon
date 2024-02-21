@@ -273,9 +273,9 @@ class BonStrip {
                 MessageBox.popup("Vil du sende en besked til køkkenet?", {
                     b1: {
                       text: "Ja",
-                      onclick: () => {
+                      onclick: (message) => {
                         if(self.bonId) {
-                          Globals.myNotifier.notify(self.bonId);
+                          Globals.myNotifier.notify(self.bonId,message);
                         } else {
                           alert("Gem venligst først!");
                         }
@@ -284,7 +284,7 @@ class BonStrip {
                       },
                     },
                     b2: { text: "Nej" },
-                  });
+                  },{label:"extra besked"});
             }
 
 

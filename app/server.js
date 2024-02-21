@@ -1123,8 +1123,9 @@ app.put("/api/notifyBon/:id",(req,res) => {
         return;
     }
     let bonId=req.params.id;
+    let message=req.body.message
     let userId=loginHandler.getSession(req).userId;
-    DB.notifyBon(userId,bonId, (status)=>{
+    DB.notifyBon(userId,bonId,message, (status)=>{
         if(status) { 
             res.sendStatus(200);  
  

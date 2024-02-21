@@ -143,6 +143,7 @@ CREATE TABLE notified_bons (
 	user_id INTEGER,
 	bon_id INTEGER,
 	notify_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	message TEXT,
 	PRIMARY KEY (user_id, bon_id)
 	FOREIGN KEY (bon_id)
 	REFERENCES "bons" (id) ON DELETE CASCADE

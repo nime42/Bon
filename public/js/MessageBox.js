@@ -35,6 +35,8 @@ class MessageBox {
         <div class="mb-style">
 
             <span id="message"></span><br><br>
+            <textarea id="input-area" rows="2" placeholder="" style="display:none"></textarea>
+            <br>
             <span class="mb-style">
             <button class="mb-style" type="button" id="b1"/>
             <button class="mb-style" type="button" id="b2"/>
@@ -43,11 +45,18 @@ class MessageBox {
         </div>
         `;
     
-    static popup(message, buttons) {
+    static popup(message, buttons,input) {
         let popup=new ModalPopup();
         let div=document.createElement("div");
         div.innerHTML=MessageBox.myContent;
         div.querySelector("#message").innerHTML=message;
+
+        if(input) {
+            let inputArea=div.querySelector("#input-area");
+            inputArea.style.display="";
+            inputArea.placeholder=input.label;
+
+        }
 
         div.querySelectorAll("button").forEach(e=>{e.style.display="none"});
         buttons && ["b1","b2","b3"].forEach((b) => {
@@ -56,7 +65,8 @@ class MessageBox {
                 button.innerHTML=buttons[b].text;
                 button.style.display="";
                 button.onclick=function() {
-                    buttons[b].onclick && buttons[b].onclick();
+                    let inputText=div.querySelector("#input-area").value;
+                    buttons[b].onclick && buttons[b].onclick(inputText);
                     popup.hide();
                 }
             }

@@ -16,12 +16,18 @@ class Notifier {
         this.myRepo = new BonRepository();
     }
 
-    notify(bonId) {
-        this.myRepo.notifyBon(bonId);
+    notify(bonId,message) {
+        this.myRepo.notifyBon(bonId,message);
     }
 
     checkNotifiedBons() {
         let self=this;
+        let gotoBon=(bonId)=>{
+            Globals.myConfig.showBonForm(bonId);
+            self.myRepo.seeBon(bonId);
+            self.myDiv.style.display="none";
+            self.checkNotifiedBons();
+        }
         this.myRepo.getNotifiedBon((status,res)=>{
             if(status) {
                 let bonId=res.bon_id;
@@ -29,9 +35,26 @@ class Notifier {
                 let aElem=this.myDiv.querySelector("a");
                 aElem.innerHTML="#"+bonId;
                 aElem.onclick=()=>{
-                    Globals.myConfig.showBonForm(bonId);
-                    self.myRepo.seeBon(bonId);
-                    self.myDiv.style.display="none";
+                    if(res.message.trim()!=="") {
+                    MessageBox.popup(res.message, {
+                        b1: {
+                          text: "gå til Bon",
+                          onclick: () => {
+                            gotoBon(bonId);
+              
+                          },
+                        },
+                        b2: { text: "Afbryd" }
+                      });
+                    } else {
+                        gotoBon(bonId);
+                    }
+
+
+
+
+
+
                 }
         
 
