@@ -4,7 +4,7 @@ class BonForm {
   shadowColor = Globals.shadowColor;
   content = `
   <div class="bon-container" style="margin-top:25px;width: 95%;margin: 60px auto;background:wheat;padding: 10px;border: 1px solid black;border-radius: 5px;">
-  <div class="bon-row" style="align-self: end;" onclick="this.parentElement.querySelector('#cancel').click()"><i class="fa fa-times" aria-hidden="true"></i></div>
+  <div class="bon-row" style="align-self: end;cursor: pointer;" onclick="this.parentElement.querySelector('#cancel').click()"><i class="fa fa-times" aria-hidden="true"></i></div>
   <div class="bon-row" style="margin: auto;min-width: 80%;">
       
 
