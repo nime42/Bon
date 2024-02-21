@@ -1,7 +1,7 @@
 class Notifier {
     innerHTML=`
-    <div class="blink">
-    <i class="fa fa-paper-plane" style="font-size: 25px;"></i>&nbsp;
+    <div>
+    <i class="fa fa-paper-plane blink" style="font-size: 25px;color: #8e631f;"></i>&nbsp;
     <a href="javascript:void(0);"></a>
     <div>
     `;
