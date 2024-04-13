@@ -393,7 +393,22 @@ class BonConfig {
 
     }
 
-
+    //If we have specified an order of categorynames then sort the feched categories as that
+    //if there is categories not in the list of sorted categories just add them to the end.
+    _sortCategoryNames(categoryNames) {
+        if(Globals.CategoryOrder) {
+            let unordered=new Set(categoryNames);
+            let ordered=Globals.CategoryOrder;
+            unordered.forEach(c=>{
+                if(!ordered?.includes(c)) {
+                    ordered.append(c);
+                }
+            });
+            return ordered;
+        } else {
+            return categoryNames;
+        }
+    }
 
     getItemsFromDB(callback) {
         this.myRepo.getItems(items=>{
@@ -403,7 +418,8 @@ class BonConfig {
                 this.price_lookup={};
                 this.myItems=items.filter(e=>(e.sellable));
                 prices.items.forEach(e=>{this.price_lookup[e.id]=e;});
-                this.priceCategories=prices.categoryNames;
+
+                this.priceCategories=this._sortCategoryNames(prices.categoryNames);
                 callback();
             });
         });

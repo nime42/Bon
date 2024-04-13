@@ -24,6 +24,13 @@ class Globals {
             "x-Levering",
             "x- Service"
         ]
+    static CategoryOrder=[
+            "Store",
+            "Catering",
+            "Festival",
+            "Produktion",
+            "Waiste",
+    ]
     static Statuses={
         new:{
             name:"new",

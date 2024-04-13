@@ -479,13 +479,9 @@ class BonForm {
     let select = this.myDiv.querySelector("#price-categories");
     let currentSelected = select.value;
     select.innerHTML = "";
-    let option = document.createElement("option");
-    option.text = "Pris kategorie...";
-    option.disabled = true;
-    select.add(option);
 
     Globals.myConfig.priceCategories.forEach((c) => {
-      option = document.createElement("option");
+      let option = document.createElement("option");
       option.text = c;
       select.add(option);
     });
@@ -875,10 +871,11 @@ class BonForm {
   }
 
   _clear() {
-    this.myDiv.querySelectorAll("#order input,textarea").forEach((e) => {
+    this.myDiv.querySelectorAll("#order input,textarea,select").forEach((e) => {
       let name = e.getAttribute("name");
       if (name !== null) {
         e.value = "";
+        if(e.selectedIndex) {e.selectedIndex=0};
         try {
           e.oninput();
         } catch (err) {}
