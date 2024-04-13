@@ -801,6 +801,10 @@ class BonConfig {
         bonId:"42",
         bonPrefix:Globals.bonPrefix,
         deliveryAdr: "Gadegaden 2\n11111 Byn",
+        deliveryStreet:"Gadegaden",
+        deliveryStreetNr:"2",
+        deliveryZipCode:"11111",
+        deliveryCity:"Byn",
         deliveryDate: "2022-11-22",
         deliveryTime: "12:00",
         foreName: "Ole",
@@ -835,9 +839,10 @@ class BonConfig {
             })
             select.onchange();
 
+            let variableList=this.myMessages.querySelector("#message-variables");
+            variableList.innerHTML="";
             Object.keys(this.valuesExample).forEach(k=>{
                 let o=document.createElement("option");
-                let variableList=this.myMessages.querySelector("#message-variables");
                 o.text="${"+k+"}";
                 o.onclick=()=>{
                     Helper.typeInTextarea(o.text,textArea);

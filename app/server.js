@@ -886,7 +886,6 @@ function manageIncomingOrders(callback) {
 }
 
 if(config.mailManager.incomingMails) {
-    let confirmMessage=DB.getMessage(config.mailManager.incomingMails.confirmTemplate)?.message;
     let checkPeriod=parseInt(config.mailManager.incomingMails.checkPeriodic);
     if(!Number.isInteger(checkPeriod)) {
         console.error("Can't check incoming mails: config.mailManager.incomingMails.checkperiodic is not a number or is missing!");

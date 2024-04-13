@@ -48,7 +48,7 @@ module.exports = class BonUtils {
     let deliveryAdress=`
     ${bon.delivery_address.street_name2}
     ${bon.delivery_address.street_name} ${bon.delivery_address.street_nr}
-    ${bon.delivery_address.zip_Code} ${bon.delivery_address.city}
+    ${bon.delivery_address.zip_code} ${bon.delivery_address.city}
     `;
 
     let deliveryDate=new Date(bon.delivery_date);
@@ -68,7 +68,11 @@ module.exports = class BonUtils {
       totSum:bon.orders.reduce((s,e)=>(s+e.quantity*e.price),0),
       foreName:bon.customer.forename,
       surName:bon.customer.surname,
-      pax:bon.nr_of_servings
+      pax:bon.nr_of_servings,
+      deliveryStreet:bon.delivery_address.street_name,
+      deliveryStreetNr:bon.delivery_address.street_nr,
+      deliveryZipCode:bon.delivery_address.zip_code,
+      deliveryCity:bon.delivery_address.city,
     }
 
     let expandedMessage=message;

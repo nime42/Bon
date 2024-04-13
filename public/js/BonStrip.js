@@ -512,6 +512,10 @@ class BonStrip {
             values.deliveryDate=this.myDiv.querySelector("#date").innerHTML;
             values.deliveryTime=this.myDiv.querySelector("#time").innerHTML;
             values.deliveryAdr=this.myDiv.querySelector("#address").innerText;
+            values.deliveryStreet=this.deliveryAdressDetails.street_name;
+            values.deliveryStreetNr=this.deliveryAdressDetails.street_nr;
+            values.deliveryZipCode=this.deliveryAdressDetails.zip_code;
+            values.deliveryCity=this.deliveryAdressDetails.city;
             values.foreName=this.myDiv.querySelector("#forename").innerText;
             values.surName=this.myDiv.querySelector("#surname").innerText;
             values.pax=this.myDiv.querySelector("#pax").innerHTML;
@@ -880,6 +884,8 @@ class BonStrip {
     
         }
         this.myDiv.querySelector("#address").innerHTML=addr;
+        //We could need these values separate when generating mail messages. 
+        this.deliveryAdressDetails=bon.delivery_address;
     }
     setDeliveryDate(deliveryDate) {
         let date=new Date(deliveryDate).toLocaleDateString();
@@ -948,6 +954,14 @@ class BonStrip {
             }
 
             this.myDiv.querySelector("#address").innerHTML=addr;
+            //We could need these values separate when generating mail messages. 
+            this.deliveryAdressDetails={};
+            this.deliveryAdressDetails.street_name=streetNameElem.value;
+            this.deliveryAdressDetails.street_nr=streetNrElem.value;
+            this.deliveryAdressDetails.zip_code=zipCodeElem.value;
+            this.deliveryAdressDetails.city=cityElem.value;
+
+
         }
         streetNameElem.oninput=f;
         streetName2Elem.oninput=f;
