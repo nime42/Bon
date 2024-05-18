@@ -18,6 +18,8 @@ class Globals {
         }
     }
     static BonStripOrder= [
+            "05 Drikke",
+            "03 Kager",
             "*",
             "06 Emballage",
             "Emballage",

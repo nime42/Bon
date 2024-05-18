@@ -709,8 +709,8 @@ class BonStrip {
         let sortFun=(a,b) => {
             let aCategory=a.querySelector("#category").value;
             let bCategory=b.querySelector("#category").value;
-            let aPos=orderPos[aCategory]?orderPos[aCategory]:allOthers;
-            let bPos=orderPos[bCategory]?orderPos[bCategory]:allOthers;
+            let aPos=orderPos[aCategory]!==undefined?orderPos[aCategory]:allOthers;
+            let bPos=orderPos[bCategory]!==undefined?orderPos[bCategory]:allOthers;
             return aPos-bPos;
 
         }
