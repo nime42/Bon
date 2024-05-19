@@ -325,4 +325,34 @@ class BonRepository {
 
     }
 
+
+    getShoppingLists(callback) {
+        let url="api/getShoppingLists";
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function(data,status,xhr) {callback(true,data);},
+            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            contentType: "application/json",
+            cache: false
+          });
+    }
+
+
+    addToShoppingList(products,shoppingListId,callback) {
+        let url="api/addToShoppingList/";
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify({products,shoppingListId}),
+            success: function(data,status,xhr) {callback(true,data);},
+            error:function(data,status,xhr) {callback(false,data,status,xhr)},            
+            contentType: "application/json"
+          });
+
+
+
+    }
+
 }

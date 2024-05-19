@@ -15,8 +15,16 @@ class IngredientList {
     <tr style="padding:0">
       <td style="padding:0">
       <label style="font-style: italic;font-weight: normal;font-size: small;">*) Underopskrift (Udvidet:<input type="checkbox" id="expand-nested">) </label>
+      <span > Tillföj shoppinglist  
+      <!--<input type="text" name="shopping-list" list="shopping-lists"><datalist id="shopping-lists"/>-->
+      <select name="shopping-list" id="shopping-list" style="height: auto;">
+
+      <input type="button" id="add-to-shopping-list" class="button-primary" value="Tillföj">
+      </span>
+      
       </td>
     </tr>
+
   </tfoot>
     </table> 
 
@@ -47,25 +55,55 @@ class IngredientList {
       orders,
       (status, ordersWithProducts) => {
         if (status) {
-          let ingredients=ordersWithProducts.map(o=>({quantity:o.quantity,ingredients:o.ingredients}));
-          this.showIngredients(ingredients,false);
+          this.ingredients=ordersWithProducts.map(o=>({quantity:o.quantity,ingredients:o.ingredients}));
+          this.showIngredients(this.ingredients,false);
           this.ingredientList.show(this.myDiv);
           this.myDiv.querySelector("#expand-nested").onchange=(e)=>{
             let expand=e.target.checked;
-             this.showIngredients(ingredients,expand);
+             this.showIngredients(this.ingredients,expand);
           }
         }
         p.hide();
       }
     );
+
+    let shoppingListElem=this.myDiv.querySelector("#shopping-list")
+    this.myRepo.getShoppingLists((status,shoppingLists)=>{
+      if(status) {
+        shoppingLists.forEach(l=> {
+          let option=document.createElement("option");
+          option.value=l.id;
+          option.text=l.name;
+          shoppingListElem.append(option)
+
+        })
+
+      }
+
+    })
+
+    let addToShoppingListElem=this.myDiv.querySelector("#add-to-shopping-list");
+    addToShoppingListElem.onclick=()=>{
+      let shoppingListId=shoppingListElem.value;
+      let products=this.getIngredients(this.ingredients,true).map(e=>({
+        product_id:e.product_id,
+        amount:e.stock_amount,
+        name:e.name
+      }));
+      let p = MessageBox.popup("Oppdater inköbsliste...");
+      this.myRepo.addToShoppingList(products,shoppingListId,(status)=>{
+        p.hide();
+        if(!status) {
+          alert("Det gick inte att oppdatere");
+        }
+
+      })
+    }
+
   }
 
 
-
-
-
-
-  showIngredients(ingredients,expandNested) {
+  getIngredients(ingredients,expandNested) {
     if(expandNested) {
       let nestedIngredients=this.getNestedIngredients(ingredients);
       ingredients=ingredients.concat(nestedIngredients);
@@ -76,6 +114,7 @@ class IngredientList {
         if(!unique[p.name]) {
           unique[p.name]={
             name:p.name,
+            product_id:p.product_id,
             purchase_amount:0,
             stock_amount:0,
             purchase_unit:p.purchase_unit,
@@ -127,12 +166,19 @@ class IngredientList {
       e.stock_amount=parseFloat(e.stock_amount.toFixed(3));
       e.in_stock=parseFloat(e.in_stock.toFixed(3));
       e.in_stock_unit=e.in_stock<=1?e.stock_unit.name:e.stock_unit.name_plural;
+    
       e.purchase_unit=e.purchase_amount<=1?e.purchase_unit.name:e.purchase_unit.name_plural;
       e.stock_unit=e.stock_amount<=1?e.stock_unit.name:e.stock_unit.name_plural;
       
 
     })
+    return uniqueProducts;
+  }
 
+
+
+  showIngredients(ingredients,expandNested) {
+    let uniqueProducts=this.getIngredients(ingredients,expandNested);
 
     let body = this.myDiv.querySelector("#ingredients");
     body.innerHTML = "";

@@ -1195,3 +1195,41 @@ app.post("/api/getGrocyProductsForOrders", (req, res) => {
 
 app.post("/api/createInvoiceDraft", (req, res) => {});
 
+
+app.get("/api/getShoppingLists",(req,res) => {
+    if (!loginHandler.isLoggedIn) {
+        res.sendStatus(401);
+        return;
+      }
+
+    grocyFuncs.getShoppingLists(function(status,shoppingLists){
+        if(status) { 
+            shoppingLists.sort((a,b)=>(b.id-a.id))
+            res.json(shoppingLists); 
+        } else {
+            console.log("getMessages",shoppingLists);
+            res.sendStatus(404);  
+
+        }
+    })   
+})
+
+app.post("/api/addToShoppingList",(req,res)=>{
+    if (!loginHandler.isLoggedIn) {
+      res.sendStatus(401);
+      return;
+    }
+    let products=req.body.products;
+    let shoppingListId=req.body.shoppingListId;
+
+    grocyFuncs.addProductsToShoppingList(products,shoppingListId,(status,message)=>{
+        if(status) {
+            res.sendStatus(200); 
+        } else {
+            console.log("addToShoppingList",message);
+            res.sendStatus(500); 
+        }
+    }) 
+
+
+})
