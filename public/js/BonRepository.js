@@ -339,13 +339,13 @@ class BonRepository {
     }
 
 
-    addToShoppingList(products,shoppingListId,callback) {
+    addToShoppingList(products,shoppingListId,resetShoppingList,callback) {
         let url="api/addToShoppingList/";
 
         $.ajax({
             type: "POST",
             url: url,
-            data: JSON.stringify({products,shoppingListId}),
+            data: JSON.stringify({products,shoppingListId,resetShoppingList}),
             success: function(data,status,xhr) {callback(true,data);},
             error:function(data,status,xhr) {callback(false,data,status,xhr)},            
             contentType: "application/json"

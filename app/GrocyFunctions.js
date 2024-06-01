@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const fetch = require("node-fetch");
 
 module.exports = class GrocyFunctions {
   constructor(config) {
@@ -22,19 +22,19 @@ module.exports = class GrocyFunctions {
     recipy.ingredients?.forEach((i) => {
       res.products.push({
         name: i.name,
-        product_id:i.product_id,
+        product_id: i.product_id,
         stock_amount: i.stock_amount / (recipy.base_servings * 1.0),
         stock_unit: {
           name: i.qu_id_stock.name,
           name_plural: i.qu_id_stock.name_plural,
-          qu_id:i.qu_id_stock.id
+          qu_id: i.qu_id_stock.id,
         },
         purchase_amount: i.purchase_amount / (recipy.base_servings * 1.0),
         variable_amount: i.variable_amount,
         purchase_unit: {
           name: i.qu_id_purchase.name,
           name_plural: i.qu_id_purchase.name_plural,
-          qu_id:i.qu_id_purchase.id
+          qu_id: i.qu_id_purchase.id,
         },
         in_stock: i.in_stock,
         in_stock_purchase_unit: i.in_stock_purchase_unit,
@@ -286,7 +286,7 @@ module.exports = class GrocyFunctions {
   }
 
   /**
-   * Add a product to shopping list in Grocy
+   * Add a product to shopping list in Grocy (This is not working)
    * @param {*} productId
    * @param {number} listId
    * @param {number} amount
@@ -304,12 +304,10 @@ module.exports = class GrocyFunctions {
       product_amount: amount,
       note: "Uppdateret från Bon",
     };
-    
-    if(this.allProducts[productId]?.qu_id_stock!==undefined) {
-        body.qu_id=this.allProducts[productId]?.qu_id_stock;
-    }
 
-    console.log("sending",JSON.stringify(body))
+    if (this.allProducts[productId]?.qu_id_stock !== undefined) {
+      body.qu_id = this.allProducts[productId]?.qu_id_stock;
+    }
 
     fetch(httpReq, {
       headers: {
@@ -327,22 +325,152 @@ module.exports = class GrocyFunctions {
       });
   }
 
+  /**
+   * Adding a product and its amount to a shopping list in Grocy
+   * @param {*} productId
+   * @param {number} listId
+   * @param {number} amount
+   * @param {*} callback
+   */
+  updateShoppingList(productId, amount, listId, callback = console.log) {
+    this.getShoppingListItems(listId, (status, listItems) => {
+      if (!status) {
+        console.log(`Failed to get existing shoppinglist with id=${listId}`);
+        listItems = [];
+      }
+
+      let currentProductListItem = listItems.find(
+        (e) => e.product_id == productId
+      );
+      let httpReq, body, method;
+
+      if (currentProductListItem !== undefined) {
+        httpReq =
+          this.config.grocy.url +
+          "/api/objects/shopping_list/" +
+          currentProductListItem.id +
+          "?GROCY-API-KEY=" +
+          this.config.grocy.apiKey;
+
+        body = {
+          amount: currentProductListItem.amount + amount,
+          note: "Uppdateret från Bon",
+        };
+        method = "PUT";
+      } else {
+        httpReq =
+          this.config.grocy.url +
+          "/api/objects/shopping_list" +
+          "?GROCY-API-KEY=" +
+          this.config.grocy.apiKey;
+
+        body = {
+          product_id: productId,
+          shopping_list_id: listId,
+          amount: amount,
+          note: "Uppdateret från Bon",
+        };
+        method = "POST";
+      }
+
+
+      fetch(httpReq, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        method: method,
+        body: JSON.stringify(body),
+      })
+        .then(function (res) {
+          if (res.status == 200 || res.status == 204) {
+            callback(true);
+          } else {
+            callback(false, res);
+          }
+        })
+        .catch(function (res) {
+          callback(false, res);
+        });
+    });
+  }
+
+  /**
+   * Get all items in a shoppinglist
+   * @param {*} listId
+   * @param {*} callback
+   */
+  getShoppingListItems(listId, callback = console.log) {
+    let httpReq =
+      this.config.grocy.url +
+      "/api/objects/shopping_list" +
+      "?GROCY-API-KEY=" +
+      this.config.grocy.apiKey;
+
+    fetch(httpReq)
+      .then((res) => res.json())
+      .then((shoppinglists) => {
+        callback(
+          true,
+          shoppinglists.filter((e) => e.shopping_list_id == listId)
+        );
+      })
+      .catch((err) => {
+        callback(false, err);
+      });
+  }
+
+  /**
+   * Clear a shoppinglist
+   * @param {*} listId 
+   * @param {*} callback 
+   */
+  clearShoppingList(listId,callback=console.log) {
+
+    let httpReq =
+    this.config.grocy.url +
+    "/api/stock/shoppinglist/clear" +
+    "?GROCY-API-KEY=" +
+    this.config.grocy.apiKey;
+
+    let body={list_id:listId}
+
+    fetch(httpReq, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(body),
+    })
+      .then(function (res) {
+        callback(true);
+      })
+      .catch(function (res) {
+        callback(false,res);
+      });
+
+  }
+
   addProductsToShoppingList(productList, listId, callback = console.log) {
     let nrOfProducts = productList.length;
+    let errorMessage = undefined;
     productList.forEach((p) => {
-        console.log(p);
-      this.addToShoppingList(
+      this.updateShoppingList(
         p.product_id,
         p.amount,
         listId,
         (status, message) => {
-          if (status) {
-            nrOfProducts--;
-            if (nrOfProducts === 0) {
+          nrOfProducts--;
+          if (!status) {
+            errorMessage = message;
+          }
+          if (nrOfProducts === 0) {
+            if (errorMessage) {
+              callback(false, errorMessage);
+            } else {
               callback(true);
             }
-          } else {
-            callback(false, message);
           }
         }
       );
@@ -354,9 +482,9 @@ module.exports = class GrocyFunctions {
   }
 
   updateCache(callback) {
-    this.buildAllRecipes((recipies,objects) => {
+    this.buildAllRecipes((recipies, objects) => {
       this.allRecipies = recipies;
-      this.allProducts=objects["products"];
+      this.allProducts = objects["products"];
       Object.keys(this.allRecipies).forEach((k) => {
         this.allRecipies[k].calculated_price =
           +this.calculatePriceForRecipy(k).toFixed(2);
@@ -436,7 +564,7 @@ module.exports = class GrocyFunctions {
       });
 
       if (callback != null) {
-        callback(recipes,objects);
+        callback(recipes, objects);
       }
     });
   }
@@ -568,5 +696,3 @@ module.exports = class GrocyFunctions {
     };
   }
 };
-
-

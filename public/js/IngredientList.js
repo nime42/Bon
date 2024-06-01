@@ -20,6 +20,7 @@ class IngredientList {
       <select name="shopping-list" id="shopping-list" style="height: auto;">
 
       <input type="button" id="add-to-shopping-list" class="button-primary" value="Tilføj">
+      <span style="font-style: italic;font-weight: normal;font-size: small;">(rense indkøbsliste først <input type="checkbox" id="reset-shopping-list">)</span>
       </span>
       
       </td>
@@ -90,8 +91,9 @@ class IngredientList {
         amount:e.stock_amount,
         name:e.name
       }));
+      let resetShoppingList=this.myDiv.querySelector("#reset-shopping-list").checked;
       let p = MessageBox.popup("Oppdater inköbsliste...");
-      this.myRepo.addToShoppingList(products,shoppingListId,(status)=>{
+      this.myRepo.addToShoppingList(products,shoppingListId,resetShoppingList,(status)=>{
         p.hide();
         if(!status) {
           alert("Det gick inte att oppdatere");

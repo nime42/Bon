@@ -1221,15 +1221,31 @@ app.post("/api/addToShoppingList",(req,res)=>{
     }
     let products=req.body.products;
     let shoppingListId=req.body.shoppingListId;
+    let resetShoppingList=req.body.resetShoppingList;
 
-    grocyFuncs.addProductsToShoppingList(products,shoppingListId,(status,message)=>{
-        if(status) {
-            res.sendStatus(200); 
-        } else {
-            console.log("addToShoppingList",message);
-            res.sendStatus(500); 
-        }
-    }) 
+    let func=() =>{
+        grocyFuncs.addProductsToShoppingList(products,shoppingListId,(status,message)=>{
+            if(status) {
+                res.sendStatus(200); 
+            } else {
+                console.log("addToShoppingList",message);
+                res.sendStatus(500); 
+            }
+        }) 
+    }
+
+    if(resetShoppingList) {
+        grocyFuncs.clearShoppingList(shoppingListId,(status)=>{
+            if(!status) {
+                console.log("Failed to clear shoppinglist with id "+shoppingListId);
+            }
+            func();
+        })
+    } else {
+        func();
+    }
+
+
 
 
 })
