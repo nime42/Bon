@@ -15,11 +15,11 @@ class IngredientList {
     <tr style="padding:0">
       <td style="padding:0">
       <label style="font-style: italic;font-weight: normal;font-size: small;">*) Underopskrift (Udvidet:<input type="checkbox" id="expand-nested">) </label>
-      <span > Tillföj shoppinglist  
+      <span > Tilføj shoppinglist  
       <!--<input type="text" name="shopping-list" list="shopping-lists"><datalist id="shopping-lists"/>-->
       <select name="shopping-list" id="shopping-list" style="height: auto;">
 
-      <input type="button" id="add-to-shopping-list" class="button-primary" value="Tillföj">
+      <input type="button" id="add-to-shopping-list" class="button-primary" value="Tilføj">
       </span>
       
       </td>
