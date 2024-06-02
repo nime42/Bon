@@ -70,6 +70,7 @@ class IngredientList {
 
     let shoppingListElem=this.myDiv.querySelector("#shopping-list")
     this.myRepo.getShoppingLists((status,shoppingLists)=>{
+      shoppingListElem.innerHTML="";
       if(status) {
         shoppingLists.forEach(l=> {
           let option=document.createElement("option");
