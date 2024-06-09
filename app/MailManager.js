@@ -306,7 +306,7 @@ function parseDeliveryDate(entries) {
     return undefined;
   }
   if (time) {
-    let groups = time.match(/(?<hour>\d{1,2}) *[.:] *(?<min>\d{1,2})/i)?.groups;
+    let groups = time.match(/(?<hour>\d{1,2})[.:]?(?<min>\d{1,2})/i)?.groups;
     if (groups) {
       dateValue.setHours(groups["hour"], groups["min"]);
     }
