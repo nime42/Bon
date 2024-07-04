@@ -292,7 +292,7 @@ class BonForm {
 
    
 
-    this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"),true,this.myDiv.querySelector("#items-selector"));
+    this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"),true,{externalItemsList:this.myDiv.querySelector("#items-selector")});
     this.myBonStrip.showMails(this.myDiv.querySelector("#mail-conversation"));
     this.myBonStrip.setOnMailSeen((bonId)=>{
       Globals.myCalender.mailSeen(bonId)

@@ -9,6 +9,14 @@ function init() {
   document.globals = { ...document.globals, ...getTemplates() };
 }
 
+
+function searchBons(searchParams,callback) {
+  let url="../api/searchBons/";
+
+  url+="?"+Object.keys(searchParams).map(k=>(k+"="+searchParams[k])).join("&");
+  $.get(url,callback);   
+}
+
 function getTemplates() {
   let sectionTemplate = copyElem(document.querySelector("#section-template"));
   let rowTemplate = copyElem(sectionTemplate.querySelector("#row-template"));
@@ -21,8 +29,7 @@ function getCateringFeatures(callback) {
   let searchParams = { includeOrders: true };
   let [year, month, day] = splitDate(new Date());
   searchParams["afterDate"] = `${year}-${month}-${day}`;
-  let repo = new BonRepository();
-  repo.searchBons(searchParams, (bons) => {
+  searchBons(searchParams, (bons) => {
     let onlyCatering = bons.filter((b) => b.price_category === "Catering");
     let features = createFeatures(onlyCatering, {isHistoric:false});
     callback(features);
@@ -31,15 +38,14 @@ function getCateringFeatures(callback) {
 
 function getHistoricFeatures(callback) {
   let searchParams = { includeOrders: true };
-  let yesterday=new Date();
+  let yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   let [year, month, day] = splitDate(yesterday);
   searchParams["beforeDate"] = `${year}-${month}-${day}`;
 
-  let repo = new BonRepository();
-  repo.searchBons(searchParams, (bons) => {
+  searchBons(searchParams, (bons) => {
     let onlyCatering = bons.filter((b) => b.price_category === "Catering");
-    let features = createFeatures(onlyCatering,{isHistoric:true});
+    let features = createFeatures(onlyCatering, { isHistoric: true });
     callback(features);
   });
 }
@@ -122,7 +128,7 @@ function createBonMarker(bonFeature, options) {
     setTimeout(()=>{
       let div=document.querySelector("#bon-popup-handle");
       div.innerHTML="";
-      bs=new BonStrip(div,false);
+      bs=new BonStrip(div,false,{hideIngredientList:true,hideGotoMap:true});
       bs.initFromBon(b,b.orders);
       console.log("popupopen",div);
     }, 300)

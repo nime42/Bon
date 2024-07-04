@@ -224,7 +224,7 @@ class BonStrip {
         <i id="notify-kitchen" class="fa fa-paper-plane" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Send en besked til køkkenet!";margin-right: 10px;></i>
         <i id="ingredients-info" class="fa fa-info-circle" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="ingredienser!"></i>        
         <i id="move-bon" class="fa fa-exchange fa-rotate-90" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Flytte til anden server!"></i>
-         <i id="goto-map" class="fa fa-globe" style="font-size:20px; color:${this.foreground};cursor: pointer;margin-right: 10px;" title="gå til kortet"></i>
+         <i id="goto-map" class="fa fa-globe" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="gå til kortet"></i>
         <select id="other-bon-instances" style="display:none;"></select>
         <div id="items-list" style="display:none"></div>
         <div id="mail-list" style="display:none"></div>
@@ -237,7 +237,7 @@ class BonStrip {
 
 
 
-    constructor(div,isEditable,externalItemList) {
+    constructor(div,isEditable,options) {
         if(typeof div==="string") {
             this.myDiv = document.querySelector(div);
         } else {
@@ -247,8 +247,8 @@ class BonStrip {
 
         if(isEditable) {
             let itemslistElem;
-            if(externalItemList) {
-                itemslistElem=externalItemList;
+            if(options?.externalItemList) {
+                itemslistElem=options.externalItemList;
             } else {
                 itemslistElem = this.myDiv.querySelector("#items-list");
             }
@@ -287,24 +287,30 @@ class BonStrip {
                     b2: { text: "Nej" },
                   },{label:"extra besked"});
             }
-            this.myDiv.querySelector("#goto-map").style.display="";
-            this.myDiv.querySelector("#goto-map").onclick=() => {
-                if(self.bonId) {
-                    window.open(`map/index.html?selectedBon=${self.bonId}`, '_blank').focus();
-                  } else {
-                    alert("Gem venligst først!");
-                  }
-                }
+
 
 
         }
         this.isEditable=isEditable;
 
-        this.myIngredientList=new IngredientList();
+        if (!options?.hideIngredientList) {
+          this.myIngredientList = new IngredientList();
 
-        this.myDiv.querySelector("#ingredients-info").style.display="";
-        this.myDiv.querySelector("#ingredients-info").onclick=() => {
-            this.myIngredientList.show(this.bonId,this.getOrders());
+          this.myDiv.querySelector("#ingredients-info").style.display = "";
+          this.myDiv.querySelector("#ingredients-info").onclick = () => {
+            this.myIngredientList.show(this.bonId, this.getOrders());
+          };
+        }
+
+        if (!options?.hideGotoMap) {
+          this.myDiv.querySelector("#goto-map").style.display = "";
+          this.myDiv.querySelector("#goto-map").onclick = () => {
+            if (self.bonId) {
+              window.open(`map/index.html?selectedBon=${self.bonId}`, "_blank").focus();
+            } else {
+              alert("Gem venligst først!");
+            }
+          };
         }
 
 
