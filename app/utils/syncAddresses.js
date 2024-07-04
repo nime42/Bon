@@ -1,5 +1,5 @@
-var config = require("../resources/config.js");
-var AddressFunctions = require("../app/AddressFunctions.js");
+var config = require("../../resources/config.js");
+var AddressFunctions = require("../AddressFunctions.js");
 var AddressSearch = new AddressFunctions(config);
 
 var sqlite3 = require("better-sqlite3");
