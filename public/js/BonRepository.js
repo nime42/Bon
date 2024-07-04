@@ -1,6 +1,6 @@
 class BonRepository {
     getBons(year,month,callback) {
-        let url="api/bons";
+        let url="/api/bons";
         if(year!==undefined && month!==undefined) {
             url+="?year="+year+"&month="+(month+"").padStart(2,"0");
         }
@@ -10,10 +10,10 @@ class BonRepository {
         let url;
         let type;
         if(bon.id!="") {
-            url="api/bons/"+bon.id;
+            url="/api/bons/"+bon.id;
             type="PUT";
         } else {
-            url="api/bons";
+            url="/api/bons";
             type="POST";
         }
 
@@ -27,7 +27,7 @@ class BonRepository {
           });
     }
     deleteBon(id,callback) {
-        let url="api/bons/"+id;
+        let url="/api/bons/"+id;
         $.ajax({
             type: "DELETE",
             url: url,
@@ -36,7 +36,7 @@ class BonRepository {
     }
 
     getBonSummary(id,callback) {
-        let url="api/bonSummary";
+        let url="/api/bonSummary";
         if(id) {
             url+="/"+id;
         }
@@ -51,23 +51,23 @@ class BonRepository {
     }
 
     getCustomers(email,callback) {
-        let url="api/customers?email="+email;
+        let url="/api/customers?email="+email;
         $.get(url,callback);
     }
 
 
     getItems(callback) {
-        let url="api/items/";
+        let url="/api/items/";
         $.get(url,callback);
     }
 
     getItemsPrices(callback) {
-        let url="api/items_prices/";
+        let url="/api/items_prices/";
         $.get(url,callback);
     }
 
     getOrders(bonId,callback) {
-        let url="api/orders/"+bonId;
+        let url="/api/orders/"+bonId;
         $.get(url,callback);
     } 
 
@@ -80,13 +80,13 @@ class BonRepository {
     }
 
     getIZettleProducts(callback) {
-        let url="api/iZettleProducts";
+        let url="/api/iZettleProducts";
         $.get(url,callback);
     }
 
 
     updateIZettleProduct(id,grocy_id,quantity,connectable) {
-        let url="api/izettleProduct/"+id;
+        let url="/api/izettleProduct/"+id;
         $.ajax({
             type: "PUT",
             url: url,
@@ -100,19 +100,19 @@ class BonRepository {
 
 
     updateDB(callback) {
-        let url="api/updateDB/";
+        let url="/api/updateDB/";
         $.get(url,callback);
     }
 
     searchBons(searchParams,callback) {
-        let url="api/searchBons/";
+        let url="/api/searchBons/";
 
         url+="?"+Object.keys(searchParams).map(k=>(k+"="+searchParams[k])).join("&");
         $.get(url,callback);   
     }
 
     updateBonStatus(id,status,callback) {
-        let url="api/bonStatus/"+id;
+        let url="/api/bonStatus/"+id;
         $.ajax({
             type: "PUT",
             url: url,
@@ -125,7 +125,7 @@ class BonRepository {
 
 
     updateOrders(id,orders,callback) {
-        let url="api/orders/"+id;
+        let url="/api/orders/"+id;
         $.ajax({
             type: "PUT",
             url: url,
@@ -137,7 +137,7 @@ class BonRepository {
     }
 
     consumeBon(id,callback) {
-        let url="api/consumeBon/"+id;
+        let url="/api/consumeBon/"+id;
         $.ajax({
             type: "PUT",
             url: url,
@@ -148,7 +148,7 @@ class BonRepository {
     }
 
     sendBonMail(id,to,message,callback) {
-        let url="api/sendBonMail/";
+        let url="/api/sendBonMail/";
         let body={
             message:message,
             bonId:id,
@@ -165,41 +165,41 @@ class BonRepository {
     }
 
     getBonMails(bonId,callback) {
-        let url="api/bonMails/"+bonId;
+        let url="/api/bonMails/"+bonId;
         $.get(url,callback);
     } 
 
     getUnseenBonIdMails(callback) {
-        let url="api/unseenBonIdMails/";
+        let url="/api/unseenBonIdMails/";
         $.get(url,callback);
     } 
 
 
     getAllUnseenBonIdMails(callback) {
-        let url="api/allUnseenBonIdMails/";
+        let url="/api/allUnseenBonIdMails/";
         $.get(url,callback);
     } 
 
     checkIncomingMails() {
-        let url="api/checkIncomingMails";
+        let url="/api/checkIncomingMails";
         $.get(url);
     }
 
     getAllBonWithMails(mailsSince,callback) {
-        let url="api/allBonWithMails?mailsSince="+(mailsSince!==undefined?mailsSince:"");
+        let url="/api/allBonWithMails?mailsSince="+(mailsSince!==undefined?mailsSince:"");
         $.get(url,callback);
     }     
 
 
     getBonsForWeek(monday,callback) {
-        let url="api/getBonsForWeek?monday="+monday.toISOString();
+        let url="/api/getBonsForWeek?monday="+monday.toISOString();
         $.get(url,callback);
     }
 
 
 
     moveBon(id,prefix,force,callback) {
-        let url="api/moveBon/";
+        let url="/api/moveBon/";
         let body={
             bonId:id,
             prefix:prefix,
@@ -217,7 +217,7 @@ class BonRepository {
 
 
     checkBonStock(callback) {
-        let url="api/checkStock";
+        let url="/api/checkStock";
 
         $.ajax({
             type: "GET",
@@ -230,13 +230,13 @@ class BonRepository {
     }
 
     getMessages(callback) {
-        let url="api/messages/";
+        let url="/api/messages/";
         $.get(url,callback);
     }
 
 
     addMessage(messageName,callback) {
-        let url="api/messages/";
+        let url="/api/messages/";
         $.ajax({
             type: "POST",
             url: url,
@@ -249,7 +249,7 @@ class BonRepository {
     }
 
     updateMessage(id,message,callback) {
-        let url="api/messages/"+id;
+        let url="/api/messages/"+id;
         $.ajax({
             type: "PUT",
             url: url,
@@ -261,7 +261,7 @@ class BonRepository {
     }
 
     delMessage(id,message,callback) {
-        let url="api/messages/"+id;
+        let url="/api/messages/"+id;
         $.ajax({
             type: "DELETE",
             url: url,
@@ -274,7 +274,7 @@ class BonRepository {
 
 
     getNotifiedBon(callback) {
-        let url="api/getNotifiedBon";
+        let url="/api/getNotifiedBon";
         $.ajax({
             type: "GET",
             url: url,
@@ -287,7 +287,7 @@ class BonRepository {
 
 
     notifyBon(bonId,message,callback) {
-        let url="api/notifyBon/"+bonId;
+        let url="/api/notifyBon/"+bonId;
         $.ajax({
             type: "PUT",
             url: url,
@@ -300,7 +300,7 @@ class BonRepository {
     }
 
     seeBon(bonId,callback) {
-        let url="api/seeBon/"+bonId;
+        let url="/api/seeBon/"+bonId;
         $.ajax({
             type: "PUT",
             url: url,
@@ -309,7 +309,7 @@ class BonRepository {
     }
 
     getGrocyProductsForOrders(bonId,orders,callback) {
-        let url="api/getGrocyProductsForOrders/";
+        let url="/api/getGrocyProductsForOrders/";
 
         $.ajax({
             type: "POST",
@@ -327,7 +327,7 @@ class BonRepository {
 
 
     getShoppingLists(callback) {
-        let url="api/getShoppingLists";
+        let url="/api/getShoppingLists";
         $.ajax({
             type: "GET",
             url: url,
@@ -340,7 +340,7 @@ class BonRepository {
 
 
     addToShoppingList(products,shoppingListId,resetShoppingList,callback) {
-        let url="api/addToShoppingList/";
+        let url="/api/addToShoppingList/";
 
         $.ajax({
             type: "POST",

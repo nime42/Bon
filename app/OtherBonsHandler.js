@@ -14,11 +14,16 @@ module.exports = class OtherBonsHandler {
             config:config,
             grocy:grocy
         }
+
+        var AddressFunctions=require('./AddressFunctions.js');
+        var AddressSearch=new AddressFunctions(config);
+
         config.otherBons && config.otherBons.forEach(f=>{
             let conf=require(f);
             //console.log(conf);
             let dbFile=path.dirname(f)+"/bon.db";
             let db=new DBClass(dbFile);
+            db.useAddressLookUp(AddressSearch);
             let grocy=new GrocyFunctions(conf);
             this.bonInstances[conf.bonPrefix]={
                 db:db,

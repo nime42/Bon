@@ -55,6 +55,9 @@ if(config.app.https) {
 var DBClass=require('./DBClass.js');
 var DB=new DBClass('./resources/bon.db');
 
+var AddressFunctions=require('./AddressFunctions.js');
+var AddressSearch=new AddressFunctions(config);
+DB.useAddressLookUp(AddressSearch);
 var mailSender=require("./mailSender.js");
 mailSender.init(config.mail);
 
@@ -125,6 +128,7 @@ try {
 var VismaFunctions=require("./VismaFunctions.js");
 const { otherBons } = require('../resources/config.js');
 const BonUtils = require('./BonUtils.js');
+const AdressFunctions = require('./AddressFunctions.js');
 var Visma=new VismaFunctions(vismaConfig,DB);
 //Visma.createInvoiceDraft(1022);
 //Visma.getCustomer("lasc@kea.dk","KEA");
