@@ -146,7 +146,7 @@ class WeekView {
         this.myRepo=new BonRepository();
         this.myPopUp=new ModalPopup();
         this.myBonStripDiv=document.createElement("div");
-        this.myBonStrip=new BonStrip(this.myBonStripDiv,false);
+        this.myBonStrip=new BonStrip(this.myBonStripDiv,false,{hideGotoMap:true});
         this.myBonStrip.showMails();
         this.myBonStrip.setOnMailSeen((bonId)=>{
             let entries=Array.from(this.myDiv.querySelectorAll(".entry"));
