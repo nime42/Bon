@@ -14,6 +14,7 @@ module.exports = class BonUtils {
       "payment_type": "",
       "customer_info": "",
       "kitchen_info": "",
+      "delivery_info": "",
       "service_type": null,
       "customer": {
         "forename": "",
