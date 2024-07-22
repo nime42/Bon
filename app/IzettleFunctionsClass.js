@@ -310,7 +310,7 @@ module.exports = class IzettleFunctionsClass {
     bon.status='closed';
     bon.customer.forename='IZettle';
     bon.customer.surname=purchase.userDisplayName;
-    
+    bon.payment_type="Kontant";
     bon.delivery_date=new Date(purchase.created).toJSON();
     bon.kitchen_info="";
     bon.invoice_info="Izettle PurchaseNr:"+purchase.purchaseNumber;
