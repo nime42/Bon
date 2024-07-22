@@ -27,6 +27,8 @@ class BonForm {
                       style="float:left" data-active-background="${Globals.Statuses["delivered"].color}">${Globals.Statuses["delivered"].label}</button>
                   <button type="button" id="${Globals.Statuses["invoiced"].name}" class="status-button"
                       style="float:left" data-active-background="${Globals.Statuses["invoiced"].color}">${Globals.Statuses["invoiced"].label}</button>
+                  <button type="button" id="${Globals.Statuses["payed"].name}" class="status-button"
+                      style="float:left" data-active-background="${Globals.Statuses["payed"].color}">${Globals.Statuses["payed"].label}</button>
                   <button type="button" id="${Globals.Statuses["closed"].name}" class="status-button"
                       style="float:left" data-active-background="${Globals.Statuses["closed"].color}">${Globals.Statuses["closed"].label}</button>
                   <button type="button" id="${Globals.Statuses["offer"].name}" class="status-button"

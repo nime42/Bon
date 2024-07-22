@@ -34,6 +34,7 @@ class BonStatusFilter {
     <button type="button" id="${Globals.Statuses["done"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["done"].color}">${Globals.Statuses["done"].label}</button>
     <button type="button" id="${Globals.Statuses["delivered"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["delivered"].color}">${Globals.Statuses["delivered"].label}</button>
     <button type="button" id="${Globals.Statuses["invoiced"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["invoiced"].color}">${Globals.Statuses["invoiced"].label}</button>
+    <button type="button" id="${Globals.Statuses["payed"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["payed"].color}">${Globals.Statuses["payed"].label}</button>
     <button type="button" id="${Globals.Statuses["closed"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["closed"].color}">${Globals.Statuses["closed"].label}</button>
     <button type="button" id="${Globals.Statuses["offer"].name}" class="status-filter" style="float:left; background:${Globals.Statuses["offer"].color}">${Globals.Statuses["offer"].label}</button>
     </div>

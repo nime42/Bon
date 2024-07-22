@@ -307,7 +307,8 @@ module.exports = class IzettleFunctionsClass {
 
   createBon(purchase) {
     let bon=bonUtils.getEmptyBon();
-    bon.status='closed';
+    bon.status='payed';
+    bon.customer.email="info@ristetrug.dk"
     bon.customer.forename='IZettle';
     bon.customer.surname=purchase.userDisplayName;
     bon.payment_type="Kontant";

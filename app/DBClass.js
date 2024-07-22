@@ -135,7 +135,7 @@ module.exports = class DB {
   }
 
   searchBons(searchParams, includeOrders, callback = console.log) {
-    let statuses = ["new", "needInfo", "approved", "preparing", "done", "delivered", "invoiced", "closed", "offer"];
+    let statuses = ["new", "needInfo", "approved", "preparing", "done", "delivered", "invoiced","payed", "closed", "offer"];
     let statusSearchConstr;
     if (searchParams.status) {
       let elems = [];

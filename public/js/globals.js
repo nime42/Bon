@@ -69,6 +69,11 @@ class Globals {
             label:"Faktureret",
             color:"mediumpurple"
         },
+        payed:{
+            name:"payed",
+            label:"Betalt",
+            color:"#BF00FF"
+        },
         closed:{
             name:"closed",
             label:"Afslutet",
