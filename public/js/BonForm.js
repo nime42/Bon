@@ -158,6 +158,9 @@ class BonForm {
                       <input type="text" id="city" name="city" placeholder="By" autocomplete="nope">
                   </div>
               </div>
+              <div class="bon-row indent">
+                <textarea name="delivery_info" id="delivery_info" placeholder="Leverings info" rows="4"autocomplete="nope" style="width:320px"></textarea>
+              </div>
               </div>
 
 
@@ -222,7 +225,7 @@ class BonForm {
               <h5>Kunde Ønsker </h5>
               <div class="bon-row indent">
                   <div class="bon-column">
-                      <textarea name="customer_info" placeholder="Kunde Ønsker" rows="2"
+                      <textarea name="customer_info" placeholder="Kunde Ønsker" rows="2" style="width:320px"
                           autocomplete="nope"></textarea>
                   </div>
               </div>
@@ -230,7 +233,7 @@ class BonForm {
               <h5>Faktura Info </h5>
               <div class="bon-row indent">
                   <div class="bon-column">
-                      <textarea name="invoice_info" placeholder="EAN/Faktura Info" rows="2"
+                      <textarea name="invoice_info" placeholder="EAN/Faktura Info" rows="2" style="width:320px"
                           autocomplete="nope"></textarea>
                   </div>
               </div>
@@ -239,7 +242,7 @@ class BonForm {
               <h5>Køkken info</h5>
                   <div class="bon-row indent">
                       <div class="bon-column">
-                          <textarea name="kitchen_info" id="kitchen_info" placeholder="køkken info" rows="2"
+                          <textarea name="kitchen_info" id="kitchen_info" placeholder="køkken info" rows="2" style="width:320px"
                               autocomplete="nope"></textarea>
                       </div>
                   </div>
@@ -321,6 +324,11 @@ class BonForm {
     this.myBonStrip.updateKitchenInfoOnChange(
       form.querySelector("#kitchen_info")
     );
+
+    this.myBonStrip.updateDeliveryInfoOnChange(
+      form.querySelector("#delivery_info")
+    );
+
     this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"));
     this.myBonStrip.updatePaymentTypeOnChange(form.querySelector("#payment-types"),()=>{
       if(form.querySelector("#payment-types").value==="Produktion") {
@@ -572,6 +580,7 @@ class BonForm {
     bon.customer_info = props.customer_info;
     bon.invoice_info = props.invoice_info;
     bon.kitchen_info = props.kitchen_info;
+    bon.delivery_info = props.delivery_info;
     bon.service_type = null;
 
     bon.customer = {};
@@ -730,10 +739,16 @@ class BonForm {
     form.querySelector("textarea[name=customer_info]").value =bon.customer_info;
     form.querySelector("textarea[name=invoice_info]").value =bon.invoice_info;
     form.querySelector("textarea[name=kitchen_info]").value = bon.kitchen_info;
+    form.querySelector("textarea[name=delivery_info]").value = bon.delivery_info;
 
     this._updateOrMerge(
       form.querySelector("textarea[name=kitchen_info]"),
       bon.kitchen_info
+    );
+
+    this._updateOrMerge(
+      form.querySelector("textarea[name=delivery_info]"),
+      bon.delivery_info
     );
 
     this._updateOrMerge(

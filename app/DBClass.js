@@ -23,7 +23,7 @@ module.exports = class DB {
 
     let sql = `
         select 
-          b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.invoice_info,b.kitchen_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,
+          b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.invoice_info,b.kitchen_info,b.delivery_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,
           a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,a.lat,a.lon,
           c.forename,c.surname,c.email,c.phone_nr,
           co.name,co.ean_nr,
@@ -159,7 +159,7 @@ module.exports = class DB {
     });
     let sql = `
       select 
-        b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.service_type,b.invoice_info,b.kitchen_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,b.invoice_date,
+        b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.service_type,b.invoice_info,b.kitchen_info,b.delivery_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,b.invoice_date,
         a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,a.lat,a.lon,
         c.forename,c.surname,c.email,c.phone_nr,
         co.name,co.ean_nr,
@@ -236,7 +236,7 @@ module.exports = class DB {
     bonData.customer_id = this.createCustomer(bonData.customer);
     bonData.delivery_address_id = this.createAddress(bonData.delivery_address);
     let sql =
-      "INSERT INTO bons(status, status2,customer_info, customer_id,delivery_address_id, delivery_date, nr_of_servings,kitchen_selects,customer_collects, kitchen_info, service_type, payment_type,price_category,invoice_info) VALUES(@status, @status2,@customer_info, @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings,@kitchen_selects,@customer_collects, @kitchen_info, @service_type, @payment_type,@price_category,@invoice_info);";
+      "INSERT INTO bons(status, status2,customer_info, customer_id,delivery_address_id, delivery_date, nr_of_servings,kitchen_selects,customer_collects, kitchen_info,delivery_info, service_type, payment_type,price_category,invoice_info) VALUES(@status, @status2,@customer_info, @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings,@kitchen_selects,@customer_collects, @kitchen_info,@delivery_info, @service_type, @payment_type,@price_category,@invoice_info);";
     try {
       const res = this.db.prepare(sql).run(bonData);
       let newBonId = res.lastInsertRowid;
@@ -275,6 +275,8 @@ module.exports = class DB {
         customer_info=@customer_info, 
         invoice_info=@invoice_info, 
         kitchen_info=@kitchen_info, 
+        delivery_info=@delivery_info, 
+
         service_type=@service_type, 
         payment_type=@payment_type,
         price_category=@price_category

@@ -185,7 +185,15 @@ class BonStrip {
             <legend>Leveringsadresse <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
             <div id="address" class="bonstrip-items field-content">
             </div>
+            
+
+
         </fieldset>
+
+        <fieldset id="deliveryinfo-field">
+                <legend>Leverings info <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
+                <span id="deliveryInfoText" class="bonstrip-items field-content"></span>
+        </fieldset>        
 
         <fieldset>
         <legend>Betaling</legend>
@@ -635,6 +643,7 @@ class BonStrip {
         this.setPaxAndKitchenSelects(bon);
         this.setDeliveryDate(bon.delivery_date);
         this.setKitchenInfo(bon.kitchen_info);
+        this.setDeliveryInfo(bon.delivery_info);
         this.setPaymentType(bon.payment_type);
         
         this.status=bon.status;
@@ -920,6 +929,18 @@ class BonStrip {
         }
     }
 
+    setDeliveryInfo(text) {
+        text=text?.replaceAll("\n","<br>");
+    
+        if(text!=="") {
+            this.myDiv.querySelector("#deliveryinfo-field").style.display="";
+            this.myDiv.querySelector("#deliveryInfoText").innerHTML=text;
+        } else {
+            this.myDiv.querySelector("#deliveryinfo-field").style.display="none";
+
+        }
+    }
+
     setPaymentType(pType) {
         this.isProductionBon(pType);
         this.myDiv.querySelector("#payment-type").innerHTML=pType;
@@ -953,6 +974,17 @@ class BonStrip {
         kitchenInfoElem.oninput=f;
 
     }    
+
+    updateDeliveryInfoOnChange(deliveryInfoElem) {
+        let self=this;
+        let f=()=> {
+
+            let text=deliveryInfoElem.value;
+            self.setDeliveryInfo(text);
+        }
+        deliveryInfoElem.oninput=f;
+
+    }     
 
     updateDeliveryAdrOnChange(streetNameElem,streetName2Elem,streetNrElem,zipCodeElem,cityElem,customerCollectsElem) {
         let f=()=> {

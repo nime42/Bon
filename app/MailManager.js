@@ -233,9 +233,24 @@ let incomingMailHelper = {
 };
 
 function getIncomingOrders(subjectContains, callback) {
+
+  const nestedSubjectsConstainsOr = (fromOr) => {
+    let nestedOr;
+  
+    fromOr.forEach((value, index) => {
+      nestedOr = index
+        ? ['OR', ['SUBJECT', value], nestedOr]
+        : ['SUBJECT', value];
+    });
+  
+    return nestedOr;
+  };
+
+  let searchCriteria=nestedSubjectsConstainsOr(subjectContains);
+
   getMails(
     "INBOX",
-    ["UNSEEN", ["SUBJECT", subjectContains]],
+    ["UNSEEN", searchCriteria],
     true,
     (status, data) => {
       if (status) {
@@ -256,34 +271,24 @@ function getIncomingOrders(subjectContains, callback) {
 function buildBon(entries) {
   let bon = bonUtils.getEmptyBon();
   bon.status = "new";
-  bon.customer.forename = entries["forename"]?.trim();
-  bon.customer.surname = entries["surname"]?.trim();
-  bon.customer.email = entries["email"]?.trim();
-  bon.customer.phone_nr = entries["phone_nr"]?.trim();
-  bon.customer.company.name = entries["company_name"]?.trim();
-  bon.nr_of_servings = entries["nr_of_servings"]?.trim();
-  bon.kitchen_selects = entries["kitchen_selects"] !== undefined ? 1 : 0;
+  bon.customer.forename = entries["forename"];
+  bon.customer.surname = entries["surname"];
+  bon.customer.email = entries["email"];
+  bon.customer.phone_nr = entries["phone_nr"];
+  bon.customer.company.name = entries["company_name"];
+  bon.nr_of_servings = entries["nr_of_servings"];
+  bon.kitchen_selects = entries["kitchen_selects"] ;
   bon.price_category = "Catering";
-  bon.delivery_date = parseDeliveryDate(entries);
-  bon.delivery_address.street_name = entries["delivery_address"]?.trim();
-  bon.delivery_address.zip_code = entries["delivery_zipcode"]?.trim();
-  bon.customer_info = entries["customer_info"]?.trim();
-  bon.invoice_info = entries["invoice_info"]?.trim();
-  try {
-    //streetname and streetnumber is in the same field, try to parse them apart
-    //Just split the adress by the first numerical value
-    let parsedAdr=bon.delivery_address.street_name.match(/^([^0-9]*) ?(.*)(\n|$)/);
-    if(parsedAdr) {
-      bon.delivery_address.street_name = parsedAdr[1].trim();
-      bon.delivery_address.street_nr = parsedAdr[2].trim();
-    }
-  } catch (err) {}
-  try {
-    let ean_nr = bon.invoice_info.match(/\d{13}/);
-    if (ean_nr) {
-      bon.customer.company.ean_nr = ean_nr[0];
-    }
-  } catch (err) {}
+  bon.delivery_date = entries["delivery_time"];
+  bon.delivery_address.street_name = entries["delivery_street_name"];
+  bon.delivery_address.street_nr = entries["delivery_street_nr"];
+  bon.delivery_address.zip_code = entries["delivery_zipcode"];
+  bon.delivery_address.city = entries["delivery_city"];
+  bon.customer_info = entries["customer_info"];
+  bon.invoice_info = entries["invoice_info"];
+  bon.delivery_info=entries["delivery_info"];
+  bon.customer.company.ean_nr=entries["ean"]
+
 
   if (bon.delivery_date === undefined) {
     bon.kitchen_info = "BEMÆRK, dato kunne ikke læses. Tjek email.";
@@ -295,8 +300,17 @@ function parseDeliveryDate(entries) {
   let date = entries["delivery_date"];
   let time = entries["delivery_time"];
   let dateValue = undefined;
-  if (date && date.match(/.* \d{1,2},\d{2,4}/)) {
+  
+  if(!date) {
+    return undefined;
+  }
+
+  if (date.match(/.* \d{1,2},\d{2,4}/)) {
     dateValue = new Date(date) + 1; //need to add one day if date is on format "Month day, Year"
+  } else if(date.match(/\d+-\d+-\d/)) {
+    let [day,month,year]=date.split("-");
+    dateValue=new Date(`${year}-${month}-${day}`);
+
   } else {
     try {
       dateValue = new Date(date);
@@ -325,23 +339,107 @@ function getFromEntry(entries, attr) {
   return val !== undefined ? val : "";
 }
 
-function parseIncomingMessage(mess, entries) {
-  let res = {};
-  mess = mess.replace(/CONTACT\n.*/, ""); //Not sure about this.
-  Object.keys(entries).forEach((k) => {
-    let regExp = new RegExp(
-      `(?<attr>${entries[k]}):\\n(?<value>[\\s\\S]*?)(?<end>(.*?:\\n|$))`
-    );
-    let m = mess.match(regExp);
-    if (m) {
-      res[k] = m.groups["value"];
-      res[k] = res[k].replaceAll("<br/>", "");
-    } else {
-      res[k] = undefined;
-    }
+
+function parseIncomingMessage(message) {
+  let attributeMap = {
+    //forename: "Fornavn",
+    //surname: "Efternavn",
+    email: "Email",
+    name: "Navn",
+    phone_nr: "Telefonnummer",
+    company_name: "Firma",
+    deliveryDateTime: "DatoOgTid",
+    delivery_address: "Adresse",
+    street: "Gade",
+    street_nr: "Nr \\(skriv etagen nedenunder\\)",
+    delivery_city: "By",
+    delivery_zipcode: "Post nummer",
+    delivery_info: "leveringsinfo",
+    nr_of_servings: "Pax",
+    kitchen_selects: "RRbestemmer",
+    contactDay: "kontaktPersonPåDagen",
+    phoneDay: "TlfPåDagen",
+    customer_info: "Ønsker",
+    invoice_info: "EAN_Faktura info",
+
+
+
+  };
+
+  Object.keys(attributeMap).forEach((k) => {
+    let regex = new RegExp(`${attributeMap[k]}:?`, "g");
+    message = message.replaceAll(regex, `:::${k}:::`);
   });
+
+  let tmp = {};
+
+  let cols = message.split(":::");
+  for (let i = 1; i < cols.length; i += 2) {
+    let col = cols[i];
+    let val = cols[i + 1];
+    val = val.trim();
+    tmp[col] = val;
+  }
+
+  let res = {};
+
+  if (tmp["name"]) {
+    let [forename, surname, rest] = tmp["name"].split(" ");
+    res["forename"] = forename;
+    res["surname"] = surname;
+    if (rest) {
+      res["surename"] += " " + rest;
+    }
+  } 
+
+  res["phone_nr"] = tmp["phone_nr"] ;
+  res["email"] = tmp["email"];
+
+  res["company_name"] = tmp["company_name"];
+
+  res["delivery_street_name"] = tmp["street"];
+  res["delivery_street_nr"] = tmp["street_nr"];
+
+  res["delivery_zipcode"] = tmp["delivery_zipcode"];
+  res["delivery_city"] = tmp["delivery_city"];
+
+  let [date, time] = tmp["deliveryDateTime"].split(" ");
+  res["delivery_time"] = parseDeliveryDate({ delivery_date: date, delivery_time: time });
+  
+
+  res["delivery_info"] = tmp["delivery_info"];
+  if (tmp["contactDay"]) {
+    res["delivery_info"] += `\nKontakt: ${tmp["contactDay"]}`;
+  }
+  if (tmp["phoneDay"]) {
+    res["delivery_info"] += `\ntelefon:  ${tmp["phoneDay"]}`;
+  }
+
+  res["nr_of_servings"] = tmp["nr_of_servings"];
+
+  res["invoice_info"] = tmp["invoice_info"];
+
+  res["customer_info"] = tmp["customer_info"];
+
+  if (tmp["kitchen_selects"] !=="") {
+    res["kitchen_selects"] = 1;
+  } else {
+    res["kitchen_selects"] = 0;
+  }
+
+  try {
+    let ean_nr = res["invoice_info"].match(/\d{13}/);
+    if (ean_nr) {
+      res["ean_nr"] = ean_nr[0];
+    }
+  } catch (err) {}
+
   return res;
 }
+
+
+
+
 
 
 
