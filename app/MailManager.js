@@ -287,7 +287,7 @@ function buildBon(entries) {
   bon.customer_info = entries["customer_info"];
   bon.invoice_info = entries["invoice_info"];
   bon.delivery_info=entries["delivery_info"];
-  bon.customer.company.ean_nr=entries["ean"]
+  bon.customer.company.ean_nr=entries["ean_nr"]
 
 
   if (bon.delivery_date === undefined) {
