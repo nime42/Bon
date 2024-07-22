@@ -1,9 +1,11 @@
 const Imap = require("imap");
 const { simpleParser } = require("mailparser");
-const { mail } = require("../resources/config.js");
 const bonUtils = require("./BonUtils.js");
 
 var config = require("../resources/config.js");
+
+var DBClass=require('./DBClass.js');
+var DB=new DBClass('./resources/bon.db');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED =
   config.mailManager.rejectUnauthorized !== undefined
@@ -278,7 +280,7 @@ function buildBon(entries) {
   bon.customer.company.name = entries["company_name"];
   bon.nr_of_servings = entries["nr_of_servings"];
   bon.kitchen_selects = entries["kitchen_selects"] ;
-  bon.price_category = "Catering";
+  bon.price_category = "Store";
   bon.delivery_date = entries["delivery_time"];
   bon.delivery_address.street_name = entries["delivery_street_name"];
   bon.delivery_address.street_nr = entries["delivery_street_nr"];
@@ -288,6 +290,12 @@ function buildBon(entries) {
   bon.invoice_info = entries["invoice_info"];
   bon.delivery_info=entries["delivery_info"];
   bon.customer.company.ean_nr=entries["ean_nr"]
+
+  let lastOrder=DB.getLastOrderByCustomer(bon.customer.email);
+  //if it's a new user set price-category to Store else use pricecategory from last order
+  if(lastOrder!==undefined) {
+    bon.price_category=lastOrder.price_category;
+  }
 
 
   if (bon.delivery_date === undefined) {

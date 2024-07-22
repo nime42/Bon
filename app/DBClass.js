@@ -672,4 +672,23 @@ module.exports = class DB {
     });
     callback(true, orders);
   }
+
+  getLastOrderByCustomer(mailAddress) {
+    let sql = `
+    SELECT b.* FROM bons b
+      JOIN customers c ON b.customer_id =c.id 
+      WHERE c.email = ?
+      ORDER BY b.delivery_date DESC LIMIT 1
+    `;
+
+    let res = this.db.prepare(sql).get(mailAddress);
+    if (res) {
+      let [bon]=this.getBonSummary(res.id);
+      return bon;
+    } else {
+      return undefined;
+    }
+
+  }
+
 };
