@@ -472,8 +472,8 @@ class BonForm {
     };
     this.customer_mail_autocomplete.onSelect = (option) => {
       form.querySelector("#email");
-      self._customerToForm(option.data, form, true);
-      self._copyCompanyAddress2Delivery(form, true);
+      self._customerToForm(option.data, form, false);
+      self._copyCompanyAddress2Delivery(form, false);
     };
 
     form.querySelector("#price-categories").onchange = function () {

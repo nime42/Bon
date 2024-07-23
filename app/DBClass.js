@@ -334,6 +334,11 @@ module.exports = class DB {
   }
 
   createCustomer(customer) {
+
+    if(!customer.email) {
+      return null;
+    }
+
     customer.company_id = this.createCompany(customer.company);
     let sql = `
         INSERT INTO customers (forename,surname,email,phone_nr,company_id)
