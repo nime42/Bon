@@ -259,7 +259,7 @@ function getIncomingOrders(subjectContains, callback) {
         let bons = data.map((m) => ({
           orgMessage: m.message,
           bon: buildBon(
-            parseIncomingMessage(m.message, incomingMailHelper.bonAttribMap)
+            parseIncomingMessage(m.message)
           ),
         }));
         callback(true, bons);
@@ -282,6 +282,7 @@ function buildBon(entries) {
   bon.kitchen_selects = entries["kitchen_selects"] ;
   bon.price_category = "Store";
   bon.delivery_date = entries["delivery_time"];
+  bon.customer_collects=entries["customer_collects"];
   bon.delivery_address.street_name = entries["delivery_street_name"];
   bon.delivery_address.street_nr = entries["delivery_street_nr"];
   bon.delivery_address.zip_code = entries["delivery_zipcode"];
@@ -369,9 +370,6 @@ function parseIncomingMessage(message) {
     phoneDay: "TlfPåDagen",
     customer_info: "Ønsker",
     invoice_info: "EAN_Faktura info",
-
-
-
   };
 
   Object.keys(attributeMap).forEach((k) => {
@@ -398,9 +396,9 @@ function parseIncomingMessage(message) {
     if (rest) {
       res["surename"] += " " + rest;
     }
-  } 
+  }
 
-  res["phone_nr"] = tmp["phone_nr"] ;
+  res["phone_nr"] = tmp["phone_nr"];
   res["email"] = tmp["email"];
 
   res["company_name"] = tmp["company_name"];
@@ -411,9 +409,21 @@ function parseIncomingMessage(message) {
   res["delivery_zipcode"] = tmp["delivery_zipcode"];
   res["delivery_city"] = tmp["delivery_city"];
 
+  //setting these values to empty string instead of undefined (to avoid error in FE-function isBonEqual)
+  ["delivery_street_name", "delivery_street_nr", "delivery_zipcode", "delivery_city"].forEach((k) => {
+    if(res[k]==undefined) {
+      res[k]="";
+    }
+  });
+
+  if (!res["delivery_street_name"] && !res["delivery_city"]) {
+    res["customer_collects"] = 1;
+  } else {
+    res["customer_collects"] = 0;
+  }
+
   let [date, time] = tmp["deliveryDateTime"].split(" ");
   res["delivery_time"] = parseDeliveryDate({ delivery_date: date, delivery_time: time });
-  
 
   res["delivery_info"] = tmp["delivery_info"];
   if (tmp["contactDay"]) {
@@ -429,7 +439,7 @@ function parseIncomingMessage(message) {
 
   res["customer_info"] = tmp["customer_info"];
 
-  if (tmp["kitchen_selects"] !=="") {
+  if (tmp["kitchen_selects"] !== "") {
     res["kitchen_selects"] = 1;
   } else {
     res["kitchen_selects"] = 0;
@@ -439,8 +449,12 @@ function parseIncomingMessage(message) {
     let ean_nr = res["invoice_info"].match(/\d{13}/);
     if (ean_nr) {
       res["ean_nr"] = ean_nr[0];
+    } else {
+      res["ean_nr"]="";
     }
-  } catch (err) {}
+  } catch (err) {
+    res["ean_nr"]="";
+  }
 
   return res;
 }
