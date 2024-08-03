@@ -348,10 +348,29 @@ class BonForm {
 
     let buttons=this.myDiv.querySelector("#buttons");
 
+    let warnIfEmailMissing=(bon)=>{
+      //due to a design-flaw can a user not save customer-info without an email
+      if(bon.customer.email==="" &&
+        bon.customer.forename+bon.customer.surname+bon.customer.phone_nr+bon.customer.company.name!=""
+      ) {
+          return true;
+      } else {
+        return false;
+      }
+    }
+
     buttons.querySelector("#save").onclick = function () {
       let props = Helper.getFormProps(form);
 
       let bon = self._createBon(props);
+
+      if(warnIfEmailMissing(bon)) {
+        let message="Uden e-mail kan du ikke gemme kundeoplysninger. Vil du stadig spare?"
+        if(!confirm(message)) {
+          return;
+        }
+      }
+
       let isNew = bon.id === undefined;
       self.myRepoObj.saveBon(bon, function (bonId) {
           bon.id=bonId;
