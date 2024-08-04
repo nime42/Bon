@@ -45,6 +45,9 @@
     <script src="js/IngredientList.js"></script>
 
 
+    <link rel="stylesheet" href="external/datepicker/datepicker.material.css">
+    <script src="external/datepicker/datepicker.js"></script>
+
     <script>
         function toggleMenu() {
             var x = document.getElementById("myLinks");
@@ -346,7 +349,13 @@
                         }
                     </style>
                     <div id="other-bons-div">
+                        
                         <label style="padding:0">Andre Bons:</label>
+                        <span id="toggle-plan-date-filter" style="cursor: pointer;">Filtrer efter dato <i class="fa fa-caret-down"></i></span>
+                        <div id="date-picker-container" style="display:none;">
+                            <div id="planning-date-picker"></div>
+                        </div>
+                        <br>                   
                         <ul id="other-bons-list" style="max-height: 450px;overflow: auto;min-height: 80px;"></ul>
                     </div>
                 </div>
@@ -358,13 +367,36 @@
 
     </div>
     <script>
-
-
+ 
 
         function initPlanBon() {
             Globals.planStatusFilter=new BonStatusFilter(document.querySelector("#planning-status-filter"));
             Globals.planStatusFilter.setStatus("closed",false);
             Globals.planStatusFilter.setStatus("invoiced",false);
+            Globals.plan_filterDates=[];
+
+            let datePicker = new Datepicker('#planning-date-picker', {
+                    multiple: true,
+                    inline:true,
+                    onChange:(dates)=>{
+                        Globals.plan_filterDates=dates;
+                        getOtherBons();
+                    }
+            });
+
+            document.querySelector("#toggle-plan-date-filter").onclick=()=>{
+                let display="";
+                let i=document.querySelector("#toggle-plan-date-filter i");
+                if(i.classList.contains('fa-caret-up')) {
+                    i.classList.remove('fa-caret-up');
+                    i.classList.add('fa-caret-down');
+                    display="none";
+                } else {
+                    i.classList.remove('fa-caret-down');
+                    i.classList.add('fa-caret-up'); 
+                }
+                document.querySelector('#date-picker-container').style.display=display;
+            }
             
             Globals.planStatusFilter.setOnStatusChange((changedStatus, statusValues)=>{
                 if(!statusValues[changedStatus]) {
@@ -416,6 +448,15 @@
             let statuses=Globals.planStatusFilter.getActiveStatuses();
 
             Globals.myConfig.myRepo.searchBons({includeOrders: true ,status:statuses}, (bons) => {
+                let isFiltered=false;
+                if(Globals.plan_filterDates.length>0) {
+                    let filterDates=Globals.plan_filterDates.map(d=>(d.toDateString()));
+                    bons=bons.filter(b=>{
+                        return filterDates.includes(new Date(b.delivery_date).toDateString());
+                    });
+                    isFiltered=true;
+                }
+
                 let otherBonsList = document.querySelector("#other-bons-list");
                 let checkedBons = Array.from(otherBonsList.querySelectorAll("input:checked")).map(e => { return e.id });
 
@@ -433,6 +474,10 @@
                         } else {
                             Globals.planBonStrip.addOrders(b.orders, -1);
                         }
+                    }
+                    if(isFiltered) {
+                        checkbox.checked=true;
+                        checkbox.onchange();
                     }
                     otherBonsList.appendChild(li)
                 })
