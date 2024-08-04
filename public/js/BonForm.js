@@ -48,7 +48,7 @@ class BonForm {
 
                   <div class="bon-column">
                       <select name="payment_type" id="payment-types" style="height: auto;">
-                          <option>Betaling...</option>
+                          <option value="">Betaling...</option>
                           <option>Kontant</option>
                           <option>Faktura</option>
                           <option>EAN nr</option>

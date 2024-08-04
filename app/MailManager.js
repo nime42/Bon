@@ -281,6 +281,7 @@ function buildBon(entries) {
   bon.nr_of_servings = entries["nr_of_servings"];
   bon.kitchen_selects = entries["kitchen_selects"] ;
   bon.price_category = "Store";
+  bon.payment_type="Faktura";
   bon.delivery_date = entries["delivery_time"];
   bon.customer_collects=entries["customer_collects"];
   bon.delivery_address.street_name = entries["delivery_street_name"];
@@ -294,8 +295,14 @@ function buildBon(entries) {
 
   let lastOrder=DB.getLastOrderByCustomer(bon.customer.email);
   //if it's a new user set price-category to Store else use pricecategory from last order
+  //and also payment_type
   if(lastOrder!==undefined) {
-    bon.price_category=lastOrder.price_category;
+    if(lastOrder.price_category!="") {
+      bon.price_category=lastOrder.price_category;
+    }
+    if(lastOrder.payment_type!="") {
+      bon.payment_type=lastOrder.payment_type;
+    }
   }
 
 
