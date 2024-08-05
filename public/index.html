@@ -355,7 +355,8 @@
                         <div id="date-picker-container" style="display:none;">
                             <div id="planning-date-picker"></div>
                         </div>
-                        <br>                   
+                        <br> 
+                        <input type="checkbox" id="select-all-plan-bons" title="Vælge alle" style="margin-bottom: 0;"/>                  
                         <ul id="other-bons-list" style="max-height: 450px;overflow: auto;min-height: 80px;"></ul>
                     </div>
                 </div>
@@ -383,6 +384,18 @@
                         getOtherBons();
                     }
             });
+
+            document.querySelector("#select-all-plan-bons").onchange=(e)=>{
+                let bonElems=document.querySelector("#other-bons-list").querySelectorAll("input");
+                let selectAll=e.target.checked;
+                bonElems.forEach(e=>{
+                    if(selectAll!==e.checked) {
+                        e.checked=selectAll;
+                        e.onchange();
+                    }
+                });
+            }              
+  
 
             document.querySelector("#toggle-plan-date-filter").onclick=()=>{
                 let display="";
@@ -446,19 +459,41 @@
             let today = new Date();
             let todayStr = today.toISOString().split('T')[0];
             let statuses=Globals.planStatusFilter.getActiveStatuses();
+            
+            let otherBonsList = document.querySelector("#other-bons-list");
+            let checkedBons = Array.from(otherBonsList.querySelectorAll("input:checked")).map(e => { return e.id });
+
 
             Globals.myConfig.myRepo.searchBons({includeOrders: true ,status:statuses}, (bons) => {
-                let isFiltered=false;
                 if(Globals.plan_filterDates.length>0) {
                     let filterDates=Globals.plan_filterDates.map(d=>(d.toDateString()));
-                    bons=bons.filter(b=>{
-                        return filterDates.includes(new Date(b.delivery_date).toDateString());
+                    let filteredBons=[],unfilteredBons=[];
+                    bons.forEach(b=>{
+                        if(filterDates.includes(new Date(b.delivery_date).toDateString())) {
+                            filteredBons.push(b);
+                        } else {
+                            unfilteredBons.push(b);
+                        }
+                    })
+                    bons=filteredBons;
+                    checkedBons.forEach(c=>{
+                        let bonToRemove=unfilteredBons.find(b=>(b.id==c));
+                        if(bonToRemove!==undefined) {
+                            Globals.planBonStrip.addOrders(bonToRemove.orders, -1);
+                        }
                     });
-                    isFiltered=true;
+
+                    
                 }
 
-                let otherBonsList = document.querySelector("#other-bons-list");
-                let checkedBons = Array.from(otherBonsList.querySelectorAll("input:checked")).map(e => { return e.id });
+
+               /* checkedBons.forEach(c=>{
+                    let checkedBon=
+                    if(bons.find(b=>(b.id===c))===undefined) {
+                        Globals.planBonStrip.addOrders(b.orders, -1);
+                    }
+                })*/
+
 
                 otherBonsList.innerHTML = "";
                 bons.forEach(b => {
@@ -475,10 +510,7 @@
                             Globals.planBonStrip.addOrders(b.orders, -1);
                         }
                     }
-                    if(isFiltered) {
-                        checkbox.checked=true;
-                        checkbox.onchange();
-                    }
+
                     otherBonsList.appendChild(li)
                 })
             })
