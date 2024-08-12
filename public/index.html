@@ -385,16 +385,55 @@
                     }
             });
 
+            const emptyBon=()=> {
+                return {
+                    customer: {
+                        "forename": "Planning",
+                        "surname": "",
+                        "email": "",
+                        "phone_nr": ""
+                    },
+                    delivery_date: new Date(),
+                    id: 0,
+                    price_category: "Festival",
+                    delivery_address: {
+                        "street_name": "",
+                        "street_name2": "",
+                        "street_nr": "",
+                        "zip_code": "",
+                        "city": ""
+                    },
+                    kitchen_info: "",
+                    nr_of_servings: 0,
+                    payment_type: ""
+
+                };
+            };
+           
             document.querySelector("#select-all-plan-bons").onchange=(e)=>{
                 let bonElems=document.querySelector("#other-bons-list").querySelectorAll("input");
                 let selectAll=e.target.checked;
-                bonElems.forEach(e=>{
-                    if(selectAll!==e.checked) {
-                        e.checked=selectAll;
-                        e.onchange();
-                    }
-                });
-            }              
+                let otherBons=document.querySelectorAll("#other-bons-list input");
+                if(!selectAll) {
+                    otherBons.forEach(e=>{
+                        e.checked=false;
+                    })
+                    Globals.planBonStrip.initFromBon(emptyBon());
+
+                } else {
+                    let orders=[];
+                    otherBons.forEach(e=>{
+                        e.checked=true;
+                        orders=Helper.sumOrders(orders,e.myBon.orders);
+
+                    })
+                    let bon=emptyBon();
+                    Globals.planBonStrip.initFromBon(bon,orders);
+                    
+
+                }
+            }
+
   
 
             document.querySelector("#toggle-plan-date-filter").onclick=()=>{
@@ -427,29 +466,7 @@
                 getOtherBons();
             });
             Globals.planBonStrip = new BonStrip("#plan-bon", true);
-            let planBon = {
-                customer: {
-                    "forename": "Planning",
-                    "surname": "",
-                    "email": "",
-                    "phone_nr": ""
-                },
-                delivery_date: new Date(),
-                id: 0,
-                price_category: "Festival",
-                delivery_address: {
-                    "street_name": "",
-                    "street_name2": "",
-                    "street_nr": "",
-                    "zip_code": "",
-                    "city": ""
-                },
-                kitchen_info: "",
-                nr_of_servings: 0,
-                payment_type: ""
-
-
-            }
+            planBon=emptyBon();
 
             Globals.planBonStrip.initFromBon(planBon);
 
@@ -487,12 +504,6 @@
                 }
 
 
-               /* checkedBons.forEach(c=>{
-                    let checkedBon=
-                    if(bons.find(b=>(b.id===c))===undefined) {
-                        Globals.planBonStrip.addOrders(b.orders, -1);
-                    }
-                })*/
 
 
                 otherBonsList.innerHTML = "";
@@ -503,6 +514,7 @@
                     li.innerHTML = `<input type="checkbox" id=${b.id} ${(checkedBons.find(e => (e == b.id)) != undefined ? "checked" : "")}> ${text}`;
                     li.style.background=Globals.Statuses[b.status].color;
                     let checkbox = li.querySelector("input");
+                    checkbox.myBon=b;
                     checkbox.onchange = () => {
                         if (checkbox.checked) {
                             Globals.planBonStrip.addOrders(b.orders);
