@@ -18,6 +18,27 @@ function goToPos(pos) {
   mapObj.flyTo(pos);
 }
 
+function toggleRoute(feature) {
+  let A = document.globals.homePosition;
+  let Z = feature.position;
+  let url = "../api/geo/route";
+  url += `?A_lat=${A[0]}&A_lon=${A[1]}&Z_lat=${Z[0]}&Z_lon=${Z[1]}`;
+  if (feature.route != undefined) {
+    if (mapObj.hasLayer(feature.route)) {
+      feature.route.remove(mapObj);
+    } else {
+      feature.route.addTo(mapObj);
+    }
+  } else {
+    $.get(url, (data) => {
+      if (data?.features !== undefined) {
+        let geojsonFeature = data.features[0];
+        feature.route = L.geoJSON(geojsonFeature).addTo(mapObj);
+      }
+    });
+  }
+}
+
 function goHome() {
   goToPos(homePos);
 }
@@ -46,7 +67,6 @@ function createNumberedMarker(position, nr, popup, color, icon) {
   return marker;
 }
 
-
 function removeMarker(marker) {
   mapObj.removeLayer(marker);
 }
@@ -71,4 +91,8 @@ function blinkMarker(marker) {
       }, 300);
     }
   }, 500);
+}
+
+function layerExists(layer) {
+  return mapObj.hasLayer(layer);
 }

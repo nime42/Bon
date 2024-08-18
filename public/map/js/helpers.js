@@ -25,15 +25,46 @@ function getTemplates() {
   return { sectionTemplate, rowTemplate };
 }
 
+const priceCategoriesFilter=["Catering","Store"];
+
 function getCateringFeatures(callback) {
   let searchParams = { includeOrders: true };
   let [year, month, day] = splitDate(new Date());
   searchParams["afterDate"] = `${year}-${month}-${day}`;
   searchBons(searchParams, (bons) => {
-    let onlyCatering = bons.filter((b) => b.price_category === "Catering");
+    let onlyCatering = bons.filter((b) => priceCategoriesFilter.includes(b.price_category));
     let features = createFeatures(onlyCatering, {isHistoric:false});
     callback(features);
   });
+}
+
+function getTimeAndDistanceMatrix(places,callback) {
+  let url="../api/geo/timeAndDistanceMatrix";
+
+  $.ajax({
+    type: "POST",
+    url: url,
+    data: JSON.stringify(places),
+    success: function(data,status,xhr) {callback(true,data);},
+    error:function(data,status,xhr) {callback(false,data,status,xhr)},
+    contentType: "application/json"
+  });
+
+}
+
+function getDistanceAndTime(from,to) {
+  let fromIndex=document.globals.distanceMatrix.destinations.findIndex(d=>d.id==from);
+  let toIndex=document.globals.distanceMatrix.destinations.findIndex(d=>d.id==to);
+  if(fromIndex<0 || toIndex<0) {
+    return undefined;
+  }
+  let duration=document.globals.distanceMatrix.durations[fromIndex][toIndex];
+  let distance=document.globals.distanceMatrix.distances[fromIndex][toIndex];
+
+  return {distance,duration};
+
+
+
 }
 
 function getHistoricFeatures(callback) {
@@ -44,7 +75,7 @@ function getHistoricFeatures(callback) {
   searchParams["beforeDate"] = `${year}-${month}-${day}`;
 
   searchBons(searchParams, (bons) => {
-    let onlyCatering = bons.filter((b) => b.price_category === "Catering");
+    let onlyCatering = bons.filter((b) => priceCategoriesFilter.includes(b.price_category));
     let features = createFeatures(onlyCatering, { isHistoric: true });
     callback(features);
   });
@@ -160,6 +191,7 @@ function populateSideBar() {
     if(f.mapIndex) {
       currentRow.querySelector(".map-index").innerHTML=f.mapIndex;
       currentRow.querySelector(".goto-map").onclick = () => {
+        toggleRoute(f);
         goToPos(f.position);
         blinkMarker(f.marker);
       };
@@ -178,6 +210,28 @@ function populateRow(rowTemplate,feature) {
   rowTemplate.querySelector(".delivery-time").innerHTML=feature.time;
   rowTemplate.querySelector(".delivery-address").innerHTML=`${feature.bon.delivery_address.street_name} ${feature.bon.delivery_address.street_nr}, ${feature.bon.delivery_address.zip_code}  ${feature.bon.delivery_address.city}`;
   rowTemplate.querySelector(".byexpress-delivery").style.display=feature.isDeliveredByByExpressen?"":"none";
+
+  let distDuration=getDistanceAndTime("home",feature.bon.id);
+  if(distDuration!==undefined) {
+    let duration=formatSeconds(distDuration.duration);
+    let distance=Math.round((distDuration.distance/1000.0) * 100)/100;
+    rowTemplate.querySelector(".distance-duration").innerHTML=`${duration} (${distance} km)`
+  }
+
+}
+
+function formatSeconds(seconds) {
+  let s=Math.floor(seconds);
+  let hours=Math.floor(s/3600);
+  let mins=Math.floor(s % 3600 / 60);
+  let res=""
+  if(hours>0) {
+    res=`${hours} tim `;
+  }
+  res+=`${mins} min`;
+  return res;
+
+
 }
 
 

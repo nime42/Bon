@@ -56,8 +56,8 @@ var DBClass=require('./DBClass.js');
 var DB=new DBClass('./resources/bon.db');
 
 var AddressFunctions=require('./AddressFunctions.js');
-var AddressSearch=new AddressFunctions(config);
-DB.useAddressLookUp(AddressSearch);
+var addressFunctions=new AddressFunctions(config);
+DB.useAddressLookUp(addressFunctions);
 var mailSender=require("./mailSender.js");
 mailSender.init(config.mail);
 
@@ -128,7 +128,6 @@ try {
 var VismaFunctions=require("./VismaFunctions.js");
 const { otherBons } = require('../resources/config.js');
 const BonUtils = require('./BonUtils.js');
-const AdressFunctions = require('./AddressFunctions.js');
 var Visma=new VismaFunctions(vismaConfig,DB);
 //Visma.createInvoiceDraft(1022);
 //Visma.getCustomer("lasc@kea.dk","KEA");
@@ -1249,7 +1248,20 @@ app.post("/api/addToShoppingList",(req,res)=>{
         func();
     }
 
+})
 
 
+app.get("/api/geo/route",(req,res) => {
+    let a=[req.query.A_lat,req.query.A_lon];
+    let z=[req.query.Z_lat,req.query.Z_lon];
+    addressFunctions.getRoute(a,z,(data)=>{
+        res.json(data);
+    })
+})
 
+app.post("/api/geo/timeAndDistanceMatrix",(req,res) => {
+    let places=req.body;
+    addressFunctions.getTimeAndDistanceMatrix(places,(data)=>{
+        res.json(data);
+    })
 })

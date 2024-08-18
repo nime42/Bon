@@ -43,8 +43,9 @@
               <div class="numberCircle map-icon"><span class="map-index">1</span></div>
               <span class="label">Bon-id:</span> <span class="bon-id">#125</span>
             </div>
-            <div class="item-time"><span class="label">Tid:</span> <span class="delivery-time"></span></div>
+            <div class="item-time"><span class="label">Levering:</span> kl <span class="delivery-time"></span></div>
             <div class="item-address hideable"><span class="label">Adresse:</span> <span class="delivery-address"></span></div>
+            <div class="item-time"><span class="label">Tid:</span> <span class="distance-duration"></span></div>
             <i class="byexpress-delivery fa fa-bicycle" title="Leveres av By-expressen" style="display:none"></i>
         </li>
         </ul>
@@ -64,7 +65,7 @@
 
       document.globals={
         homePosition:[55.693459, 12.552345],
-        homeName:"Ristet Rug Cafe cafe"
+        homeName:"Ristet Rug Cafe"
       };
 
       document.querySelector("#historic-bons").onchange=()=>{
@@ -78,10 +79,21 @@
 
       getCateringFeatures((features)=>{
         document.globals.features=features;
-        populateSideBar();
-        if(selectedBon) {
-          gotoBonId(selectedBon);
-        }
+        let places=features.filter(f=>(f.position!==undefined));
+        //The timeAndMatrixfunction expects coordinates in long,lat order
+        places=places.map(f=>({id:f.bon.id,position:[f.position[1],f.position[0]]}));
+        places=[{id:"home",position:[document.globals.homePosition[1],document.globals.homePosition[0]]},...places]
+        getTimeAndDistanceMatrix(places,(status,matrix)=>{
+          if(status) {
+            document.globals.distanceMatrix=matrix;
+          }
+          populateSideBar();
+          if(selectedBon) {
+            gotoBonId(selectedBon);
+          }
+
+        })
+
       })
 
       
