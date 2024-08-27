@@ -161,7 +161,7 @@ class BonForm {
                   </div>
               </div>
               <div class="bon-row indent">
-                <textarea name="delivery_info" id="delivery_info" placeholder="Leverings info" rows="4"autocomplete="nope" style="width:320px"></textarea>
+                <textarea name="delivery_info" id="delivery_info" placeholder="Leverings info" rows="4"autocomplete="nope" style="width:320px;field-sizing: content"></textarea>
               </div>
               </div>
 
@@ -227,7 +227,7 @@ class BonForm {
               <h5>Kunde Ønsker </h5>
               <div class="bon-row indent">
                   <div class="bon-column">
-                      <textarea name="customer_info" placeholder="Kunde Ønsker" rows="2" style="width:320px"
+                      <textarea name="customer_info" placeholder="Kunde Ønsker" rows="2" style="width:320px; field-sizing: content"
                           autocomplete="nope"></textarea>
                   </div>
               </div>
@@ -235,7 +235,7 @@ class BonForm {
               <h5>Faktura Info </h5>
               <div class="bon-row indent">
                   <div class="bon-column">
-                      <textarea name="invoice_info" placeholder="EAN/Faktura Info" rows="2" style="width:320px"
+                      <textarea name="invoice_info" placeholder="EAN/Faktura Info" rows="2" style="width:320px;field-sizing: content"
                           autocomplete="nope"></textarea>
                   </div>
               </div>
@@ -244,7 +244,7 @@ class BonForm {
               <h5>Køkken info</h5>
                   <div class="bon-row indent">
                       <div class="bon-column">
-                          <textarea name="kitchen_info" id="kitchen_info" placeholder="køkken info" rows="2" style="width:320px"
+                          <textarea name="kitchen_info" id="kitchen_info" placeholder="køkken info" rows="2" style="width:320px;field-sizing: content"
                               autocomplete="nope"></textarea>
                       </div>
                   </div>
