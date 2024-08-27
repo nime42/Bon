@@ -144,7 +144,7 @@ class Helper {
       return true;
     }
 
-    return bon1 == bon2 || bon2 == undefined;
+    return (bon1==null?"":bon1) == (bon2==null?"":bon2 )|| bon2 == undefined;
   }
 
   static sumOrders(orders1, orders2) {
