@@ -8,6 +8,8 @@ module.exports = class AdressFunctions {
       this.apiKey = this.config.geo.apiKey;
       this.routeServiceUrl = this.config.geo.routeServiceUrl;
       this.routeServiceToken = this.config.geo.routeServiceToken;
+      this.routeDirectionProfile=this.config.geo.routeDirectionProfile!==undefined?this.config.geo.routeDirectionProfile:"driving-car"
+
     } else {
       console.log("AdressFunctions: missing config.geo, Bon will not be able to find adresses or directions");
     }
@@ -37,7 +39,7 @@ module.exports = class AdressFunctions {
       "Content-Type": "application/json; charset=utf-8",
     };
 
-    let directionsUrl = this.routeServiceUrl + "/v2/directions/driving-car/geojson";
+    let directionsUrl = this.routeServiceUrl + "/v2/directions/"+this.routeDirectionProfile+"/geojson";
     let directionsBody = {
       coordinates: [
         [coordA[1], coordA[0]],
@@ -73,7 +75,7 @@ module.exports = class AdressFunctions {
       Authorization: this.routeServiceToken,
       "Content-Type": "application/json; charset=utf-8",
     };
-    let matrixUrl = this.routeServiceUrl + "/v2/matrix/driving-car";
+    let matrixUrl = this.routeServiceUrl + "/v2/matrix/"+this.routeDirectionProfile;
     let matrixBody = {
       locations:locations,
       metrics: ["distance", "duration"]
