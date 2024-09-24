@@ -9,9 +9,9 @@ module.exports = class AdressFunctions {
       this.routeServiceUrl = this.config.geo.routeServiceUrl;
       this.routeServiceToken = this.config.geo.routeServiceToken;
       this.routeDirectionProfile=this.config.geo.routeDirectionProfile!==undefined?this.config.geo.routeDirectionProfile:"driving-car"
-
+      console.log(`AdressFunctions(${this.config.bonInstance}): using routing profile '${this.routeDirectionProfile}' when calculating routes`);
     } else {
-      console.log("AdressFunctions: missing config.geo, Bon will not be able to find adresses or directions");
+      console.log(`AdressFunctions(${this.config.bonInstance}): missing config.geo, Bon will not be able to find adresses or directions`);
     }
   }
 
