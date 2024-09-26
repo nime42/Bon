@@ -48,6 +48,14 @@ class BonStrip {
         padding-bottom: 5px;
 
     }
+
+    .pickup-time {
+        font-style: italic;
+        font-weight: bold;
+        font-family: sans-serif;
+        padding-bottom: 5px;
+    }
+
     .order {
         Xpadding-bottom: 8px;
         cursor: pointer;
@@ -174,10 +182,11 @@ class BonStrip {
             </div>
         </fieldset>
         <fieldset>
-            <legend>Tidspunkt</legend>
+            <legend>Tidspunkt (pickup tid)</legend>
             <div>
             <div id="date" style="float:left" class="bonstrip-items"></div>
             <div id="time" style="float:left" class="bonstrip-items"></div>
+            <div class="pickup-time">&nbsp;&nbsp;(<span id="pickup-time"></span>)</div>
             </div>
         </fieldset>
 
@@ -642,6 +651,8 @@ class BonStrip {
         this.setDeliveryAddr(bon);
         this.setPaxAndKitchenSelects(bon);
         this.setDeliveryDate(bon.delivery_date);
+        this.setPickupTime(bon.pickup_time);
+        
         this.setKitchenInfo(bon.kitchen_info);
         this.setDeliveryInfo(bon.delivery_info);
         this.setPaymentType(bon.payment_type);
@@ -912,9 +923,16 @@ class BonStrip {
     }
     setDeliveryDate(deliveryDate) {
         let date=new Date(deliveryDate).toLocaleDateString();
-        let time=new Date(deliveryDate).toLocaleTimeString();
+        let time=new Date(deliveryDate).toLocaleTimeString('en-US', { hour12: false,hour: '2-digit', minute: '2-digit' } );
         this.myDiv.querySelector("#date").innerHTML=date;
         this.myDiv.querySelector("#time").innerHTML=time;
+    }
+
+    setPickupTime(pickupTime) {
+        if(pickupTime!==null) {
+            let time=new Date(pickupTime).toLocaleTimeString('en-US', { hour12: false,hour: '2-digit', minute: '2-digit' });
+            this.myDiv.querySelector("#pickup-time").innerHTML=time;
+        }
     }
 
     setKitchenInfo(text) {
@@ -1035,6 +1053,12 @@ class BonStrip {
         }
         dateElem.oninput=f;
         timeElem.oninput=f;
+    }
+
+    updatePickupTimeOnChange(timeElem) {
+        timeElem.oninput=()=>{
+            this.myDiv.querySelector("#pickup-time").innerHTML=timeElem.value;
+        }
     }
 
     updatePaxOnChange(paxElem) {

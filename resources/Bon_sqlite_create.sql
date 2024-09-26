@@ -117,11 +117,17 @@ CREATE TABLE bons (
 	nr_of_servings INTEGER,
 	customer_info TEXT,
 	service_type TEXT,
-	payment_type TEXT, kitchen_info TEXT, price_category TEXT, kitchen_selects INTEGER DEFAULT 0 NOT NULL, customer_collects INTEGER DEFAULT 0, invoice_info TEXT, invoice_date DATETIME, 
+	payment_type TEXT,
+	kitchen_info TEXT,
+	price_category TEXT,
+	kitchen_selects INTEGER DEFAULT (0) NOT NULL,
+	customer_collects INTEGER,
+	invoice_info TEXT,
+	invoice_date DATETIME,
+	delivery_info TEXT, pickup_time DATETIME,
 	CONSTRAINT FK_bons_customers FOREIGN KEY (customer_id) REFERENCES customers(id),
-	CONSTRAINT FK_customers_addresses FOREIGN KEY (delivery_address_id) REFERENCES Addresses(id) ON DELETE set null
+	CONSTRAINT FK_customers_addresses FOREIGN KEY (delivery_address_id) REFERENCES addresses(id) ON DELETE SET NULL
 );
-
 
 -- izettle_purchases definition
 

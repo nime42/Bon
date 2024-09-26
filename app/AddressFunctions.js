@@ -93,7 +93,7 @@ module.exports = class AdressFunctions {
         callback(data);
       })
       .catch((err) => {
-        console.log("Failed to get distance and time matrix:", matrixBodyBody,err);
+        console.log("Failed to get distance and time matrix:", matrixBody,err);
         callback({})
       });
 

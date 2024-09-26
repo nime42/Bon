@@ -528,6 +528,19 @@ app.put("/api/bons/:id",(req,res) => {
     });
 })
 
+app.patch("/api/bons/:id",(req,res) => {
+    DB.patchBon(req.params.id,req.body,function(status,msg) {
+        if(status) {  
+            res.json(msg);
+ 
+        } else {
+            console.log("patchBon",msg);
+            res.sendStatus(500);  
+
+        }
+    });
+})
+
 app.put("/api/bonStatus/:id",(req,res) => {
     DB.updateBonStatus(req.params.id,req.body.status,function(status,msg) {
         if(status) {  

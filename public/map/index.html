@@ -29,16 +29,20 @@
 
   </head>
   <body>
-    <div id="sidebar">
+    <div id="sidebar" style="width:300px">
       <div style="margin: 5px; cursor: pointer" onclick="goHome();">
         <i id="home-icon" class="fa fa-home map-icon"></i>
         <i class="fa fa-chevron-left" style="float: right; cursor: pointer" onclick="event.stopPropagation();narrowUnnarrow(this)"></i>
       </div>
-      <input type="checkbox" id="historic-bons" name="historic-bons"><label for="historic-bons" style="padding-right: 7px;"> Historiske</label><br>
+      <div>
+      <input type="checkbox" id="historic-bons" name="historic-bons"><label for="historic-bons" style="padding-right: 7px;"> Historiske</label>
+      <input type="checkbox" checked title="slå alle til/fra" onchange="hideUnhideAll(this)"/>
+      <i id="fold-unfold-all" class="fa fa-chevron-up" style="float: right; cursor: pointer;font-size: 15px;" onclick="foldUnfoldAll(this)"></i>
+      </div>
       <div id="bons">
         <ul id="section-template">
-          <h3 style="margin-bottom: 0"><span class="delivery-date">2024-06-10</span><input type="checkbox" checked title="slå adresser til/fra" onchange="hideUnhide(this)"/><i class="fa fa-chevron-up" style="float: right; cursor: pointer;font-size: 15px;" onclick="foldUnfold(this)"></i></h3>
-          <li id="row-template">
+          <h3 style="margin-bottom: 0"><span class="delivery-date">2024-06-10</span><input type="checkbox" checked class="hide-unhide" title="slå adresser til/fra" onchange="hideUnhide(this)"/><i class="fa fa-chevron-up fold-unfold" style="float: right; cursor: pointer;font-size: 15px;" onclick="foldUnfold(this)"></i></h3>
+          <li id="row-template" style="transition: height 4s;">
             <div class="item-id goto-map" style="cursor: pointer">
               <div class="numberCircle map-icon"><span class="map-index">1</span></div>
               <span class="label">Bon-id:</span> <span class="bon-id">#125</span>
@@ -46,6 +50,7 @@
             <div class="item-time"><span class="label">Levering:</span> kl <span class="delivery-time"></span></div>
             <div class="item-address hideable"><span class="label">Adresse:</span> <span class="delivery-address"></span></div>
             <div class="item-time"><span class="label">Tid:</span> <span class="distance-duration"></span></div>
+            <div><span class="label">Pickup tid:&nbsp;</span><input class="pickup-time" type="time"><button disabled class="map-button update-button">Opdater</button></div>
             <i class="byexpress-delivery fa fa-bicycle" title="Leveres av By-expressen" style="display:none"></i>
         </li>
         </ul>
@@ -65,7 +70,12 @@
 
       document.globals={
         homePosition:[55.693459, 12.552345],
-        homeName:"Ristet Rug Cafe"
+        homeName:"Ristet Rug Cafe",
+        byExpressenPickupMinutes:45,
+        prePickupMinutes:5,
+        postPickupMinutes:5,
+        durationFactor:1.2
+
       };
 
       document.querySelector("#historic-bons").onchange=()=>{
@@ -92,6 +102,11 @@
             gotoBonId(selectedBon);
           }
 
+          foldUnfoldAll(document.querySelector("#fold-unfold-all"));
+          try {
+            //unfold first date
+            document.querySelector(".delivery-date").parentElement.querySelector(".fold-unfold").click();
+          } catch(e) {}
         })
 
       })

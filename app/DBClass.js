@@ -23,7 +23,7 @@ module.exports = class DB {
 
     let sql = `
         select 
-          b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.invoice_info,b.kitchen_info,b.delivery_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,
+          b.id,b.delivery_date,b.pickup_time,b.status,b.status2,b.nr_of_servings,b.customer_info,b.invoice_info,b.kitchen_info,b.delivery_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,
           a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,a.lat,a.lon,
           c.forename,c.surname,c.email,c.phone_nr,
           co.name,co.ean_nr,
@@ -59,7 +59,7 @@ module.exports = class DB {
   getBonSummary(bonId) {
     let sql = `
     with boninfo as (select 
-      b.id,b.delivery_date,b.status,b.nr_of_servings,
+      b.id,b.delivery_date,b.pickup_time,b.status,b.nr_of_servings,
       b.price_category,b.payment_type,
       b.kitchen_selects,b.customer_collects,
       b.invoice_date,
@@ -82,7 +82,7 @@ module.exports = class DB {
      left join companies co on c.company_id =co.id
      left join addresses co_a on co_a.id=co.address_id
      left join orders o on b.id=o.bon_id)
-    select id,delivery_date,status ,nr_of_servings,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,sum(price) as price,sum(cost_price) as cost_price,invoice_date from boninfo
+    select id,delivery_date,pickup_time,status ,nr_of_servings,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,sum(price) as price,sum(cost_price) as cost_price,invoice_date from boninfo
     where coalesce(?,id)=id
     group by id order by id desc
     `;
@@ -94,7 +94,7 @@ module.exports = class DB {
     let sql = `
         with all_bons as (
             with boninfo as (select 
-                  b.id,b.delivery_date,b.status,b.nr_of_servings,
+                  b.id,b.delivery_date,pickup_time,b.status,b.nr_of_servings,
                   b.price_category,b.payment_type,
                   b.kitchen_selects,b.customer_collects,
                   b.invoice_date,
@@ -117,7 +117,7 @@ module.exports = class DB {
                  left join companies co on c.company_id =co.id
                  left join addresses co_a on co_a.id=co.address_id
                  left join orders o on b.id=o.bon_id)
-                select id,delivery_date,status ,nr_of_servings,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,coalesce(sum(price),0) as total_price,coalesce(sum(cost_price),0) as total_cost_price,invoice_date from boninfo
+                select id,delivery_date,pickup_time,status ,nr_of_servings,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,coalesce(sum(price),0) as total_price,coalesce(sum(cost_price),0) as total_cost_price,invoice_date from boninfo
                 group by id 
             ),
             all_orders as (
@@ -159,7 +159,7 @@ module.exports = class DB {
     });
     let sql = `
       select 
-        b.id,b.delivery_date,b.status,b.status2,b.nr_of_servings,b.customer_info,b.service_type,b.invoice_info,b.kitchen_info,b.delivery_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,b.invoice_date,
+        b.id,b.delivery_date,pickup_time,b.status,b.status2,b.nr_of_servings,b.customer_info,b.service_type,b.invoice_info,b.kitchen_info,b.delivery_info,b.price_category,b.payment_type,b.kitchen_selects,b.customer_collects,b.invoice_date,
         a.street_name,a.street_name2,a.street_nr,a.zip_code,a.city,a.lat,a.lon,
         c.forename,c.surname,c.email,c.phone_nr,
         co.name,co.ean_nr,
@@ -171,7 +171,7 @@ module.exports = class DB {
        left join addresses co_a on co_a.id=co.address_id
        where b.id=ifnull(@bonId,b.id) and ${statusSearchConstr} and b.status2=ifnull(@status2,b.status2)
         and date(b.delivery_date,'localtime')>=ifnull(@afterDate,date(b.delivery_date,'-1 day','localtime')) and date(b.delivery_date,'localtime')<=ifnull(@beforeDate,date(b.delivery_date,'localtime'))
-      order by b.delivery_date
+      order by coalesce(b.pickup_time,b.delivery_date)
       `;
 
     try {
@@ -236,7 +236,7 @@ module.exports = class DB {
     bonData.customer_id = this.createCustomer(bonData.customer);
     bonData.delivery_address_id = this.createAddress(bonData.delivery_address);
     let sql =
-      "INSERT INTO bons(status, status2,customer_info, customer_id,delivery_address_id, delivery_date, nr_of_servings,kitchen_selects,customer_collects, kitchen_info,delivery_info, service_type, payment_type,price_category,invoice_info) VALUES(@status, @status2,@customer_info, @customer_id,@delivery_address_id, @delivery_date, @nr_of_servings,@kitchen_selects,@customer_collects, @kitchen_info,@delivery_info, @service_type, @payment_type,@price_category,@invoice_info);";
+      "INSERT INTO bons(status, status2,customer_info, customer_id,delivery_address_id, delivery_date,pickup_time, nr_of_servings,kitchen_selects,customer_collects, kitchen_info,delivery_info, service_type, payment_type,price_category,invoice_info) VALUES(@status, @status2,@customer_info, @customer_id,@delivery_address_id, @delivery_date,@pickup_time, @nr_of_servings,@kitchen_selects,@customer_collects, @kitchen_info,@delivery_info, @service_type, @payment_type,@price_category,@invoice_info);";
     try {
       const res = this.db.prepare(sql).run(bonData);
       let newBonId = res.lastInsertRowid;
@@ -269,6 +269,7 @@ module.exports = class DB {
         customer_id=@customer_id,
         delivery_address_id=@delivery_address_id, 
         delivery_date=@delivery_date, 
+        pickup_time=@pickup_time, 
         nr_of_servings=@nr_of_servings,
         kitchen_selects=@kitchen_selects,
         customer_collects=@customer_collects,
@@ -290,6 +291,39 @@ module.exports = class DB {
       callback(false, err);
     }
   }
+
+patchBon(bonId,patches,callback) {
+
+  let columnLookUp={};
+  this.db.pragma("table_info(bons)").forEach(c=>{columnLookUp[c.name.toLowerCase()]=true;});
+  let assignments=[];
+  let columns=Object.keys(patches);
+  for(let i=0;i<columns.length;i++) {
+    let col=columns[i].toLowerCase();
+    if(columnLookUp[col]!==true) {
+      callback(false,`${col} is not a column in table bon`);
+      return;
+    }
+    assignments.push(`${col}=@${columns[i]}`);
+  }
+  let sql=`update bons set ${assignments.join(",")} where id=@id`;
+  try {
+    this.db.prepare(sql).run({...patches,id:bonId});
+    if (callback === null) {
+      return true;
+    } else {
+      callback(true, "ok");
+    }
+  } catch(err) {
+    if (callback === null) {
+      throw err;
+    } else {
+      callback(false, err);
+    }
+  }
+
+}
+
 
   updateInvoiceDate(bonId, newStatus) {
     if (newStatus === "invoiced") {

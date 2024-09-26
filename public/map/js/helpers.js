@@ -17,6 +17,19 @@ function searchBons(searchParams,callback) {
   $.get(url,callback);   
 }
 
+function updateBon(bonId,patches,callback) {
+  let url="../api/bons/"+bonId;
+  $.ajax({
+    type: "PATCH",
+    url: url,
+    data: JSON.stringify(patches),
+    success:callback,
+    error: ()=>alert("kunne ikke opdatere Bon"),
+    dataType: "json",
+    contentType: "application/json"
+  });
+}
+
 function getTemplates() {
   let sectionTemplate = copyElem(document.querySelector("#section-template"));
   let rowTemplate = copyElem(sectionTemplate.querySelector("#row-template"));
@@ -32,7 +45,7 @@ function getCateringFeatures(callback) {
   let [year, month, day] = splitDate(new Date());
   searchParams["afterDate"] = `${year}-${month}-${day}`;
   searchBons(searchParams, (bons) => {
-    let onlyCatering = bons.filter((b) => priceCategoriesFilter.includes(b.price_category));
+    let onlyCatering = bons.filter((b) => priceCategoriesFilter.includes(b.price_category) && !b.customer_collects);
     let features = createFeatures(onlyCatering, {isHistoric:false});
     callback(features);
   });
@@ -158,10 +171,14 @@ function createBonMarker(bonFeature, options) {
   m.on("click", (p) => {
     setTimeout(()=>{
       let div=document.querySelector("#bon-popup-handle");
+      if(div===null) {
+        return;
+      }
       div.innerHTML="";
       bs=new BonStrip(div,false,{hideIngredientList:true,hideGotoMap:true});
       bs.initFromBon(b,b.orders);
       console.log("popupopen",div);
+      toggleRoute(bonFeature);
     }, 300)
 
   });
@@ -176,7 +193,7 @@ function populateSideBar() {
   let currentSection = undefined;
 
   let bonsDiv = document.querySelector("#bons");
-  bonsDiv.innerHTML = "";
+  let today=new Date();
 
   features.forEach((f) => {
     if (f.date !== currentDate) {
@@ -211,6 +228,7 @@ function populateRow(rowTemplate,feature) {
   rowTemplate.querySelector(".delivery-address").innerHTML=`${feature.bon.delivery_address.street_name} ${feature.bon.delivery_address.street_nr}, ${feature.bon.delivery_address.zip_code}  ${feature.bon.delivery_address.city}`;
   rowTemplate.querySelector(".byexpress-delivery").style.display=feature.isDeliveredByByExpressen?"":"none";
 
+
   let distDuration=getDistanceAndTime("home",feature.bon.id);
   if(distDuration!==undefined) {
     let duration=formatSeconds(distDuration.duration);
@@ -218,33 +236,107 @@ function populateRow(rowTemplate,feature) {
     rowTemplate.querySelector(".distance-duration").innerHTML=`${duration} (${distance} km)`
   }
 
+
+
+  let updateButton=rowTemplate.querySelector(".update-button");
+  let pickupTimeElement=rowTemplate.querySelector(".pickup-time");
+
+  const UPDATE="Updater";
+  const SUGGEST="Foreslå";
+
+  if (feature.bon.pickup_time !== null) {
+    let pickupTime = new Date(feature.bon.pickup_time);
+    pickupTimeElement.value=pickupTime.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
+    updateButton.innerHTML=UPDATE;
+  } else {
+    updateButton.innerHTML=SUGGEST;
+    updateButton.disabled=false;
+  }
+
+
+  pickupTimeElement.onchange=()=>{
+    updateButton.disabled=false;
+    if(pickupTimeElement.value==="") {
+      updateButton.innerHTML=SUGGEST;
+    } else {
+      updateButton.innerHTML=UPDATE;
+    }
+  }
+
+  const updatePickup=()=>{
+    let time=pickupTimeElement.value;
+    let newPickupTime;
+    if(time!=="") {
+      newPickupTime=new Date(feature.date+"T"+time);
+      let deliverydate=new Date(feature.bon.delivery_date);
+      if(newPickupTime>deliverydate) {
+        newPickupTime.setDate(newPickupTime.getDate() - 1);
+      }
+    } else {
+      newPickupTime=null;
+    }
+    updateBon(feature.bon.id,{pickup_time:newPickupTime},()=>{updateButton.disabled=true});
+
+  }
+
+
+  const suggest=()=>{
+    let seconds=0;
+    if(feature.isDeliveredByByExpressen) {
+      seconds=document.globals.byExpressenPickupMinutes*60;
+    } else {
+      let distDuration=getDistanceAndTime("home",feature.bon.id);
+      if(distDuration!==undefined) {
+        seconds=distDuration.duration - (distDuration.duration % 60); 
+        seconds=document.globals.prePickupMinutes*60+document.globals.durationFactor*seconds+document.globals.postPickupMinutes*60;
+      }
+    }
+    if(seconds>0) {
+      let newPickupTime=new Date(feature.bon.delivery_date)
+      newPickupTime.setTime(newPickupTime.getTime()-seconds*1000);
+      pickupTimeElement.value=newPickupTime.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
+    } 
+  }
+
+
+  updateButton.onclick=()=>{
+    if(updateButton.innerHTML==UPDATE) {
+      updatePickup();
+    } else {
+      suggest();
+      updateButton.innerHTML=UPDATE;
+    }
+  }
+
+
+
 }
 
+
+
 function formatSeconds(seconds) {
-  let s=Math.floor(seconds);
-  let hours=Math.floor(s/3600);
-  let mins=Math.floor(s % 3600 / 60);
-  let res=""
-  if(hours>0) {
-    res=`${hours} tim `;
-  }
-  res+=`${mins} min`;
-  return res;
+  let d=new Date();
+  d.setHours(0);d.setMinutes(0);d.setSeconds(0);
+  d.setTime(d.getTime()+seconds*1000);
+  return `${d.getHours()>0?d.getHours()+ " tim ":""}${d.getMinutes()} min`
+
 
 
 }
 
 
 function narrowUnnarrow(elem) {
-  let displayVal;
+  let displayVal,narrow;
   if (elem.classList.contains("fa-chevron-left")) {
     elem.classList.remove("fa-chevron-left");
     elem.classList.add("fa-chevron-right");
     displayVal = "none";
+    narrow=true;
   } else {
     elem.classList.remove("fa-chevron-right");
     elem.classList.add("fa-chevron-left");
     displayVal = "";
+    narrow=false;
   }
 
   document
@@ -253,6 +345,12 @@ function narrowUnnarrow(elem) {
     .forEach((e) => {
       e.style.display = displayVal;
     });
+
+  if(narrow) {
+    document.querySelector("#sidebar").style.width="200px";
+  }  else {
+    document.querySelector("#sidebar").style.width="300px";
+  }
 }
 
 function foldUnfold(elem) {
@@ -272,6 +370,30 @@ function foldUnfold(elem) {
   });
 }
 
+function foldUnfoldAll(elem) {
+  let folded;
+
+  if (elem.classList.contains("fa-chevron-up")) {
+    elem.classList.remove("fa-chevron-up");
+    elem.classList.add("fa-chevron-down");
+    folded = true;
+  } else {
+    elem.classList.remove("fa-chevron-down");
+    elem.classList.add("fa-chevron-up");
+    folded=false;
+  }
+
+  let all=document.querySelectorAll(".fold-unfold");
+
+  all.forEach(e=>{
+    let isFolded=e.classList.contains("fa-chevron-down")?true:false;
+    if(isFolded!==folded) {
+      e.onclick();
+    }
+  })
+
+}
+
 function hideUnhide(elem) {
   let show = elem.checked;
   let date=elem.parentElement.querySelector(".delivery-date").innerHTML;
@@ -288,6 +410,23 @@ function hideUnhide(elem) {
     }
   })
 }
+
+
+function hideUnhideAll(elem) {
+  let checked=elem.checked;
+  let all=document.querySelectorAll(".hide-unhide");
+  all.forEach(e=>{
+    if(e.checked!==checked) {
+      e.checked=checked;
+      e.onchange();
+    }
+  })
+  console.log(all);
+}
+
+
+
+
 
 function splitDate(date) {
   let yearStr = date.getFullYear() + "";

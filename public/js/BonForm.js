@@ -56,6 +56,15 @@ class BonForm {
                       </select>
                   </div>
               </div>
+              <div class="bon-row indent">
+                  <div class="bon-column">
+                     Pickup tid:
+                  </div>
+                  <div class="bon-column">
+                      <input id="pickup_time" type="time" name="pickup_time">
+
+                  </div> 
+              </div> 
 
               <h5>Køkken info</h5>
               <div class="bon-row indent">
@@ -323,6 +332,8 @@ class BonForm {
       form.querySelector("#date"),
       form.querySelector("#time")
     );
+    this.myBonStrip.updatePickupTimeOnChange(form.querySelector("#pickup_time"));
+
     this.myBonStrip.updateKitchenInfoOnChange(
       form.querySelector("#kitchen_info")
     );
@@ -591,6 +602,16 @@ class BonForm {
     bon.delivery_date = new Date(
       props.delivery_date + "T" + props.delivery_time
     );
+    if(props.pickup_time!=="") {
+      let pickupTime=new Date(props.delivery_date + "T" + props.pickup_time);
+      if(pickupTime>bon.delivery_date) {
+        pickupTime.setDate(pickupTime.getDate() - 1);
+      }
+      bon.pickup_time=pickupTime;
+    } else {
+      bon.pickup_time=null;
+    }
+
     bon.status = this._getStatus();
     bon.status2 = "";
     bon.nr_of_servings = props.nr_of_servings;
@@ -740,6 +761,14 @@ class BonForm {
 
     let date = new Date(bon.delivery_date);
     this._setFormDate(date, formDiv);
+
+    if (bon.pickup_time !== null) {
+      let pickupTime = new Date(bon.pickup_time);
+      form.querySelector("input[name=pickup_time]").value = pickupTime.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
+    } else {
+      form.querySelector("input[name=pickup_time]").value="";
+    }
+    form.querySelector("input[name=pickup_time]").oninput();
 
     this._customerToForm(bon.customer, form);
 
