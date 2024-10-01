@@ -651,7 +651,7 @@ class BonStrip {
         this.setDeliveryAddr(bon);
         this.setPaxAndKitchenSelects(bon);
         this.setDeliveryDate(bon.delivery_date);
-        this.setPickupTime(bon.pickup_time);
+        this.setPickupTime(bon.pickup_time!==null?bon.pickup_time:bon.delivery_date);
         
         this.setKitchenInfo(bon.kitchen_info);
         this.setDeliveryInfo(bon.delivery_info);

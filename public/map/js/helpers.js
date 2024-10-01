@@ -275,7 +275,7 @@ function populateRow(rowTemplate,feature) {
     } else {
       newPickupTime=null;
     }
-    updateBon(feature.bon.id,{pickup_time:newPickupTime},()=>{updateButton.disabled=true});
+    updateBon(feature.bon.id,{pickup_time:newPickupTime},()=>{updateButton.disabled=true;feature.bon.pickup_time=newPickupTime});
 
   }
 
@@ -306,6 +306,11 @@ function populateRow(rowTemplate,feature) {
       suggest();
       updateButton.innerHTML=UPDATE;
     }
+  }
+
+  if(feature.bon.pickup_time===null) {
+    suggest();
+    updatePickup();
   }
 
 
