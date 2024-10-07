@@ -70,6 +70,9 @@ module.exports = class AdressFunctions {
 
 
     let locations=places.filter(p=>(p.position!==undefined)).map(p=>(p.position));
+    if(locations.length<2) {
+      throw "getTimeAndDistanceMatrix:must be more than one location";
+    }
 
     let headers = {
       Authorization: this.routeServiceToken,

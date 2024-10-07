@@ -66,6 +66,9 @@ function getTimeAndDistanceMatrix(places,callback) {
 }
 
 function getDistanceAndTime(from,to) {
+  if(document.globals.distanceMatrix===undefined) {
+    return undefined;
+  }
   let fromIndex=document.globals.distanceMatrix.destinations.findIndex(d=>d.id==from);
   let toIndex=document.globals.distanceMatrix.destinations.findIndex(d=>d.id==to);
   if(fromIndex<0 || toIndex<0) {
