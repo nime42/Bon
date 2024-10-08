@@ -24,7 +24,7 @@ module.exports = class AdressFunctions {
     let fixedStreetNr=address.street_nr.replace(/.*\//,"");
     
     //Try to parse out a streetnumber, e.g a number eventually followed by one entrance char or two
-    let regexp=fixedStreetNr.match(/([0-9]+[A-Za-z]{0,2})/);
+    let regexp=fixedStreetNr.match(/([0-9]+ ?[A-Za-z]{0,2})/);
     if(regexp) {
       fixedStreetNr=regexp[0];
     }
