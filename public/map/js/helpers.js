@@ -223,14 +223,27 @@ function populateSideBar() {
   });
 }
 
-
+function toStr(val) {
+  if(!!val) {
+    return val;
+  } else {
+    return "";
+  }
+}
 
 function populateRow(rowTemplate,feature) {
   rowTemplate.querySelector(".bon-id").innerHTML = "#" + feature.bon.id;
   rowTemplate.querySelector(".delivery-time").innerHTML=feature.time;
-  rowTemplate.querySelector(".delivery-address").innerHTML=`${feature.bon.delivery_address.street_name} ${feature.bon.delivery_address.street_nr}, ${feature.bon.delivery_address.zip_code}  ${feature.bon.delivery_address.city}`;
+  rowTemplate.querySelector(".delivery-address").innerHTML=`${toStr(feature.bon.delivery_address.street_name)} ${toStr(feature.bon.delivery_address.street_nr)}, ${toStr(feature.bon.delivery_address.zip_code)}  ${toStr(feature.bon.delivery_address.city)}`;
   rowTemplate.querySelector(".byexpress-delivery").style.display=feature.isDeliveredByByExpressen?"":"none";
 
+
+  if(feature.position!=undefined) {
+    let gotoGoogle=rowTemplate.querySelector(".goto-google");
+    const [lat,lon]=feature.position;
+    gotoGoogle.href=`https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+    gotoGoogle.style.display="";
+  }
 
   let distDuration=getDistanceAndTime("home",feature.bon.id);
   if(distDuration!==undefined) {
