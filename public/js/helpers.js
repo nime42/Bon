@@ -9,7 +9,7 @@ class Helper {
         if (e.type === "checkbox") {
           res[name] = e.checked ? 1 : 0;
         } else {
-          res[name] = e.value;
+          res[name] = e.value?.trim();
         }
       }
     });
