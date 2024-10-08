@@ -19,7 +19,17 @@ module.exports = class AdressFunctions {
     if (this.url === undefined) {
       callback(false, []);
     }
-    let query = `${address.street_name} ${address.street_nr} ${address.zip_code} ${address.city}`;
+    //jotform could represent a street-nr "5B, 1 tr" like "1 tr/5B"
+    //get rid of everything before /
+    let fixedStreetNr=address.street_nr.replace(/.*\//,"");
+    
+    //Try to parse out a streetnumber, e.g a number eventually followed by one entrance char or two
+    let regexp=fixedStreetNr.match(/([0-9]+[A-Za-z]{0,2})/);
+    if(regexp) {
+      fixedStreetNr=regexp[0];
+    }
+
+    let query = `${address.street_name} ${fixedStreetNr} ${address.zip_code} ${address.city}`;
     let httpReq = `${this.url}/search?api_key=${this.apiKey}&q=${query}`;
     fetch(httpReq)
       .then((res) => res.json())
