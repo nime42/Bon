@@ -391,7 +391,7 @@ patchBon(bonId,patches,callback) {
   }
 
   createCompany(company) {
-    if (company == undefined || company.name == undefined) {
+    if (company == undefined || !company.name) {
       return null;
     }
     company.address_id = this.createAddress(company.address);
@@ -421,7 +421,7 @@ patchBon(bonId,patches,callback) {
   }
 
   createAddress(address) {
-    if (address == undefined) {
+    if (address == undefined || !address.street_name) {
       return null;
     }
 
