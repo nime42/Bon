@@ -5,6 +5,7 @@ module.exports = class BonUtils {
     let bon={
       "id": "",
       "delivery_date": "",
+      "pickup_time":null,
       "status": "",
       "status2": "",
       "nr_of_servings": "",

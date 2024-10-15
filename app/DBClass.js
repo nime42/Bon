@@ -235,6 +235,7 @@ module.exports = class DB {
   createBon(bonData, callback = console.log) {
     bonData.customer_id = this.createCustomer(bonData.customer);
     bonData.delivery_address_id = this.createAddress(bonData.delivery_address);
+    //OBS!!!!! Don't forget to add new columns as attributes in BonUtils.getEmptyBon
     let sql =
       "INSERT INTO bons(status, status2,customer_info, customer_id,delivery_address_id, delivery_date,pickup_time, nr_of_servings,kitchen_selects,customer_collects, kitchen_info,delivery_info, service_type, payment_type,price_category,invoice_info) VALUES(@status, @status2,@customer_info, @customer_id,@delivery_address_id, @delivery_date,@pickup_time, @nr_of_servings,@kitchen_selects,@customer_collects, @kitchen_info,@delivery_info, @service_type, @payment_type,@price_category,@invoice_info);";
     try {
