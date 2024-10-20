@@ -33,7 +33,9 @@ class TabsClass {
         border-bottom:0px;
       }
 
-   
+      .tablinks {
+        margin-bottom:0
+      }
       
       /* Style the tab content */
       .hori-tab .tabcontent {
