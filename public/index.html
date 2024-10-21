@@ -34,6 +34,7 @@
     <script src="js/BonForm.js"></script>
     <script src="js/BonRepository.js"></script>
     <script src="js/BonConfig.js"></script>
+    <script src="js/KitchenChores.js"></script>
     <script src="js/BonMails.js"></script>
     <script src="js/BonWall.js"></script>
     <script src="js/loginHandler.js"></script>
@@ -126,9 +127,12 @@
             <a href="#week" data-check-access="${ADMIN}"
                 onclick="gotoMenu(this);Globals.myWeekWiew.refresh();toggleMenu();"><i
                     class="fa fa-home"></i> Ugeoversigt</a>
-            <a href="#kitchen" data-check-access=""
+            <a href="#kitchen-today" data-check-access=""
                 onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i
                     class="fa fa-cutlery"></i> Køkken idag</a>
+            <a href="#kitchen" data-check-access=""
+                onclick="gotoMenu(this);toggleMenu();"><i
+                    class="fa fa-cutlery"></i> Køkken</a>
             <a href="#future" data-check-access="${ADMIN} || ${USER}"
                 onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i
                     class="fa fa-sun-o"></i>køkken senere</a>
@@ -313,6 +317,9 @@
         </section>
 
         <section id="admin" style="display:none">
+        </section>
+
+        <section id="kitchen-today" style="display:none">
         </section>
 
         <section id="kitchen" style="display:none">
@@ -555,11 +562,13 @@
 
             Globals.myConfig = new BonConfig("#admin");
 
+            Globals.myKitchenChores=new KitchenChores("#kitchen");
+
             Globals.myCalender = new BonCalendar("#calendar-div");
 
             Globals.myMails = new BonMails("#mails");
 
-            Globals.myKitchenBonWall = new BonWall("#kitchen", ["approved", "preparing", "done"]);
+            Globals.myKitchenBonWall = new BonWall("#kitchen-today", ["approved", "preparing", "done"]);
 
             Globals.myInvoiceBonWall = new BonWall("#invoices", ["delivered"]);
 
@@ -584,7 +593,7 @@
                         document.querySelector('a[href="#calendar"]').onclick();
                         toggleMenu();
                     } else {
-                        document.querySelector('a[href="#kitchen"]').onclick();
+                        document.querySelector('a[href="#kitchen-today"]').onclick();
                         toggleMenu();
                     }
                 }
