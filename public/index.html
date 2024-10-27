@@ -35,6 +35,7 @@
     <script src="js/BonRepository.js"></script>
     <script src="js/BonConfig.js"></script>
     <script src="js/KitchenChores.js"></script>
+    <script src="js/ProductionChores.js"></script>
     <script src="js/BonMails.js"></script>
     <script src="js/BonWall.js"></script>
     <script src="js/loginHandler.js"></script>
@@ -132,11 +133,13 @@
                     class="fa fa-cutlery"></i> Køkken idag</a>
             <a href="#kitchen" data-check-access=""
                 onclick="gotoMenu(this);toggleMenu();"><i
-                    class="fa fa-cutlery"></i> Køkken</a>
+                    class="fa fa-cutlery"></i> Indkøb/Varemodtagelse</a>
+            <a href="#production" data-check-access=""
+                onclick="gotoMenu(this);toggleMenu();"><i
+                    class="fa fa-cutlery"></i> Produktion/Opskrifter</a>
             <a href="#future" data-check-access="${ADMIN} || ${USER}"
                 onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i
                     class="fa fa-sun-o"></i>køkken senere</a>
-            <a href="#grocy" id="link-to-grocy" target=”_blank” onclick="toggleMenu();"><i class="fa fa-database"> Grocy Indkøb</i></a>
             <a href="#map" id="link-to-map" target=”_blank” onclick="toggleMenu();"><i class="fa fa-globe"> Kort</i></a>
 
             <a href="#invoices" data-check-access="${ADMIN}"
@@ -323,6 +326,9 @@
         </section>
 
         <section id="kitchen" style="display:none">
+        </section>
+
+        <section id="production" style="display:none">
         </section>
 
         <section id="invoices" style="display:none">
@@ -548,7 +554,6 @@
         });
 
 
-        document.querySelector("#link-to-grocy").href = Globals.grocyLink+"/shoppinglist";
         document.querySelector("#link-to-map").href = "map/index.html";
 
         document.querySelector("#bon-instance").innerHTML = Globals.bonInstance;
@@ -563,6 +568,8 @@
             Globals.myConfig = new BonConfig("#admin");
 
             Globals.myKitchenChores=new KitchenChores("#kitchen");
+
+            Globals.myProductionChores=new ProductionChores("#production");
 
             Globals.myCalender = new BonCalendar("#calendar-div");
 

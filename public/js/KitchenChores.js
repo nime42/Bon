@@ -1,6 +1,6 @@
 class KitchenChores {
 
-grocyPurchase=`
+    grocyGoodsReceipt=`
     <style>
         #chores .container {
             display: flex;
@@ -47,8 +47,41 @@ grocyPurchase=`
 
         </div>
     </div>
+    `
 
-`
+    grocyPurchaise=`
+        <style>
+        #chores .container {
+            display: flex;
+            justify-content: space-between; /* Skapar jämn avstånd mellan divarna */
+        }
+        #chores .box {
+            border: 1px solid #000;
+            box-sizing: border-box;
+            margin-right: 15px;
+            padding: 5px;
+        }
+        #chores h2 {
+            font-size: 2rem;
+            margin: 0 0 3px 0;
+        }
+        #chores p {
+            margin: 0; /* Tar bort marginalen från paragraferna */
+        }
+        
+    </style>
+    <div id=chores>
+        <div class="container">
+            <div class="box">
+                <h2>Indkøbsliste</h2>
+                <a href="${Globals.grocyLink}/shoppinglist" target="”_blank”"> Gå til Grocy indkøbsliste</a>
+            </div>
+
+        </div>
+    </div>
+
+    `;
+
     production=`
     <div>
         <div id="chores-production-bon" style="max-width: 300px;"/>
@@ -56,7 +89,11 @@ grocyPurchase=`
     `
 constructor(div) {
     this.myTabs=new TabsClass(div);
-    this.myTabs.addTab("Indkøb",this.grocyPurchase);
+    this.myTabs.addTab("Indkøb",this.grocyPurchaise);
+    this.myTabs.addTab("Varemodtagelse",this.grocyGoodsReceipt);
+
+
+
     return;
     this.myTabs.addTab("Produktion",this.production);
     let productionBon=new BonStrip("#chores-production-bon",true);
