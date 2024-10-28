@@ -31,8 +31,8 @@ class ProductionChores {
             <div class="box">
                 <h2>Opskrifter</h2>
                 <a href="${Globals.grocyLink}/recipes?search=produktion" target="”_blank”">Gå til Produktion opskrifter</a><br>
-                <a href="${Globals.grocyLink}/recipes?search=sandwich" target="”_blank”">Gå til Sandwich opskrifter</a><br>
-                <a href="${Globals.grocyLink}/recipes?search=salat" target="”_blank”">Gå til Salat opskrifter</a><br>
+                <a href="${Globals.grocyLink}/recipes?search=01 Sandwich" target="”_blank”">Gå til Sandwich opskrifter</a><br>
+                <a href="${Globals.grocyLink}/recipes?search=02 Salat" target="”_blank”">Gå til Salat opskrifter</a><br>
 
                 </div>
 
