@@ -30,7 +30,7 @@ class ProductionChores {
         <div class="container">
             <div class="box">
                 <h2>Opskrifter</h2>
-                <a href="${Globals.grocyLink}/recipes" target="”_blank”"> Gå til Grocy Opskrifter</a>
+                <a href="${Globals.grocyLink}/recipes?search=produktion" target="”_blank”"> Gå til Grocy Opskrifter</a>
             </div>
 
         </div>
