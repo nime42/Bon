@@ -8,6 +8,11 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
+
     <link rel="stylesheet" href="css/bon.css">
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/skeleton.css">
@@ -38,6 +43,7 @@
     <script src="js/ProductionChores.js"></script>
     <script src="js/BonMails.js"></script>
     <script src="js/BonWall.js"></script>
+    <script src="js/PlanBon.js"></script>
     <script src="js/loginHandler.js"></script>
     <script src="js/ChatClass.js"></script>
     <script src="js/BonStatusFilter.js"></script>
@@ -46,9 +52,6 @@
     <script src="js/Notifier.js"></script>
     <script src="js/IngredientList.js"></script>
 
-
-    <link rel="stylesheet" href="external/datepicker/datepicker.material.css">
-    <script src="external/datepicker/datepicker.js"></script>
 
     <script>
         function toggleMenu() {
@@ -147,7 +150,7 @@
                     class="fa fa-money"></i> Fakturer</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i
                     class="fa fa-wrench"></i> Admin</a>
-            <a href="#planning" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);getOtherBons();toggleMenu();"><i
+            <a href="#planning" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myPlanBon.getOtherBons();toggleMenu();"><i
                     class="fa fa-tasks"></i> Planlægning</a>
             <a href="#log-in" class="active-menu" onclick="gotoMenu(this);toggleMenu()"><i
                     class="fa fa-key">Login</i></a>
@@ -338,211 +341,10 @@
         </section>
 
         <section id="planning" style="display:none">
-            <div style="margin:auto;width:700px">
-                <div id="planning-status-filter"></div>
-                <div id="plan-bon" style="min-width: 300px;float:left"></div>
-                <div style="float:left">
-                    <style>
-                        #other-bons-div {
-                            margin-left: 15px;
-                            min-width: 250px;
-                            background: #f1e6b2;
-                            box-shadow: 5px 5px 5px grey;
-                            padding-left: 10px;
-                            border: 2px solid #8e631f;
-
-                        }
-
-                        #other-bons-div ul {
-                            list-style: none;
-                        }
-
-                        #other-bons-div li {
-                            margin-bottom: -10px;
-                        }
-                    </style>
-                    <div id="other-bons-div">
-                        
-                        <label style="padding:0">Andre Bons:</label>
-                        <span id="toggle-plan-date-filter" style="cursor: pointer;">Filtrer efter dato <i class="fa fa-caret-down"></i></span>
-                        <div id="date-picker-container" style="display:none;">
-                            <div id="planning-date-picker"></div>
-                        </div>
-                        <br> 
-                        <input type="checkbox" id="select-all-plan-bons" title="Vælge alle" style="margin-bottom: 0;"/>                  
-                        <ul id="other-bons-list" style="max-height: 450px;overflow: auto;min-height: 80px;"></ul>
-                    </div>
-                </div>
-            </div>
-
-
         </section>
 
 
     </div>
-    <script>
- 
-
-        function initPlanBon() {
-            Globals.planStatusFilter=new BonStatusFilter(document.querySelector("#planning-status-filter"));
-            Globals.planStatusFilter.setStatus("closed",false);
-            Globals.planStatusFilter.setStatus("invoiced",false);
-            Globals.plan_filterDates=[];
-
-            let datePicker = new Datepicker('#planning-date-picker', {
-                    multiple: true,
-                    inline:true,
-                    onChange:(dates)=>{
-                        Globals.plan_filterDates=dates;
-                        getOtherBons();
-                    }
-            });
-
-            const emptyBon=()=> {
-                return {
-                    customer: {
-                        "forename": "Planning",
-                        "surname": "",
-                        "email": "",
-                        "phone_nr": ""
-                    },
-                    delivery_date: new Date(),
-                    id: 0,
-                    price_category: "Festival",
-                    delivery_address: {
-                        "street_name": "",
-                        "street_name2": "",
-                        "street_nr": "",
-                        "zip_code": "",
-                        "city": ""
-                    },
-                    delivery_info:"",
-                    kitchen_info: "",
-                    nr_of_servings: 0,
-                    payment_type: ""
-
-                };
-            };
-           
-            document.querySelector("#select-all-plan-bons").onchange=(e)=>{
-                let bonElems=document.querySelector("#other-bons-list").querySelectorAll("input");
-                let selectAll=e.target.checked;
-                let otherBons=document.querySelectorAll("#other-bons-list input");
-                if(!selectAll) {
-                    otherBons.forEach(e=>{
-                        e.checked=false;
-                    })
-                    Globals.planBonStrip.initFromBon(emptyBon());
-
-                } else {
-                    let orders=[];
-                    otherBons.forEach(e=>{
-                        e.checked=true;
-                        orders=Helper.sumOrders(orders,e.myBon.orders);
-
-                    })
-                    let bon=emptyBon();
-                    Globals.planBonStrip.initFromBon(bon,orders);
-                    
-
-                }
-            }
-
-  
-
-            document.querySelector("#toggle-plan-date-filter").onclick=()=>{
-                let display="";
-                let i=document.querySelector("#toggle-plan-date-filter i");
-                if(i.classList.contains('fa-caret-up')) {
-                    i.classList.remove('fa-caret-up');
-                    i.classList.add('fa-caret-down');
-                    display="none";
-                } else {
-                    i.classList.remove('fa-caret-down');
-                    i.classList.add('fa-caret-up'); 
-                }
-                document.querySelector('#date-picker-container').style.display=display;
-            }
-            
-            Globals.planStatusFilter.setOnStatusChange((changedStatus, statusValues)=>{
-                if(!statusValues[changedStatus]) {
-                    let otherBonsList = document.querySelector("#other-bons-list");
-                    let elemsWithStatus=otherBonsList.getElementsByClassName("my_status_"+changedStatus);
-                    Array.from(elemsWithStatus).filter(e=>true).forEach(e=>{
-                        let checkbox=e.querySelector("input");
-                        if(checkbox.checked) {
-                            checkbox.checked=false;
-                            checkbox.onchange();
-                        }
-
-                    });
-                }
-                getOtherBons();
-            });
-            Globals.planBonStrip = new BonStrip("#plan-bon", true);
-            planBon=emptyBon();
-
-            Globals.planBonStrip.initFromBon(planBon);
-
-        }
-
-        function getOtherBons() {
-            let today = new Date();
-            let todayStr = today.toISOString().split('T')[0];
-            let statuses=Globals.planStatusFilter.getActiveStatuses();
-            
-            let otherBonsList = document.querySelector("#other-bons-list");
-            let checkedBons = Array.from(otherBonsList.querySelectorAll("input:checked")).map(e => { return e.id });
-
-
-            Globals.myConfig.myRepo.searchBons({includeOrders: true ,status:statuses}, (bons) => {
-                if(Globals.plan_filterDates.length>0) {
-                    let filterDates=Globals.plan_filterDates.map(d=>(d.toDateString()));
-                    let filteredBons=[],unfilteredBons=[];
-                    bons.forEach(b=>{
-                        if(filterDates.includes(new Date(b.delivery_date).toDateString())) {
-                            filteredBons.push(b);
-                        } else {
-                            unfilteredBons.push(b);
-                        }
-                    })
-                    bons=filteredBons;
-                    checkedBons.forEach(c=>{
-                        let bonToRemove=unfilteredBons.find(b=>(b.id==c));
-                        if(bonToRemove!==undefined) {
-                            Globals.planBonStrip.addOrders(bonToRemove.orders, -1);
-                        }
-                    });
-
-                    
-                }
-
-
-
-
-                otherBonsList.innerHTML = "";
-                bons.forEach(b => {
-                    let li = document.createElement("li");
-                    li.classList.add("my_status_"+b.status);
-                    let text = `<b>#${b.id}</b> ${new Date(b.delivery_date).toLocaleDateString()} ${new Date(b.delivery_date).toLocaleTimeString()}`
-                    li.innerHTML = `<input type="checkbox" id=${b.id} ${(checkedBons.find(e => (e == b.id)) != undefined ? "checked" : "")}> ${text}`;
-                    li.style.background=Globals.Statuses[b.status].color;
-                    let checkbox = li.querySelector("input");
-                    checkbox.myBon=b;
-                    checkbox.onchange = () => {
-                        if (checkbox.checked) {
-                            Globals.planBonStrip.addOrders(b.orders);
-                        } else {
-                            Globals.planBonStrip.addOrders(b.orders, -1);
-                        }
-                    }
-
-                    otherBonsList.appendChild(li)
-                })
-            })
-        }
-
-    </script>
 
     <script>
         $(document).ready(function () {
@@ -581,6 +383,8 @@
 
             Globals.myFutureBonWall = new BonWall("#future", ["new", "needInfo", "approved", "preparing"]);
 
+            
+            Globals.myPlanBon=new PlanBon("#planning");
 
             Globals.myWeekWiew = new WeekView("#week");
             Globals.myWeekWiew.setOnChange(Globals.myWeekWiew.fetchBons);
@@ -606,7 +410,7 @@
                 }
 
                 if (Globals.myLoginHandler.hasRole(userInfo,"ADMIN")) {
-                    Globals.planBonStrip.showCostPrices(true);
+                    Globals.myPlanBon.planBonStrip.showCostPrices(true);
                 }
 
                 if (!Globals.myLoginHandler.hasRole(userInfo,"ADMIN")) {
@@ -619,8 +423,6 @@
             document.querySelector("#login").style.display = "none";
             document.querySelector("#logout").style.display = "";
 
-
-            initPlanBon()
         })
         Globals.myLoginHandler.setForgotPasswordForm("#forgot-password");
         Globals.myLoginHandler.whenForgotPassword(() => {
