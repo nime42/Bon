@@ -910,10 +910,11 @@ class BonStrip {
         if(bon.customer_collects) {
             addr=this.CUSTOMER_COLLECTS_TXT;
         } else {
+            const replaceNull=(s)=>(s?s:"");
             addr=`
-            ${bon.delivery_address.street_name2} ${bon.delivery_address.street_name2?"<br>":""}
-            ${bon.delivery_address.street_name} ${bon.delivery_address.street_nr}<br>
-            ${bon.delivery_address.zip_code} ${bon.delivery_address.city}
+            ${replaceNull(bon.delivery_address.street_name2)} ${bon.delivery_address.street_name2?"<br>":""}
+            ${replaceNull(bon.delivery_address.street_name)} ${replaceNull(bon.delivery_address.street_nr)}<br>
+            ${replaceNull(bon.delivery_address.zip_code)} ${replaceNull(bon.delivery_address.city)}
             `;
     
         }
