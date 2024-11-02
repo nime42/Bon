@@ -148,6 +148,53 @@ module.exports = class GrocyFunctions {
         }
       );
     });
+
+    //if the recipy have a product_id then this recipy is producing a product in Grocy-DB
+    if(this.allRecipies[recipyId]?.product_id!==null) {
+      this.addProduct(amount, recipyId);
+    }
+  }
+
+  addProduct(amount,recipyId) {
+    let recipy=this.allRecipies[recipyId];
+    let productId=recipy.product_id;
+    let cost=recipy.calculated_price;
+    let product=this.allProducts.find(p=>p.id==productId);
+    let body={
+      amount:amount,
+      price:cost + ""
+    };
+
+    let httpReq =
+      this.config.grocy.url +
+      "/api/stock/products/" +
+      productId + "/add" +
+      "?GROCY-API-KEY=" +
+      this.config.grocy.apiKey;
+
+
+    fetch(httpReq, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(body),
+    })
+      .then(function (res) {
+        if(res.status==200) {
+          console.log(`Produced ${amount} units of ${product.name}`);
+        } else {
+          console.log(`Failed to produce ${amount} units of ${product.name}`);
+          console.log(res);
+        }
+      })
+      .catch(function (res) {
+        console.log(`Failed to produce ${amount} units of ${product.name}`);
+        console.log(res);
+      });
+
+
   }
 
   calculatePriceForRecipy(recipyId) {
@@ -693,6 +740,7 @@ module.exports = class GrocyFunctions {
       external_id: recipe.id,
       salesPrices: salesPrices,
       base_servings: recipe.base_servings,
+      product_id:recipe.product_id
     };
   }
 };
