@@ -68,6 +68,7 @@ class PlanBon {
           phone_nr: "",
         },
         delivery_date: new Date(),
+        pickup_time:null,
         id: 0,
         price_category: "Festival",
         delivery_address: {
@@ -172,6 +173,8 @@ class PlanBon {
 
       otherBonsList.innerHTML = "";
       bons.forEach((b) => {
+        //remove eventual comment, to avoid that commented orders come in separate row
+        b.orders?.forEach(o=>{o.special_request="";})
         let li = document.createElement("li");
         li.classList.add("my_status_" + b.status);
         let text = `<b>#${b.id}</b> ${new Date(b.delivery_date).toLocaleDateString()} ${new Date(b.delivery_date).toLocaleTimeString()}`;
