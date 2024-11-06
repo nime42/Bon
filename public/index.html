@@ -120,7 +120,7 @@
     <!-- Top Navigation Menu -->
     <div class="topnav">
         <a href="#home" class="menu" onclick="toggleMenu()">RR<span id="menu-header"></span><span id="bon-instance"
-                style="float: right;margin-right: 50%;margin-bottom: 0;font-weight: bold;">Hej</span></a>
+                style="float: right;margin-right: 50%;margin-bottom: 0;font-weight: bold;"></span></a>
         <div id="myLinks">
             <a href="#calendar" data-check-access="${ADMIN} || ${USER}"
                 onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i>
@@ -136,10 +136,10 @@
                     class="fa fa-cutlery"></i> Køkken idag</a>
             <a href="#kitchen" data-check-access=""
                 onclick="gotoMenu(this);toggleMenu();"><i
-                    class="fa fa-cutlery"></i> Indkøb/Varemodtagelse</a>
+                    class="fa fa-cart-plus"></i> Indkøb/Varemodtagelse</a>
             <a href="#production" data-check-access=""
                 onclick="gotoMenu(this);toggleMenu();"><i
-                    class="fa fa-cutlery"></i> Produktion/Opskrifter</a>
+                    class="fa fa-book"></i> Produktion/Opskrifter</a>
             <a href="#future" data-check-access="${ADMIN} || ${USER}"
                 onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i
                     class="fa fa-sun-o"></i>køkken senere</a>
@@ -173,7 +173,7 @@
     <div id="new-bon" style="width: fit-content;padding: 5px;">
     </div>
 
-    <div id="menu-elems" style="margin-top: 5%;">
+    <div id="menu-elems" style="margin-top: 3px;">
         <section id="log-in">
             <div class="container">
                 <form id="login" class="login-form-style" autocomplete="off" method="post">
