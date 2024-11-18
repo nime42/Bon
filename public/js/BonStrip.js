@@ -205,7 +205,7 @@ class BonStrip {
         </fieldset>        
 
         <fieldset>
-        <legend>Betaling</legend>
+        <legend>Betaling <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
         <span id="payment-type" class="field-content" style="float: left;font-weight: bold;font-style: italic;padding-left: 10px;">Kontant</span>
         </fieldset>
 
@@ -1189,6 +1189,10 @@ class BonStrip {
         } else {
             bonDiv.style.background=this.background;
         }
+    }
+
+    compactLegends() {
+        this.myDiv.querySelectorAll("i.fa-caret-up").forEach(e=>e.click());
     }
 
 }

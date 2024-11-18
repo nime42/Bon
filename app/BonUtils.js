@@ -1,6 +1,7 @@
 var config=require('../resources/config.js');
 
 module.exports = class BonUtils {
+  //Don't forget to update helpers.getEmptyBon in frontend when you update this.
  static getEmptyBon() {
     let bon={
       "id": "",
@@ -16,6 +17,7 @@ module.exports = class BonUtils {
       "customer_info": "",
       "kitchen_info": "",
       "delivery_info": "",
+      "invoice_info":"",
       "service_type": null,
       "customer": {
         "forename": "",
