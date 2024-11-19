@@ -277,9 +277,10 @@ module.exports = class GrocyFunctions {
       .then((res) => res.json())
       .then(
         (json) => {
-          let stock_amount = json.stock_amount;
+          let stock_amount = json.stock_amount_aggregated;
           let consumed_amount =
             quantityAmount < stock_amount ? quantityAmount : stock_amount;
+
           httpReq =
             this.config.grocy.url +
             "/api/stock/products/" +
@@ -288,7 +289,7 @@ module.exports = class GrocyFunctions {
             "?GROCY-API-KEY=" +
             this.config.grocy.apiKey;
           let body = {
-            amount: consumed_amount,
+            amount: quantityAmount,
             transaction_type: "consume",
             spoiled: false,
             allow_subproduct_substitution:true
