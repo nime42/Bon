@@ -18,6 +18,10 @@
     "rotating-file-stream": "2.1.6",
     "swagger-ui-express": "^4.3.0"
   },
+  "//":"This is to fix vulnerability warnings",
+  "overrides": { 
+  "semver": "~7.5.2"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app/server.js",
