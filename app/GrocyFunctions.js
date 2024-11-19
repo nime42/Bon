@@ -291,6 +291,7 @@ module.exports = class GrocyFunctions {
             amount: consumed_amount,
             transaction_type: "consume",
             spoiled: false,
+            allow_subproduct_substitution:true
           };
 
           fetch(httpReq, {
