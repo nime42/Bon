@@ -22,7 +22,7 @@ class CalendarClass {
 
 
   calendarBody = `
-      <div class="container calendar" style="margin-top: 5%">
+      <div class="container calendar" style="margin-top: 5%;margin-bottom:15px">
       <div class="row">
           <div class="twelwe columns" style="text-align: center;">
           <div id="header"></div>
