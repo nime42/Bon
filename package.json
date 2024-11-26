@@ -26,7 +26,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app/server.js",
     "shutdown": "node app/shutdown.js",
-    "replaceClientVars": "node app/replaceFromConfig.js ./public/js/globals.js",
+    "replaceClientVars": "node app/replaceFromConfig.js ./public/js/globals.js ./public/map/js/mapGlobals.js",
     "clearDB": "node app/clearDB.js"
   },
   "author": "Nils Meinhard",

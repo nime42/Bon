@@ -19,10 +19,7 @@ function goToPos(pos) {
 }
 
 function toggleRoute(feature) {
-  let A = document.globals.homePosition;
-  let Z = feature.position;
-  let url = "../api/geo/route";
-  url += `?A_lat=${A[0]}&A_lon=${A[1]}&Z_lat=${Z[0]}&Z_lon=${Z[1]}`;
+
   if (feature.route != undefined) {
     if (mapObj.hasLayer(feature.route)) {
       feature.route.remove(mapObj);
@@ -30,12 +27,13 @@ function toggleRoute(feature) {
       feature.route.addTo(mapObj);
     }
   } else {
-    $.get(url, (data) => {
-      if (data?.features !== undefined) {
-        let geojsonFeature = data.features[0];
-        feature.route = L.geoJSON(geojsonFeature).addTo(mapObj);
-      }
-    });
+    if(MapGlobals.geoData===undefined) {
+      return;
+    }
+    let bonGeoData=MapGlobals.geoData.find(e=>(e.bon_id==feature.bon.id));
+    let geojsonFeature =JSON.parse(bonGeoData?.route_feature)
+    feature.route = L.geoJSON(geojsonFeature).addTo(mapObj);
+
   }
 }
 

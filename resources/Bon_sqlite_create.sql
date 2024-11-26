@@ -178,3 +178,13 @@ CREATE TABLE orders (
 					ON UPDATE NO ACTION
 	
 );
+
+
+CREATE TABLE geo_information (
+	bon_id INTEGER,
+	adress_id INTEGER,
+	distance NUMERIC,
+	duration NUMERIC,
+	route_feature TEXT,
+	CONSTRAINT distances_bons_FK FOREIGN KEY (bon_id) REFERENCES bons(id) ON DELETE CASCADE
+);

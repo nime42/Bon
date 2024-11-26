@@ -15,11 +15,13 @@ function replaceInFile(file) {
   });
 }
 
-var args = process.argv.slice(2);
+var files = process.argv.slice(2);
 
-let file=args[0];
-if(!file) {
-    console.log(`usage node ${process.argv[1]} file`);
+if(files.length===0) {
+    console.log(`usage node ${process.argv[1]} file...`);
 }
 
-replaceInFile(file);
+files.forEach(file => {
+  replaceInFile(file);
+});
+

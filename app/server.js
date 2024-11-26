@@ -1278,3 +1278,8 @@ app.post("/api/geo/timeAndDistanceMatrix",(req,res) => {
         res.json(data);
     })
 })
+
+app.post("/api/geo/geoInfo",(req,res) => {
+    let bonIds=req.body;
+    res.json(DB.getGeoInfo(bonIds));
+})

@@ -1,5 +1,3 @@
-
-
 module.exports = class DB {
   constructor(dbFile) {
     var sqlite3 = require("better-sqlite3");
@@ -40,12 +38,12 @@ module.exports = class DB {
       const rows = this.db.prepare(sql).all(yearMonth);
 
       rows.forEach((r) => {
-        this.createSubObject(r, "delivery_address", ["street_name", "street_name2", "street_nr", "zip_code", "city","lat","lon"]);
+        this.createSubObject(r, "delivery_address", ["street_name", "street_name2", "street_nr", "zip_code", "city", "lat", "lon"]);
         this.createSubObject(r, "customer", ["forename", "surname", "email", "phone_nr"]);
         this.createSubObject(r, "company", ["name", "ean_nr"]);
         r.customer.company = r.company;
         delete r.company;
-        this.createSubObject(r, "company_address", ["co_street_name", "co_street_name2", "co_street_nr", "co_zip_code", "co_city","co_lat","co_lon"], ["street_name", "street_name2", "street_nr", "zip_code", "city","lat","lon"]);
+        this.createSubObject(r, "company_address", ["co_street_name", "co_street_name2", "co_street_nr", "co_zip_code", "co_city", "co_lat", "co_lon"], ["street_name", "street_name2", "street_nr", "zip_code", "city", "lat", "lon"]);
         r.customer.company.address = r.company_address;
         delete r.company_address;
       });
@@ -135,7 +133,7 @@ module.exports = class DB {
   }
 
   searchBons(searchParams, includeOrders, callback = console.log) {
-    let statuses = ["new", "needInfo", "approved", "preparing", "done", "delivered", "invoiced","payed", "closed", "offer"];
+    let statuses = ["new", "needInfo", "approved", "preparing", "done", "delivered", "invoiced", "payed", "closed", "offer"];
     let statusSearchConstr;
     if (searchParams.status) {
       let elems = [];
@@ -178,12 +176,12 @@ module.exports = class DB {
       const rows = this.db.prepare(sql).all(searchParams);
 
       rows.forEach((r) => {
-        this.createSubObject(r, "delivery_address", ["street_name", "street_name2", "street_nr", "zip_code", "city","lat","lon"]);
+        this.createSubObject(r, "delivery_address", ["street_name", "street_name2", "street_nr", "zip_code", "city", "lat", "lon"]);
         this.createSubObject(r, "customer", ["forename", "surname", "email", "phone_nr"]);
         this.createSubObject(r, "company", ["name", "ean_nr"]);
         r.customer.company = r.company;
         delete r.company;
-        this.createSubObject(r, "company_address", ["co_street_name", "co_street_name2", "co_street_nr", "co_zip_code", "co_city","co_lat","co_lon"], ["street_name", "street_name2", "street_nr", "zip_code", "city","lat","lon"]);
+        this.createSubObject(r, "company_address", ["co_street_name", "co_street_name2", "co_street_nr", "co_zip_code", "co_city", "co_lat", "co_lon"], ["street_name", "street_name2", "street_nr", "zip_code", "city", "lat", "lon"]);
         r.customer.company.address = r.company_address;
         delete r.company_address;
         if (includeOrders) {
@@ -232,9 +230,9 @@ module.exports = class DB {
    *                      bonId {integer} the new bon-id or an error object if status is false.
    * @returns bonId {integer} (if callback=null)
    */
-  createBon(bonData, callback = console.log) {
+  async createBon(bonData, callback = console.log) {
     bonData.customer_id = this.createCustomer(bonData.customer);
-    bonData.delivery_address_id = this.createAddress(bonData.delivery_address);
+    bonData.delivery_address_id = await this.createAddress(bonData.delivery_address);
     //OBS!!!!! Don't forget to add new columns as attributes in BonUtils.getEmptyBon
     let sql =
       "INSERT INTO bons(status, status2,customer_info, customer_id,delivery_address_id, delivery_date,pickup_time, nr_of_servings,kitchen_selects,customer_collects, kitchen_info,delivery_info, service_type, payment_type,price_category,invoice_info) VALUES(@status, @status2,@customer_info, @customer_id,@delivery_address_id, @delivery_date,@pickup_time, @nr_of_servings,@kitchen_selects,@customer_collects, @kitchen_info,@delivery_info, @service_type, @payment_type,@price_category,@invoice_info);";
@@ -244,6 +242,7 @@ module.exports = class DB {
       this.saveOrders(newBonId, bonData.orders);
 
       this.updateInvoiceDate(newBonId, bonData.status);
+      this.addGeoInfo(newBonId);
 
       if (callback === null) {
         return newBonId;
@@ -259,9 +258,11 @@ module.exports = class DB {
     }
   }
 
-  updateBon(id, bonData, callback = console.log) {
+  async updateBon(id, bonData, callback = console.log) {
     bonData.customer_id = this.createCustomer(bonData.customer);
-    bonData.delivery_address_id = this.createAddress(bonData.delivery_address);
+    let orgDeliveryAdressId = bonData.delivery_address_id;
+    bonData.delivery_address_id = await this.createAddress(bonData.delivery_address);
+
     this.updateInvoiceDate(id, bonData.status);
     let sql = `
       update bons set 
@@ -287,44 +288,44 @@ module.exports = class DB {
     try {
       const res = this.db.prepare(sql).run(bonData);
       this.saveOrders(id, bonData.orders);
+      this.addGeoInfo(id);
       callback(true, bonData.id);
     } catch (err) {
       callback(false, err);
     }
   }
 
-patchBon(bonId,patches,callback) {
-
-  let columnLookUp={};
-  this.db.pragma("table_info(bons)").forEach(c=>{columnLookUp[c.name.toLowerCase()]=true;});
-  let assignments=[];
-  let columns=Object.keys(patches);
-  for(let i=0;i<columns.length;i++) {
-    let col=columns[i].toLowerCase();
-    if(columnLookUp[col]!==true) {
-      callback(false,`${col} is not a column in table bon`);
-      return;
+  patchBon(bonId, patches, callback) {
+    let columnLookUp = {};
+    this.db.pragma("table_info(bons)").forEach((c) => {
+      columnLookUp[c.name.toLowerCase()] = true;
+    });
+    let assignments = [];
+    let columns = Object.keys(patches);
+    for (let i = 0; i < columns.length; i++) {
+      let col = columns[i].toLowerCase();
+      if (columnLookUp[col] !== true) {
+        callback(false, `${col} is not a column in table bon`);
+        return;
+      }
+      assignments.push(`${col}=@${columns[i]}`);
     }
-    assignments.push(`${col}=@${columns[i]}`);
+    let sql = `update bons set ${assignments.join(",")} where id=@id`;
+    try {
+      this.db.prepare(sql).run({ ...patches, id: bonId });
+      if (callback === null) {
+        return true;
+      } else {
+        callback(true, "ok");
+      }
+    } catch (err) {
+      if (callback === null) {
+        throw err;
+      } else {
+        callback(false, err);
+      }
+    }
   }
-  let sql=`update bons set ${assignments.join(",")} where id=@id`;
-  try {
-    this.db.prepare(sql).run({...patches,id:bonId});
-    if (callback === null) {
-      return true;
-    } else {
-      callback(true, "ok");
-    }
-  } catch(err) {
-    if (callback === null) {
-      throw err;
-    } else {
-      callback(false, err);
-    }
-  }
-
-}
-
 
   updateInvoiceDate(bonId, newStatus) {
     if (newStatus === "invoiced") {
@@ -369,8 +370,7 @@ patchBon(bonId,patches,callback) {
   }
 
   createCustomer(customer) {
-
-    if(!customer.email) {
+    if (!customer.email) {
       return null;
     }
 
@@ -420,8 +420,7 @@ patchBon(bonId,patches,callback) {
     });
     row[mainAttribute] = s;
   }
-
-  createAddress(address) {
+  async createAddress(address) {
     if (address == undefined || !address.street_name) {
       return null;
     }
@@ -429,13 +428,16 @@ patchBon(bonId,patches,callback) {
     let sql = "insert into addresses(street_name,street_name2,street_nr,zip_code,city) values(@street_name,@street_name2,@street_nr,@zip_code,@city)";
     try {
       const res = this.db.prepare(sql).run(address);
-      this.addCoordinatesToAdressId(res.lastInsertRowid);
+      await this.addCoordinatesToAdressId(res.lastInsertRowid);
       return res.lastInsertRowid;
     } catch (err) {
       if (err.code == "SQLITE_CONSTRAINT_UNIQUE") {
         sql =
-          "select id from addresses where street_name=@street_name COLLATE NOCASE and street_name2=@street_name2 COLLATE NOCASE and street_nr=@street_nr COLLATE NOCASE and zip_code=@zip_code COLLATE NOCASE and city=@city COLLATE NOCASE";
+          "select id,lat,lon from addresses where street_name=@street_name COLLATE NOCASE and street_name2=@street_name2 COLLATE NOCASE and street_nr=@street_nr COLLATE NOCASE and zip_code=@zip_code COLLATE NOCASE and city=@city COLLATE NOCASE";
         const row = this.db.prepare(sql).get(address);
+        if (row.lat === null || row.lon === null) {
+          await this.addCoordinatesToAdressId(row.id);
+        }
         return row.id;
       } else {
         throw err;
@@ -443,20 +445,52 @@ patchBon(bonId,patches,callback) {
     }
   }
 
-  addCoordinatesToAdressId(id) {
+  async addCoordinatesToAdressId(id) {
     if (this.addressLookupFunctions) {
       let sql = "select * from addresses where id=?";
       const address = this.db.prepare(sql).get(id);
       if (address) {
-        this.addressLookupFunctions.findCoordinates(address, (status, coordinates) => {
-            if(status) {
-                let {lat,lon}=coordinates;
-                let sql="update addresses set lat=?,lon=? where id=?";
-                const res = this.db.prepare(sql).run(lat,lon,id);
-            }
-        });
+        let [status, coordinates] = await this.addressLookupFunctions.findCoordinates(address);
+        if (status) {
+          let { lat, lon } = coordinates;
+          let sql = "update addresses set lat=?,lon=? where id=?";
+          const res = this.db.prepare(sql).run(lat, lon, id);
+        }
       }
     }
+  }
+
+  addGeoInfo(bonId) {
+
+    let sql=`
+    select b.id,b.delivery_address_id,g.adress_id as current_address_id,a.lat,a.lon from bons b
+    left join geo_information g on b.id =g.bon_id 
+    left join addresses a on a.id =b.delivery_address_id 
+    where b.id=?
+    `;
+    let r = this.db.prepare(sql).get(bonId) ?? [];
+
+    if(r.delivery_address_id!=r.current_address_id) {
+      sql="delete from geo_information where bon_id=?";
+      this.db.prepare(sql).run(bonId);
+      if(r.lat!=null && r.lon!=null) {
+        this.addressLookupFunctions.getRouteFromHome(r.lat, r.lon, (data) => {
+          sql="INSERT INTO geo_information(bon_id, adress_id, distance, duration, route_feature) VALUES(?,?,?,?,?)"; 
+          this.db.prepare(sql).run(bonId,r.delivery_address_id,data.distance,data.duration,JSON.stringify(data.feature));
+        })
+      }
+    }
+  }
+
+
+  getGeoInfo(bonIdList) {
+
+    const sql = `
+        SELECT bon_id,distance,duration,route_feature FROM geo_information 
+        WHERE
+            bon_id IN (${new Array(bonIdList.length).fill('?').join(',')})`;
+    const rows = this.db.prepare(sql).all(bonIdList);
+    return rows;
   }
 
   getItems(callback = console.log) {
@@ -723,12 +757,10 @@ patchBon(bonId,patches,callback) {
 
     let res = this.db.prepare(sql).get(mailAddress);
     if (res) {
-      let [bon]=this.getBonSummary(res.id);
+      let [bon] = this.getBonSummary(res.id);
       return bon;
     } else {
       return undefined;
     }
-
   }
-
 };

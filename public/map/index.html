@@ -25,7 +25,7 @@
 
     <script src="js/map-functions.js"></script>
     <script src="js/helpers.js"></script>
-
+    <script src="js/mapGlobals.js"></script>
 
   </head>
   <body>
@@ -53,7 +53,9 @@
             <div><span class="label">Pickup tid:&nbsp;</span><input class="pickup-time" type="time"><button disabled class="map-button update-button">Opdater</button></div>
             <a class="label goto-google" style="display:none" target="_blank">Google Maps</a>
             <i class="byexpress-delivery fa fa-bicycle" title="Leveres av By-expressen" style="display:none"></i>
-        </li>
+            <i class="ristet-rug-delivery fa fa-car" title="Leveres av Ristet Rug" style="display:none"></i>
+
+          </li>
         </ul>
       </div>
       <!--<div id="filter">-->
@@ -69,15 +71,7 @@
         }
     } );
 
-      document.globals={
-        homePosition:[55.693459, 12.552345],
-        homeName:"Ristet Rug Cafe",
-        byExpressenPickupMinutes:45,
-        prePickupMinutes:5,
-        postPickupMinutes:5,
-        durationFactor:1.2
 
-      };
 
       document.querySelector("#historic-bons").onchange=()=>{
         showHistoricFeatures(document.querySelector("#historic-bons").checked);
@@ -89,14 +83,10 @@
       init();
 
       getCateringFeatures((features)=>{
-        document.globals.features=features;
-        let places=features.filter(f=>(f.position!==undefined));
-        //The timeAndMatrixfunction expects coordinates in long,lat order
-        places=places.map(f=>({id:f.bon.id,position:[f.position[1],f.position[0]]}));
-        places=[{id:"home",position:[document.globals.homePosition[1],document.globals.homePosition[0]]},...places]
-        getTimeAndDistanceMatrix(places,(status,matrix)=>{
+        MapGlobals.features=features;
+        getGeoInfo(features.map(f=>(f.bon.id)),(status,data)=>{
           if(status) {
-            document.globals.distanceMatrix=matrix;
+            MapGlobals.geoData=data;
           }
           populateSideBar();
           if(selectedBon) {
@@ -109,9 +99,9 @@
             document.querySelector(".delivery-date").parentElement.querySelector(".fold-unfold").click();
           } catch(e) {}
         })
-
       })
 
+    
       
     </script>
   </body>

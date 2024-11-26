@@ -52,13 +52,13 @@ async function main(args) {
       updateAddress(adr, coord,db);
       continue;
     } else {
-      AddressSearch.findCoordinates(adr, (status, coordinates) => {
+      let [status, coordinates] = await AddressSearch.findCoordinates(adr);
         if (status) {
           updateAddress(adr, coordinates,db);
         } else {
             console.log( `failed to update ${adr.street_name} ${adr.street_nr} ${adr.zip_code} ${adr.city} (id=${adr.id})`)
         }
-      });
+
     }
     await sleep(2000);
   }
