@@ -487,8 +487,10 @@ class BonConfig {
     }
 
     getBons() {
+        let b=MessageBox.popup("Henter Bons...");
         this.myRepo.getBonSummary(undefined,bons=>{
             this.createBonSummaryTable(bons);
+            b.hide();
         })    
     }
 
