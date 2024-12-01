@@ -233,7 +233,7 @@ module.exports = class DB {
    * @returns bonId {integer} (if callback=null)
    */
   async createBon(bonData, callback = console.log) {
-    bonData.customer_id = this.createCustomer(bonData.customer);
+    bonData.customer_id = await this.createCustomer(bonData.customer);
     bonData.delivery_address_id = await this.createAddress(bonData.delivery_address);
     //OBS!!!!! Don't forget to add new columns as attributes in BonUtils.getEmptyBon
     let sql =
@@ -261,7 +261,7 @@ module.exports = class DB {
   }
 
   async updateBon(id, bonData, callback = console.log) {
-    bonData.customer_id = this.createCustomer(bonData.customer);
+    bonData.customer_id = await this.createCustomer(bonData.customer);
     let orgDeliveryAdressId = bonData.delivery_address_id;
     bonData.delivery_address_id = await this.createAddress(bonData.delivery_address);
 
@@ -371,12 +371,12 @@ module.exports = class DB {
     }
   }
 
-  createCustomer(customer) {
+  async createCustomer(customer) {
     if (!customer.email) {
       return null;
     }
 
-    customer.company_id = this.createCompany(customer.company);
+    customer.company_id = await this.createCompany(customer.company);
     let sql = `
         INSERT INTO customers (forename,surname,email,phone_nr,company_id)
         VALUES (@forename, @surname, @email, @phone_nr, @company_id)
@@ -393,11 +393,11 @@ module.exports = class DB {
     return res.id;
   }
 
-  createCompany(company) {
+  async createCompany(company) {
     if (company == undefined || !company.name) {
       return null;
     }
-    company.address_id = this.createAddress(company.address);
+    company.address_id = await this.createAddress(company.address);
     let sql = `
         INSERT INTO companies (name,address_id,ean_nr) VALUES (@name,@address_id,@ean_nr)
         ON CONFLICT (name) DO
