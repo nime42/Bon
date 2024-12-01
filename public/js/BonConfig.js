@@ -741,6 +741,7 @@ class BonConfig {
         <th>Købspris</th>
         <th>Pris</th>
         <th>Fakturadato</th>
+        <th>Afstand(km)</th>
         </tr>
         `;
         let headerRow=document.createElement("thead");
@@ -779,6 +780,7 @@ class BonConfig {
         <td>${b.cost_price?b.cost_price.toFixed(2):0}</td>
         <td>${b.price?b.price.toFixed(2):0}</td>
         <td>${Helper.formatDate(b.invoice_date)}</td>
+        <td>${b.distance?(b.distance/1000).toFixed(2):0}</td>
         `;
     }
 

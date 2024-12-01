@@ -1107,6 +1107,7 @@ class BonStrip {
 
 
         otherOrders.forEach(o=>{
+            o={...o};
             o.comment=o.special_request; //in DB it's called special_request but in bon it's called comment, my misstake :-/
             o.id=o.item_id
             let existing=orders.find(e=>(((e.id!=null && e.id==o.id) ||(e.id==null && e.izettle_product_id==o.izettle_product_id)) && e.comment==o.comment))

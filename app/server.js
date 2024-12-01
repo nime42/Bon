@@ -237,6 +237,7 @@ app.get("/api/bonSummaryFile",(req,res) => {
         "Købspris",
         "Pris",
         "Fakturadato",
+        "afstand (km)"
     ];
 
     const excel = require('excel4node');
@@ -258,6 +259,10 @@ app.get("/api/bonSummaryFile",(req,res) => {
     });
 
     let bons=DB.getBonSummary();
+    let distanceLookup={}
+    bons.forEach(b=>{
+        distanceLookup[b.id]=b.distance;
+    })
     bons.forEach(b=>{
         col=1;
         row++;
@@ -287,6 +292,7 @@ app.get("/api/bonSummaryFile",(req,res) => {
         } else {
             worksheet.cell(row, col++).string("");
         }
+        worksheet.cell(row, col++).number(+safeNumber(b.distance/1000).toFixed(2));
         
 
    })
@@ -299,7 +305,8 @@ app.get("/api/bonSummaryFile",(req,res) => {
         "Antal",
         "Købspris",
         "Pris",
-        "Extra info"
+        "Extra info",
+        "Afstand(km)"
     ];
     row=1;
     col=1;
@@ -317,6 +324,9 @@ app.get("/api/bonSummaryFile",(req,res) => {
     ordersWorksheet.cell(row, col++).number(safeNumber(o.cost_price));
     ordersWorksheet.cell(row, col++).number(safeNumber(o.price));
     ordersWorksheet.cell(row, col++).string(safeString(o.special_request));
+    if(o.category.match(/.*levering*./i)) {
+        ordersWorksheet.cell(row, col++).number(+safeNumber(distanceLookup[o.bon_id]/1000).toFixed(2));
+    }
    });
    
 
@@ -345,7 +355,8 @@ app.get("/api/bonSummaryFile",(req,res) => {
     "Antal",
     "Købspris(produkt)",
     "Pris(produkt)",
-    "Extra info"
+    "Extra info",
+    "Afstand(km)"
     ];
     row=1;
     col=1;
@@ -403,6 +414,9 @@ app.get("/api/bonSummaryFile",(req,res) => {
         allWorksheet.cell(row, col++).number(safeNumber(b.product_cost_price)).style(productInfoStyle);
         allWorksheet.cell(row, col++).number(safeNumber(b.product_price)).style(productInfoStyle);
         allWorksheet.cell(row, col++).string(safeString(b.special_request)).style(productInfoStyle);
+        if(b.product_category.match(/.*levering*./i)) {
+            allWorksheet.cell(row, col++).number(+safeNumber(distanceLookup[b.id]/1000).toFixed(2)).style(productInfoStyle);
+        }
 
    })
 
