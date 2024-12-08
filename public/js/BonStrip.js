@@ -212,8 +212,11 @@ class BonStrip {
         <fieldset>
             <legend>Pax <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
             <div class="field-content">
+            <span>
             <span id="pax" style="float: left;font-weight: bold;font-style: italic;padding-left: 10px;"></span>
+            <span id="pax-units" style="float: left;font-weight: bold;font-style: italic;padding-left: 3px;"></span>
 
+            </span>
             <label style="font-weight: bold;font-style: italic;float: right">
             Køkkenet vælger
             <input onclick="return false;" type="checkbox" id="kitchen-selects" value="1" style="margin-left: 5px;">
@@ -550,6 +553,7 @@ class BonStrip {
             values.foreName=this.myDiv.querySelector("#forename").innerText;
             values.surName=this.myDiv.querySelector("#surname").innerText;
             values.pax=this.myDiv.querySelector("#pax").innerHTML;
+            values.paxUnits=this.myDiv.querySelector("#pax-units").innerHTML;
             values.bonId=this.bonId;
             values.bonPrefix=Globals.bonPrefix;
 
@@ -967,6 +971,11 @@ class BonStrip {
 
     setPaxAndKitchenSelects(bon) {
         this.myDiv.querySelector("#pax").innerHTML=bon.nr_of_servings;
+        if(bon.pax_units) {
+            this.myDiv.querySelector("#pax-units").innerHTML="("+bon.pax_units+")";
+        } else {
+            this.myDiv.querySelector("#pax-units").innerHTML="";
+        }
         this.myDiv.querySelector("#kitchen-selects").checked=bon.kitchen_selects;
     }
 
@@ -1062,11 +1071,20 @@ class BonStrip {
         }
     }
 
-    updatePaxOnChange(paxElem) {
+    updatePaxOnChange(paxElem,paxUnitsElem) {
         let f=()=> {
-            this.myDiv.querySelector("#pax").innerHTML=paxElem.value;
+            const pax=paxElem.value;
+            const paxUnits=paxUnitsElem.value.trim();
+            this.myDiv.querySelector("#pax").innerHTML=pax;
+            if(paxUnits) {
+                this.myDiv.querySelector("#pax-units").innerHTML=`(${paxUnits})`
+            } else {
+                this.myDiv.querySelector("#pax-units").innerHTML="";
+            }
+
         }
         paxElem.oninput=f;
+        paxUnitsElem.oninput=f;
     }
 
     updatePaymentTypeOnChange(paymentElem,extra) {
@@ -1109,10 +1127,11 @@ class BonStrip {
         otherOrders.forEach(o=>{
             o={...o};
             o.comment=o.special_request; //in DB it's called special_request but in bon it's called comment, my misstake :-/
-            o.id=o.item_id
+            o.id=o.item_id;
             let existing=orders.find(e=>(((e.id!=null && e.id==o.id) ||(e.id==null && e.izettle_product_id==o.izettle_product_id)) && e.comment==o.comment))
             if(existing) {
                 existing.quantity=Number(existing.quantity)+Number(o.quantity)*factor;
+            
             } else {
                 orders.push(o);
             }

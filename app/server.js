@@ -275,6 +275,8 @@ app.get("/api/bonSummaryFile",(req,res) => {
         }
         worksheet.cell(row, col++).string(safeString(b.status));
         worksheet.cell(row, col++).number(safeNumber(b.nr_of_servings));
+        worksheet.cell(row, col++).string(b.pax_units);
+
  
         worksheet.cell(row, col++).string(b.kitchen_selects?"Ja":"Nej");
         worksheet.cell(row, col++).string(b.customer_collects?"Afhentes":safeString(b.delivery_adr));
@@ -391,6 +393,7 @@ app.get("/api/bonSummaryFile",(req,res) => {
         } else {
             allWorksheet.cell(row, col++).string(safeString(b.nr_of_servings));
         }
+        allWorksheet.cell(row, col++).string(b.pax_units);
         allWorksheet.cell(row, col++).string(b.kitchen_selects?"Ja":"Nej");
         allWorksheet.cell(row, col++).string(b.customer_collects?"Afhentes":b.delivery_adr);
         allWorksheet.cell(row, col++).string(safeString(b.name));

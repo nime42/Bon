@@ -770,6 +770,7 @@ class BonConfig {
         <td>${Helper.formatDate(b.delivery_date)}</td>
         <td style="background-color:${Globals.Statuses[b.status].color};color:${Helper.contrastColor(Globals.Statuses[b.status].color)}">${Globals.Statuses[b.status].label}</td>
         <td>${b.nr_of_servings}</td>
+        <td>${b.pax_units}</td>      
         <td>${b.kitchen_selects?"Ja":"Nej"}</td>
         <td>${b.customer_collects?"Afhentes":b.delivery_adr}</td>
         <td>${b.name}</td>
@@ -830,6 +831,7 @@ class BonConfig {
         foreName: "Ole",
         surName: "Svendsen",
         pax: "2",
+        paxUnits:"10x3",
         totSum: "150.00",
         orderWithPrices: "1 X Dansk italiene (75 kr)\n1 X Bobler (75 kr)",
         orders: "1 X Dansk italiene\n1 X Bobler"

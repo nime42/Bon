@@ -68,6 +68,7 @@ class WeekView {
             cursor: pointer;
             white-space: nowrap;
             overflow: hidden;
+            width:fit-content;
           }
 
         #week-table .missing {
@@ -308,7 +309,11 @@ class WeekView {
         let [prefix,id]=bon.id.split("-");
         let color=Globals.Statuses[bon.status]?.color;
         let time=new Date(bon.delivery_date).toLocaleTimeString("default",{ hour: '2-digit', minute: '2-digit' });
-        let div=`<div id='${bon.id}' class="entry status-${bon.status}" style="background: ${color}; color: black;"><li class="fa fa-wrench" style="display:${bon.payment_type==="Produktion"?"":"none"}"></li>${time},#${id},P:${bon.nr_of_servings}<li class="fa fa-envelope mail" style="display:none"></li></div>`
+        let pax="P:"+(bon.nr_of_servings != "" ? bon.nr_of_servings : 0);
+        if(bon.pax_units) {
+          pax="("+bon.pax_units.trim()+")";
+        }
+        let div=`<div id='${bon.id}' class="entry status-${bon.status}" style="background: ${color}; color: black;"><li class="fa fa-wrench" style="display:${bon.payment_type==="Produktion"?"":"none"}"></li>${time},#${id},${pax}<li class="fa fa-envelope mail" style="display:none"></li></div>`
         let entries=Array.from(col.childNodes);
         if(entries.length===0) {
             col.insertAdjacentHTML("beforeend",div);

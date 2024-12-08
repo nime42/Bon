@@ -118,6 +118,7 @@ constructor(div) {
             delivery_info:"",
             kitchen_info: "",
             nr_of_servings: 0,
+            pax_units:"",
             payment_type: "Produktion"
 
         };

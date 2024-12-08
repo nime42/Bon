@@ -78,10 +78,14 @@ class BonForm {
 
               <div class="bon-row indent">
                   <div class="bon-column">
-                      Pax:
+                      Pax(Enheder):
+                  </div>
+                  <div class="bon-column" style="width: 100px;">
+                      <input type="text" id="nr_of_servings" name="nr_of_servings" placeholder="Pax"
+                          autocomplete="nope">
                   </div>
                   <div class="bon-column">
-                      <input type="text" id="nr_of_servings" name="nr_of_servings" placeholder="Pax"
+                      <input type="text" id="pax_units" name="pax_units" placeholder="Enheder"
                           autocomplete="nope">
                   </div>
               </div>
@@ -342,7 +346,7 @@ class BonForm {
       form.querySelector("#delivery_info")
     );
 
-    this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"));
+    this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"),form.querySelector("#pax_units"));
     this.myBonStrip.updatePaymentTypeOnChange(form.querySelector("#payment-types"),()=>{
       if(form.querySelector("#payment-types").value==="Produktion") {
         //If user chooses Produktion set price to Produktion also
@@ -542,16 +546,17 @@ class BonForm {
 
   createBonLabelAndcolor(bon,haveUnseenMail) {
     let statusColor = this.getStatusColor(bon.status);
+    let pax="P:"+(bon.nr_of_servings != "" ? bon.nr_of_servings : 0);
+    if(bon.pax_units) {
+      pax="("+bon.pax_units.trim()+")";
+    }
     let timeStr =
       bon.delivery_date.getHours().toString().padStart(2, "0") +
       "." +
       bon.delivery_date.getMinutes().toString().padStart(2, "0");
     let label =
       timeStr +
-      ",#" +
-      bon.id +
-      ",P:" +
-      (bon.nr_of_servings != "" ? bon.nr_of_servings : 0);
+      ",#" +bon.id + ","+pax;
     
     let icons=[];
     if(haveUnseenMail) {
@@ -615,6 +620,7 @@ class BonForm {
     bon.status = this._getStatus();
     bon.status2 = "";
     bon.nr_of_servings = props.nr_of_servings;
+    bon.pax_units = props.pax_units;
     bon.kitchen_selects = props.kitchen_selects;
     bon.customer_collects = props.customer_collects;
     bon.price_category = props.price_category;
@@ -775,6 +781,8 @@ class BonForm {
     form.querySelector("input[name=bon_id]").value = bon.id;
     form.querySelector("input[name=nr_of_servings]").value = bon.nr_of_servings;
     form.querySelector("input[name=nr_of_servings]").oninput();
+    form.querySelector("input[name=pax_units]").value = bon.pax_units;
+    form.querySelector("input[name=pax_units]").oninput();
     form.querySelector("input[name=customer_collects]").checked =
       bon.customer_collects;
     form.querySelector("input[name=kitchen_selects]").checked =

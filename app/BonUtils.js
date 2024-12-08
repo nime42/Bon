@@ -10,6 +10,7 @@ module.exports = class BonUtils {
       "status": "",
       "status2": "",
       "nr_of_servings": "",
+      "pax_units":"",
       "kitchen_selects": 0,
       "customer_collects": 0,
       "price_category": "",
