@@ -731,6 +731,7 @@ class BonConfig {
         <th>Leveringsdato</th>
         <th>Status</th>
         <th>Pax</th>
+        <th>Pax-enheter</th>
         <th>Køkkenet vælger</th>
         <th>Leveringsadresse</th>
         <th>Navn</th>
@@ -764,26 +765,28 @@ class BonConfig {
     }
 
      _createTableRow(b) {
+        let c={...b};
+        Object.keys(c).forEach(k=>{if(c[k]===null) c[k]=""});
         
         return `
-        <td><a href="javascript:void(0);"  onclick="Globals.myConfig.showBonForm(${b.id},this.parentNode.parentNode);">#${b.id}</a></td>
-        <td>${Helper.formatDate(b.delivery_date)}</td>
-        <td style="background-color:${Globals.Statuses[b.status].color};color:${Helper.contrastColor(Globals.Statuses[b.status].color)}">${Globals.Statuses[b.status].label}</td>
-        <td>${b.nr_of_servings}</td>
-        <td>${b.pax_units}</td>      
-        <td>${b.kitchen_selects?"Ja":"Nej"}</td>
-        <td>${b.customer_collects?"Afhentes":b.delivery_adr}</td>
-        <td>${b.name}</td>
-        <td>${b.email}</td>
-        <td>${b.phone_nr}</td>
-        <td>${b.company}</td>
-        <td>${b.ean_nr}</td>
-        <td>${b.payment_type}</td>
-        <td>${b.price_category}</td>
-        <td>${b.cost_price?b.cost_price.toFixed(2):0}</td>
-        <td>${b.price?b.price.toFixed(2):0}</td>
-        <td>${Helper.formatDate(b.invoice_date)}</td>
-        <td>${b.distance?(b.distance/1000).toFixed(2):0}</td>
+        <td><a href="javascript:void(0);"  onclick="Globals.myConfig.showBonForm(${c.id},this.parentNode.parentNode);">#${c.id}</a></td>
+        <td>${Helper.formatDate(c.delivery_date)}</td>
+        <td style="background-color:${Globals.Statuses[c.status].color};color:${Helper.contrastColor(Globals.Statuses[c.status].color)}">${Globals.Statuses[c.status].label}</td>
+        <td>${c.nr_of_servings}</td>
+        <td>${c.pax_units}</td>      
+        <td>${c.kitchen_selects?"Ja":"Nej"}</td>
+        <td>${c.customer_collects?"Afhentes":c.delivery_adr}</td>
+        <td>${c.name}</td>
+        <td>${c.email}</td>
+        <td>${c.phone_nr}</td>
+        <td>${c.company}</td>
+        <td>${c.ean_nr}</td>
+        <td>${c.payment_type}</td>
+        <td>${c.price_category}</td>
+        <td>${c.cost_price?c.cost_price.toFixed(2):0}</td>
+        <td>${c.price?c.price.toFixed(2):0}</td>
+        <td>${Helper.formatDate(c.invoice_date)}</td>
+        <td>${c.distance?(c.distance/1000).toFixed(2):0}</td>
         `;
     }
 

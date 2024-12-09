@@ -225,6 +225,7 @@ app.get("/api/bonSummaryFile",(req,res) => {
         "Leveringsdato",
         "Status",
         "Pax",
+        "Pax-enheter",
         "Køkkenet vælger",
         "Leveringsadresse",
         "Navn",
@@ -340,6 +341,7 @@ app.get("/api/bonSummaryFile",(req,res) => {
     "Leveringsdato",
     "Status",
     "Pax",
+    "Pax-enheter",
     "Køkkenet vælger",
     "Leveringsadresse",
     "Navn",
@@ -884,11 +886,11 @@ function manageIncomingOrders(callback) {
 
         try {
             isManagingIncomingOrders = true;
-            mailManager.getIncomingOrders(config.mailManager.incomingMails.subjectContains, (status, orders) => {
+            mailManager.getIncomingOrders(config.mailManager.incomingMails.subjectContains, async (status, orders) => {
                 if (status) {
                     let mailOrders = [];
-                    orders.forEach(o => {
-                        let bonId = DB.createBon(o.bon, null);
+                    await orders.forEach(async o => {
+                        let bonId = await DB.createBon(o.bon, null);
                         mailOrders.push({ bonId: bonId, orgMessage: o.orgMessage });
                     })
 
