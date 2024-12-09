@@ -889,11 +889,11 @@ function manageIncomingOrders(callback) {
             mailManager.getIncomingOrders(config.mailManager.incomingMails.subjectContains, async (status, orders) => {
                 if (status) {
                     let mailOrders = [];
-                    await orders.forEach(async o => {
+                    for(let i=0;i<orders.length;i++) {
+                        let o=orders[i];
                         let bonId = await DB.createBon(o.bon, null);
                         mailOrders.push({ bonId: bonId, orgMessage: o.orgMessage });
-                    })
-
+                    }
                     mailIncomingOrders(mailOrders, (status)=> {
                         if(status) {
                             if(confirmMessage) {
