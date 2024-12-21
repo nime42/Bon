@@ -1129,11 +1129,17 @@ class BonStrip {
             o.comment=o.special_request; //in DB it's called special_request but in bon it's called comment, my misstake :-/
             o.id=o.item_id;
             let existing=orders.find(e=>(((e.id!=null && e.id==o.id) ||(e.id==null && e.izettle_product_id==o.izettle_product_id)) && e.comment==o.comment))
-            if(existing) {
-                existing.quantity=Number(existing.quantity)+Number(o.quantity)*factor;
-            
+            if (existing) {
+              const totQ = Number(existing.quantity) + Number(o.quantity) * factor;
+              const totCostPrice = Number(existing.quantity) * existing.cost_price + Number(o.quantity) * factor * o.cost_price;
+              const totPrice = Number(existing.quantity) * existing.price + Number(o.quantity) * factor * o.price;
+              existing.quantity = Number(existing.quantity) + Number(o.quantity) * factor;
+              if (existing.quantity > 0) {
+                existing.cost_price = totCostPrice / totQ;
+                existing.price = totPrice / totQ;
+              }
             } else {
-                orders.push(o);
+              orders.push(o);
             }
 
         })
