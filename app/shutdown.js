@@ -1,6 +1,6 @@
-var config=require('../resources/config.js');
+var config = require('../resources/config.js');
 const fetch = require('node-fetch');
 
-let url=`http://localhost:${config.app.http}/shutdown`;
+let url = `http://localhost:${config.app.http}/shutdown`;
 fetch(url);
 

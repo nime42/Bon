@@ -150,19 +150,19 @@ module.exports = class GrocyFunctions {
     });
 
     //if the recipy have a product_id then this recipy is producing a product in Grocy-DB
-    if(this.allRecipies[recipyId]?.product_id!==null) {
+    if (this.allRecipies[recipyId]?.product_id !== null) {
       this.addProduct(amount, recipyId);
     }
   }
 
-  addProduct(amount,recipyId) {
-    let recipy=this.allRecipies[recipyId];
-    let productId=recipy.product_id;
-    let cost=recipy.calculated_price;
-    let product=this.allProducts.find(p=>p.id==productId);
-    let body={
-      amount:amount,
-      price:cost + ""
+  addProduct(amount, recipyId) {
+    let recipy = this.allRecipies[recipyId];
+    let productId = recipy.product_id;
+    let cost = recipy.calculated_price;
+    let product = this.allProducts.find(p => p.id == productId);
+    let body = {
+      amount: amount,
+      price: cost + ""
     };
 
     let httpReq =
@@ -182,7 +182,7 @@ module.exports = class GrocyFunctions {
       body: JSON.stringify(body),
     })
       .then(function (res) {
-        if(res.status==200) {
+        if (res.status == 200) {
           console.log(`Produced ${amount} units of ${product.name}`);
         } else {
           console.log(`Failed to produce ${amount} units of ${product.name}`);
@@ -292,7 +292,7 @@ module.exports = class GrocyFunctions {
             amount: quantityAmount,
             transaction_type: "consume",
             spoiled: false,
-            allow_subproduct_substitution:true
+            allow_subproduct_substitution: true
           };
 
           fetch(httpReq, {
@@ -474,15 +474,15 @@ module.exports = class GrocyFunctions {
    * @param {*} listId 
    * @param {*} callback 
    */
-  clearShoppingList(listId,callback=console.log) {
+  clearShoppingList(listId, callback = console.log) {
 
     let httpReq =
-    this.config.grocy.url +
-    "/api/stock/shoppinglist/clear" +
-    "?GROCY-API-KEY=" +
-    this.config.grocy.apiKey;
+      this.config.grocy.url +
+      "/api/stock/shoppinglist/clear" +
+      "?GROCY-API-KEY=" +
+      this.config.grocy.apiKey;
 
-    let body={list_id:listId}
+    let body = { list_id: listId }
 
     fetch(httpReq, {
       headers: {
@@ -496,7 +496,7 @@ module.exports = class GrocyFunctions {
         callback(true);
       })
       .catch(function (res) {
-        callback(false,res);
+        callback(false, res);
       });
 
   }
@@ -647,11 +647,9 @@ module.exports = class GrocyFunctions {
   }
 
   getGrocyObjects(objectName, callback) {
-    let httpReq = `${
-      this.config.grocy.url
-    }/api/objects/${objectName}?GROCY-API-KEY=${
-      this.config.grocy.apiKey
-    }&dummy=${Date.now()}`;
+    let httpReq = `${this.config.grocy.url
+      }/api/objects/${objectName}?GROCY-API-KEY=${this.config.grocy.apiKey
+      }&dummy=${Date.now()}`;
     fetch(httpReq, { cache: "no-store" })
       .then((res) => res.json())
       .then(
@@ -682,7 +680,7 @@ module.exports = class GrocyFunctions {
     let purchase_amount = recipy_pos.amount;
     let conversion =
       conversionLookup[
-        `${p.qu_id_stock},${recipy_pos.qu_id},${recipy_pos.product_id}`
+      `${p.qu_id_stock},${recipy_pos.qu_id},${recipy_pos.product_id}`
       ];
     if (conversion == undefined) {
       conversion =
@@ -742,7 +740,7 @@ module.exports = class GrocyFunctions {
       external_id: recipe.id,
       salesPrices: salesPrices,
       base_servings: recipe.base_servings,
-      product_id:recipe.product_id
+      product_id: recipe.product_id
     };
   }
 };

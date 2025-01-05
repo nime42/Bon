@@ -1,108 +1,123 @@
 <html lang="sv">
-  <head>
-    <base target="_top" />
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Bon map</title>
+<head>
+  <base target="_top" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+  <title>Bon map</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-    
-    <link rel="stylesheet" href="css/map.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="../js/globals.js"></script>
-    <script src="../js/BonRepository.js"></script>
-    <script src="../js/BonStrip.js"></script>
-    <script src="../js/IngredientList.js"></script>
-    <script src="../js/ModalPopup.js"></script>
-    <script src="../js/DraggableList.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+  <link rel="stylesheet" href="css/map.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="../js/globals.js"></script>
+  <script src="../js/BonRepository.js"></script>
+  <script src="../js/BonStrip.js"></script>
+  <script src="../js/IngredientList.js"></script>
+  <script src="../js/ModalPopup.js"></script>
+  <script src="../js/DraggableList.js"></script>
 
 
-    <script src="js/map-functions.js"></script>
-    <script src="js/helpers.js"></script>
-    <script src="js/mapGlobals.js"></script>
+  <script src="js/map-functions.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/mapGlobals.js"></script>
 
-  </head>
-  <body>
-    <div id="sidebar" style="width:300px">
-      <div style="margin: 5px; cursor: pointer" onclick="goHome();">
-        <i id="home-icon" class="fa fa-home map-icon"></i>
-        <i class="fa fa-chevron-left" style="float: right; cursor: pointer" onclick="event.stopPropagation();narrowUnnarrow(this)"></i>
-      </div>
-      <div>
-      <input type="checkbox" id="historic-bons" name="historic-bons"><label for="historic-bons" style="padding-right: 7px;"> Historiske</label>
-      <input type="checkbox" checked title="slå alle til/fra" onchange="hideUnhideAll(this)"/>
-      <i id="fold-unfold-all" class="fa fa-chevron-up" style="float: right; cursor: pointer;font-size: 15px;" onclick="foldUnfoldAll(this)"></i>
-      </div>
-      <div id="bons">
-        <ul id="section-template">
-          <h3 style="margin-bottom: 0"><span class="delivery-date">2024-06-10</span><input type="checkbox" checked class="hide-unhide" title="slå adresser til/fra" onchange="hideUnhide(this)"/><i class="fa fa-chevron-up fold-unfold" style="float: right; cursor: pointer;font-size: 15px;" onclick="foldUnfold(this)"></i></h3>
-          <li id="row-template" style="transition: height 4s;">
-            <div class="item-id goto-map" style="cursor: pointer">
-              <div class="numberCircle map-icon"><span class="map-index">1</span></div>
-              <span class="label">Bon-id:</span> <span class="bon-id">#125</span>
-            </div>
-            <div class="item-time"><span class="label">Levering:</span> kl <span class="delivery-time"></span></div>
-            <div class="item-address hideable"><span class="label">Adresse:</span> <span class="delivery-address"></span></div>
-            <div class="item-time"><span class="label">Tid:</span> <span class="distance-duration"></span></div>
-            <div><span class="label">Pickup tid:&nbsp;</span><input class="pickup-time" type="time"><button disabled class="map-button update-button">Opdater</button></div>
-            <a class="label goto-google" style="display:none" target="_blank">Google Maps</a>
-            <i class="byexpress-delivery fa fa-bicycle" title="Leveres av By-expressen" style="display:none"></i>
-            <i class="ristet-rug-delivery fa fa-car" title="Leveres av Ristet Rug" style="display:none"></i>
+</head>
 
-          </li>
-        </ul>
-      </div>
-      <!--<div id="filter">-->
-
-      </div>
+<body>
+  <div id="sidebar" style="width:300px">
+    <div style="margin: 5px; cursor: pointer" onclick="goHome();">
+      <i id="home-icon" class="fa fa-home map-icon"></i>
+      <i class="fa fa-chevron-left" style="float: right; cursor: pointer"
+        onclick="event.stopPropagation();narrowUnnarrow(this)"></i>
     </div>
+    <div>
+      <input type="checkbox" id="historic-bons" name="historic-bons"><label for="historic-bons"
+        style="padding-right: 7px;"> Historiske</label>
+      <input type="checkbox" checked title="slå alle til/fra" onchange="hideUnhideAll(this)" />
+      <i id="fold-unfold-all" class="fa fa-chevron-up" style="float: right; cursor: pointer;font-size: 15px;"
+        onclick="foldUnfoldAll(this)"></i>
+    </div>
+    <div id="bons">
+      <ul id="section-template">
+        <h3 style="margin-bottom: 0"><span class="delivery-date">2024-06-10</span><input type="checkbox" checked
+            class="hide-unhide" title="slå adresser til/fra" onchange="hideUnhide(this)" /><i
+            class="fa fa-chevron-up fold-unfold" style="float: right; cursor: pointer;font-size: 15px;"
+            onclick="foldUnfold(this)"></i></h3>
+        <li id="row-template" style="transition: height 4s;">
+          <div class="item-id goto-map" style="cursor: pointer">
+            <div class="numberCircle map-icon"><span class="map-index">1</span></div>
+            <span class="label">Bon-id:</span> <span class="bon-id">#125</span>
+          </div>
+          <div class="item-time"><span class="label">Levering:</span> kl <span class="delivery-time"></span></div>
+          <div class="item-address hideable"><span class="label">Adresse:</span> <span class="delivery-address"></span>
+          </div>
+          <div class="item-time"><span class="label">Tid:</span> <span class="distance-duration"></span></div>
+          <div><span class="label">Pickup tid:&nbsp;</span><input class="pickup-time" type="time"><button disabled
+              class="map-button update-button">Opdater</button></div>
+          <a class="label goto-google" style="display:none" target="_blank">Google Maps</a>
+          <i class="byexpress-delivery fa fa-bicycle" title="Leveres av By-expressen" style="display:none"></i>
+          <i class="ristet-rug-delivery fa fa-car" title="Leveres av Ristet Rug" style="display:none"></i>
 
-    <div id="map" class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0"></div>
-    <script>
-      $( document ).on( "ajaxError", function(event, jqXHR) {
-        if(jqXHR.status==401) {
-          alert("Du är inte inloggad i Bon!");
-        }
-    } );
+        </li>
+      </ul>
+    </div>
+    <!--<div id="filter">-->
 
+  </div>
+  </div>
 
-
-      document.querySelector("#historic-bons").onchange=()=>{
-        showHistoricFeatures(document.querySelector("#historic-bons").checked);
+  <div id="map"
+    class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom"
+    tabindex="0"></div>
+  <script>
+    $(document).on("ajaxError", function (event, jqXHR) {
+      if (jqXHR.status == 401) {
+        alert("Du är inte inloggad i Bon!");
       }
+    });
 
 
-      let selectedBon=new URLSearchParams(window.location.search).get("selectedBon"); 
-    
-      init();
 
-      getCateringFeatures((features)=>{
-        MapGlobals.features=features;
-        getGeoInfo(features.map(f=>(f.bon.id)),(status,data)=>{
-          if(status) {
-            MapGlobals.geoData=data;
-          }
-          populateSideBar();
-          if(selectedBon) {
-            gotoBonId(selectedBon);
-          }
+    document.querySelector("#historic-bons").onchange = () => {
+      showHistoricFeatures(document.querySelector("#historic-bons").checked);
+    }
 
-          foldUnfoldAll(document.querySelector("#fold-unfold-all"));
-          try {
-            //unfold first date
-            document.querySelector(".delivery-date").parentElement.querySelector(".fold-unfold").click();
-          } catch(e) {}
-        })
+
+    let selectedBon = new URLSearchParams(window.location.search).get("selectedBon");
+
+    init();
+
+    getCateringFeatures((features) => {
+      MapGlobals.features = features;
+      getGeoInfo(features.map(f => (f.bon.id)), (status, data) => {
+        if (status) {
+          MapGlobals.geoData = data;
+        }
+        populateSideBar();
+        if (selectedBon) {
+          gotoBonId(selectedBon);
+        }
+
+        foldUnfoldAll(document.querySelector("#fold-unfold-all"));
+        try {
+          //unfold first date
+          document.querySelector(".delivery-date").parentElement.querySelector(".fold-unfold").click();
+        } catch (e) { }
       })
+    })
 
-    
-      
-    </script>
-  </body>
+
+
+  </script>
+</body>
+
 </html>

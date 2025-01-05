@@ -43,7 +43,7 @@ function getTemplates() {
   return { sectionTemplate, rowTemplate };
 }
 
-const priceCategoriesFilter = ["Catering", "Store","Festival"];
+const priceCategoriesFilter = ["Catering", "Store", "Festival"];
 
 function getCateringFeatures(callback) {
   let searchParams = { includeOrders: true };

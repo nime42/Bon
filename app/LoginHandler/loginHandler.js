@@ -5,13 +5,13 @@ var sessionHandler = require('./sessionHandler.js');
 var db = require('./dbFunctions.js');
 const dbFunctions = require('./dbFunctions.js');
 
-var mailSender=undefined;
-var forgottenPasswordMailTemplate=undefined;
+var mailSender = undefined;
+var forgottenPasswordMailTemplate = undefined;
 
-function init(app,dbFile,mailfunc,mailTemplate) {
+function init(app, dbFile, mailfunc, mailTemplate) {
     db.init(dbFile);
-    mailSender=mailfunc;
-    forgottenPasswordMailTemplate=mailTemplate;
+    mailSender = mailfunc;
+    forgottenPasswordMailTemplate = mailTemplate;
 
     app.use(cookieParser());
 
@@ -35,9 +35,9 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
     app.post('/register', (req, res) => {
 
-        if(!checkRoles(req,"${ADMIN}")) {
+        if (!checkRoles(req, "${ADMIN}")) {
             res.sendStatus(401);
-            return;        
+            return;
         }
 
         var username = req.body.username;
@@ -47,9 +47,9 @@ function init(app,dbFile,mailfunc,mailTemplate) {
                     if (status) {
                         db.updateUserInfo(id, req.body, function (status, err) {
                             if (status) {
-                                if(req.body.roles) {
-                                    db.updateRoles(id,req.body.roles,function(status) {
-                                        if(status) {
+                                if (req.body.roles) {
+                                    db.updateRoles(id, req.body.roles, function (status) {
+                                        if (status) {
                                             res.sendStatus(200);
                                         } else {
                                             res.sendStatus(500);
@@ -83,49 +83,49 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
     })
 
-    app.post('/forgotPassword',(req,res)=> {  
-    
-        db.getUserInfoByUserNameOrEmailOrPhone(req.body.identity,function(status,row) {
-            if(status) {
-                if(row.length===0 || row.email==="") {
+    app.post('/forgotPassword', (req, res) => {
+
+        db.getUserInfoByUserNameOrEmailOrPhone(req.body.identity, function (status, row) {
+            if (status) {
+                if (row.length === 0 || row.email === "") {
                     res.sendStatus(404);
                     return;
                 } else {
-                    let userId=row.userid;
-                    let mailAdr=row.email;
-                    let userName=row.username;
-                    db.createPassWordResetToken(userId,function(status,token) {
-                        let url=req.protocol + '://' + req.get('host') +"/index.html?reset-token="+token
-                        let body=forgottenPasswordMailTemplate.body.replace("$URL$",url).replace("$USER$",userName);
-                        let from=forgottenPasswordMailTemplate.from;
-                        let to=mailAdr;
-                        let cc=undefined;
-                        let bcc=undefined;
-                        let subject=forgottenPasswordMailTemplate.subject;
-                        let text=body;
-                        let html=undefined;
+                    let userId = row.userid;
+                    let mailAdr = row.email;
+                    let userName = row.username;
+                    db.createPassWordResetToken(userId, function (status, token) {
+                        let url = req.protocol + '://' + req.get('host') + "/index.html?reset-token=" + token
+                        let body = forgottenPasswordMailTemplate.body.replace("$URL$", url).replace("$USER$", userName);
+                        let from = forgottenPasswordMailTemplate.from;
+                        let to = mailAdr;
+                        let cc = undefined;
+                        let bcc = undefined;
+                        let subject = forgottenPasswordMailTemplate.subject;
+                        let text = body;
+                        let html = undefined;
 
 
-                        mailSender(from,to,cc,bcc,subject,text,html, function(err) {
-                            if(err!==null) {
+                        mailSender(from, to, cc, bcc, subject, text, html, function (err) {
+                            if (err !== null) {
                                 console.log(err);
                                 res.sendStatus(500);
                             } else {
-                                res.sendStatus(200);          
+                                res.sendStatus(200);
                             }
                         })
-                        
-                        
+
+
                     })
-                    
+
                 }
             } else {
                 res.sendStatus(500);
             }
         })
-    
+
     });
-    
+
 
 
 
@@ -150,9 +150,9 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
 
     app.get('/getUserInfo', (req, res) => {
-        let session=sessionHandler.getSession(req);
-        var userId = session?session.userId:undefined;
-        if (userId==undefined) {
+        let session = sessionHandler.getSession(req);
+        var userId = session ? session.userId : undefined;
+        if (userId == undefined) {
             res.sendStatus(401);
             return;
         }
@@ -172,21 +172,21 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
 
     app.post('/updateInfo', (req, res) => {
-        let session=sessionHandler.getSession(req);
-        var userId = session?session.userId:undefined;
-        if (userId==undefined) {
+        let session = sessionHandler.getSession(req);
+        var userId = session ? session.userId : undefined;
+        if (userId == undefined) {
             res.sendStatus(401);
             return;
         }
 
 
-        if(req.body.userid) {
-            if(req.body.userid!==userId) {
-                if(!checkRoles(req,"${ADMIN}")) {
+        if (req.body.userid) {
+            if (req.body.userid !== userId) {
+                if (!checkRoles(req, "${ADMIN}")) {
                     res.sendStatus(401);
-                    return;        
+                    return;
                 } else {
-                    userId=req.body.userid;  
+                    userId = req.body.userid;
                 }
 
             }
@@ -205,23 +205,23 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
 
     app.get("/roles/:id", (req, res) => {
-      if (!checkRoles(req, "${ADMIN}")) {
-        res.sendStatus(401);
-        return;
-      }
-      let roles = dbFunctions.getRoles(req.params.id);
-      res.json(roles);
+        if (!checkRoles(req, "${ADMIN}")) {
+            res.sendStatus(401);
+            return;
+        }
+        let roles = dbFunctions.getRoles(req.params.id);
+        res.json(roles);
     });
-    
+
 
     app.put('/updateRoles/:id', (req, res) => {
-        if(!checkRoles(req,"${ADMIN}")) {
+        if (!checkRoles(req, "${ADMIN}")) {
             res.sendStatus(401);
-            return;        
+            return;
         }
-        let userId=req.params.id;
-        let roles=req.body.roles;
-        db.updateRoles(userId,roles,function (status, error) {
+        let userId = req.params.id;
+        let roles = req.body.roles;
+        db.updateRoles(userId, roles, function (status, error) {
             if (status) {
                 res.sendStatus(200);
             } else {
@@ -236,9 +236,9 @@ function init(app,dbFile,mailfunc,mailTemplate) {
 
 
     app.get('/getUsers', (req, res) => {
-        if(!checkRoles(req,"${ADMIN}")) {
+        if (!checkRoles(req, "${ADMIN}")) {
             res.sendStatus(401);
-            return;        
+            return;
         }
         db.getUsers(function (status, rows) {
             if (status) {
@@ -250,13 +250,13 @@ function init(app,dbFile,mailfunc,mailTemplate) {
             }
         });
 
-    })    
+    })
 
 
     app.get('/getAllRoles', (req, res) => {
-        if(!checkRoles(req,"${ADMIN}")) {
+        if (!checkRoles(req, "${ADMIN}")) {
             res.sendStatus(401);
-            return;        
+            return;
         }
         db.getAllRoles(function (status, rows) {
             if (status) {
@@ -268,27 +268,27 @@ function init(app,dbFile,mailfunc,mailTemplate) {
             }
         });
 
-    }) 
+    })
 
-    app.delete("/user/:id",(req,res) => {
+    app.delete("/user/:id", (req, res) => {
 
-        
-        if(!checkRoles(req,"${ADMIN}")) {
+
+        if (!checkRoles(req, "${ADMIN}")) {
             res.sendStatus(401);
-            return;        
+            return;
         }
 
-        db.deleteUser(req.params.id,function(status,err){
-            if(status) { 
-                res.sendStatus(200);  
-     
+        db.deleteUser(req.params.id, function (status, err) {
+            if (status) {
+                res.sendStatus(200);
+
             } else {
-                console.log("deleteUser",err);
-                res.sendStatus(500);  
-    
+                console.log("deleteUser", err);
+                res.sendStatus(500);
+
             }
-        })      
-    
+        })
+
 
 
     })
@@ -301,46 +301,46 @@ function getSession(req, roles) {
 }
 
 function isLoggedIn(req) {
-    let session=sessionHandler.getSession(req);
-    if(session!==undefined) {
+    let session = sessionHandler.getSession(req);
+    if (session !== undefined) {
         return true;
     }
-    return sessionHandler.getSession(req)!==undefined?true:false;
+    return sessionHandler.getSession(req) !== undefined ? true : false;
 }
 
-function fromBasicAuth(req,res,callback) {
-    if(req.headers?.authorization) {
-        let [user,passwd]=parseBasicAuth(req.headers.authorization);
-        if(user!==null) {
+function fromBasicAuth(req, res, callback) {
+    if (req.headers?.authorization) {
+        let [user, passwd] = parseBasicAuth(req.headers.authorization);
+        if (user !== null) {
             db.authenticateUser(user, passwd, function (status, userId) {
                 if (status) {
                     sessionHandler.addSession(req, res, userId);
-                    callback(true,req,res);
+                    callback(true, req, res);
 
                 } else {
-                    callback(false,req,res);
+                    callback(false, req, res);
                 }
             });
 
         }
     } else {
-        callback(false,req,res);
+        callback(false, req, res);
     }
 }
 
 function parseBasicAuth(authHeader) {
     try {
-        let base64Data=authHeader.match(/Basic (.*)/i)[1];
-        let plain=Buffer.from(base64Data, 'base64').toString('utf8');
-        let m=plain.match(/^([^:]+):(.*)$/);
-        if(m) {
-            let [dummy,user,passwd]=m;
-            return [user,passwd];
+        let base64Data = authHeader.match(/Basic (.*)/i)[1];
+        let plain = Buffer.from(base64Data, 'base64').toString('utf8');
+        let m = plain.match(/^([^:]+):(.*)$/);
+        if (m) {
+            let [dummy, user, passwd] = m;
+            return [user, passwd];
         } else {
-            return [null,null];
+            return [null, null];
         }
-    } catch(err) {
-        return [null,null];
+    } catch (err) {
+        return [null, null];
     }
 }
 
@@ -348,25 +348,25 @@ function parseBasicAuth(authHeader) {
 
 
 
-function checkRoles(req,roleExpr) {
+function checkRoles(req, roleExpr) {
     var session = sessionHandler.getSession(req);
     if (!session) {
         return false;
     }
     let userId = sessionHandler.getSession(req).userId;
 
-    if(!sessionHandler.getSession(req).roles) {
-        sessionHandler.getSession(req).roles=db.getRoles(userId);
+    if (!sessionHandler.getSession(req).roles) {
+        sessionHandler.getSession(req).roles = db.getRoles(userId);
     }
- 
-    let userRoles=sessionHandler.getSession(req).roles;
+
+    let userRoles = sessionHandler.getSession(req).roles;
 
     let expr = roleExpr;
     userRoles && userRoles.forEach(r => {
         expr = expr.replace(new RegExp("\\$\\{ *" + r.roleid + " *\\}"), true);
     })
     expr = expr.replaceAll(new RegExp("\\$\\{[^\\}]*\\}", "g"), false);
-    
+
     return !!(eval(expr == "" || expr));
 
 
@@ -385,9 +385,9 @@ function resumeSessions() {
 module.exports = {
     init: init,
     getSession: getSession,
-    checkRoles:checkRoles,
-    isLoggedIn:isLoggedIn,
-    fromBasicAuth:fromBasicAuth,
-    saveSessions:saveSessions,
-    resumeSessions:resumeSessions
+    checkRoles: checkRoles,
+    isLoggedIn: isLoggedIn,
+    fromBasicAuth: fromBasicAuth,
+    saveSessions: saveSessions,
+    resumeSessions: resumeSessions
 }

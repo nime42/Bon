@@ -1,6 +1,6 @@
 class KitchenChores {
 
-    grocyGoodsReceipt=`
+    grocyGoodsReceipt = `
     <style>
         #chores .container {
             display: flex;
@@ -49,7 +49,7 @@ class KitchenChores {
     </div>
     `
 
-    grocyPurchaise=`
+    grocyPurchaise = `
         <style>
         #chores .container {
             display: flex;
@@ -82,49 +82,49 @@ class KitchenChores {
 
     `;
 
-    production=`
+    production = `
     <div>
         <div id="chores-production-bon" style="max-width: 300px;"/>
     </div>
     `
-constructor(div) {
-    this.myTabs=new TabsClass(div);
-    this.myTabs.addTab("Indkøb",this.grocyPurchaise);
-    this.myTabs.addTab("Varemodtagelse",this.grocyGoodsReceipt);
+    constructor(div) {
+        this.myTabs = new TabsClass(div);
+        this.myTabs.addTab("Indkøb", this.grocyPurchaise);
+        this.myTabs.addTab("Varemodtagelse", this.grocyGoodsReceipt);
 
 
 
-    return;
-    this.myTabs.addTab("Produktion",this.production);
-    let productionBon=new BonStrip("#chores-production-bon",true);
-    const emptyBon=()=> {
-        return {
-            customer: {
-                "forename": "Produktion",
-                "surname": "",
-                "email": "",
-                "phone_nr": ""
-            },
-            delivery_date: new Date(),
-            id: 0,
-            price_category: "Produktion",
-            delivery_address: {
-                "street_name": "",
-                "street_name2": "",
-                "street_nr": "",
-                "zip_code": "",
-                "city": ""
-            },
-            delivery_info:"",
-            kitchen_info: "",
-            nr_of_servings: 0,
-            pax_units:"",
-            payment_type: "Produktion"
+        return;
+        this.myTabs.addTab("Produktion", this.production);
+        let productionBon = new BonStrip("#chores-production-bon", true);
+        const emptyBon = () => {
+            return {
+                customer: {
+                    "forename": "Produktion",
+                    "surname": "",
+                    "email": "",
+                    "phone_nr": ""
+                },
+                delivery_date: new Date(),
+                id: 0,
+                price_category: "Produktion",
+                delivery_address: {
+                    "street_name": "",
+                    "street_name2": "",
+                    "street_nr": "",
+                    "zip_code": "",
+                    "city": ""
+                },
+                delivery_info: "",
+                kitchen_info: "",
+                nr_of_servings: 0,
+                pax_units: "",
+                payment_type: "Produktion"
 
+            };
         };
-    };
-    productionBon.initFromBon(emptyBon());
-   
+        productionBon.initFromBon(emptyBon());
 
-}
+
+    }
 }

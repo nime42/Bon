@@ -1,9 +1,9 @@
 class BonMails {
-    background=Globals.background;
-    foreground=Globals.foreground;
-    shadowColor=Globals.shadowColor;
+    background = Globals.background;
+    foreground = Globals.foreground;
+    shadowColor = Globals.shadowColor;
 
-    style=`
+    style = `
 
     .mail-style table {
         border-collapse: collapse;
@@ -45,7 +45,7 @@ class BonMails {
 
 
 
-    mails=`
+    mails = `
     <div>
     <style>
         ${this.style}
@@ -58,40 +58,40 @@ class BonMails {
     <input type="button" id="refresh-mails" value="Opdater" style="margin: 10px;">
     </div>
     </div>
-    `    
+    `
 
 
 
     constructor(div) {
         this.myRepo = new BonRepository();
 
-        if(typeof div==="string") {
-            div=document.querySelector(div);
+        if (typeof div === "string") {
+            div = document.querySelector(div);
         }
-        this.myDiv=div;
-        this.myDiv.innerHTML=this.mails;
-        this.myMailTable=this.myDiv.querySelector("#mail-table");
+        this.myDiv = div;
+        this.myDiv.innerHTML = this.mails;
+        this.myMailTable = this.myDiv.querySelector("#mail-table");
 
-        this.myPopUp=new ModalPopup();
-        this.myBonStripDiv=document.createElement("div");
-        this.myBonStrip=new BonStrip(this.myBonStripDiv,false);
+        this.myPopUp = new ModalPopup();
+        this.myBonStripDiv = document.createElement("div");
+        this.myBonStrip = new BonStrip(this.myBonStripDiv, false);
         this.myBonStrip.showMails();
 
-        let self=this;
-        this.myBonStrip.setOnMailSeen((bonId)=>{
+        let self = this;
+        this.myBonStrip.setOnMailSeen((bonId) => {
             self.markAsRead(bonId);
         })
 
 
-        let refreshButton=this.myDiv.querySelector("#refresh-mails");
+        let refreshButton = this.myDiv.querySelector("#refresh-mails");
         refreshButton.onclick = function () {
             self.refreshMails(true);
             self.myRepo.checkIncomingMails();
         }
 
 
-        this.myMails={};
-        this.lastRefresh=undefined;
+        this.myMails = {};
+        this.lastRefresh = undefined;
 
 
 
@@ -100,30 +100,30 @@ class BonMails {
 
     markAsRead(bonId) {
 
-        if(Helper.isNumeric(bonId)) {
-            bonId=Globals.bonPrefix+"-"+bonId;
+        if (Helper.isNumeric(bonId)) {
+            bonId = Globals.bonPrefix + "-" + bonId;
         }
 
-        if(this.myMails[bonId]) {
-            this.myMails[bonId].mail.unread=false;
+        if (this.myMails[bonId]) {
+            this.myMails[bonId].mail.unread = false;
         }
-        let envelope=this.myMailTable.querySelector(`#bon-id-${bonId}`);
-        if(envelope) {
-            envelope.style.display="none"
+        let envelope = this.myMailTable.querySelector(`#bon-id-${bonId}`);
+        if (envelope) {
+            envelope.style.display = "none"
         }
     }
 
     refreshMails(withProgressMessage) {
-        let p=undefined;
-        if(withProgressMessage) {
-            p=MessageBox.popup("henter mail...");
+        let p = undefined;
+        if (withProgressMessage) {
+            p = MessageBox.popup("henter mail...");
         }
-        let mailsSince=this.lastRefresh;
-        this.lastRefresh=new Date();
-        this.myRepo.getAllBonWithMails(mailsSince,(mails)=>{
+        let mailsSince = this.lastRefresh;
+        this.lastRefresh = new Date();
+        this.myRepo.getAllBonWithMails(mailsSince, (mails) => {
             p && p.hide();
-            mails.forEach(m=>{
-                this.myMails[m.bon.id]=m;
+            mails.forEach(m => {
+                this.myMails[m.bon.id] = m;
             })
 
             this.createMailTable(Object.values(this.myMails));
@@ -131,10 +131,10 @@ class BonMails {
     }
 
     createMailTable(mails) {
-        let self=this;
-        this.myMailTable.innerHTML="";
-        
-        let headers=`
+        let self = this;
+        this.myMailTable.innerHTML = "";
+
+        let headers = `
         <tr>
         <th>Ulæst</th>
         <th>Dato</th>
@@ -145,14 +145,14 @@ class BonMails {
         <th>Email</th>
         </tr>
         `;
-        let headerRow=document.createElement("thead");
-        headerRow.innerHTML=headers;
+        let headerRow = document.createElement("thead");
+        headerRow.innerHTML = headers;
         this.myMailTable.append(headerRow);
-        let tableRows=document.createElement("tbody");
+        let tableRows = document.createElement("tbody");
 
-        mails.forEach(m=>{
-            let r=`
-                <td><li id="bon-id-${m.bon.id}" class="fa fa-envelope mail unread-mails" style="display:${m.mail.unread?"":"none"}"></li></td>
+        mails.forEach(m => {
+            let r = `
+                <td><li id="bon-id-${m.bon.id}" class="fa fa-envelope mail unread-mails" style="display:${m.mail.unread ? "" : "none"}"></li></td>
                 <td>${new Date(m.mail.date).toLocaleString()}</td>
                 <td><a href="#">${m.bon.id}</a></td>
                 <td>${new Date(m.bon.delivery_date).toLocaleString()}</td>
@@ -160,24 +160,24 @@ class BonMails {
                 <td>${m.bon.customer.company.name}</td>
                 <td>${m.bon.customer.email}</td>
                 `;
-                let row=document.createElement("tr");
-                row.innerHTML=r;
-                row.querySelector("a").onclick=() =>{
-                    self.onSelectBon(m.bon);
-                    return false;
-                }
-                row.querySelector(`#bon-id-${m.bon.id}`).onclick=() =>{
-                    self.onSelectBon(m.bon);
-                    return false;
-                }
-                tableRows.append(row);
+            let row = document.createElement("tr");
+            row.innerHTML = r;
+            row.querySelector("a").onclick = () => {
+                self.onSelectBon(m.bon);
+                return false;
+            }
+            row.querySelector(`#bon-id-${m.bon.id}`).onclick = () => {
+                self.onSelectBon(m.bon);
+                return false;
+            }
+            tableRows.append(row);
         })
 
         this.myMailTable.append(tableRows);
-        TableEnhancer.sortable(this.myMailTable,{
-            0:(td)=>(td.querySelector("li").style.display),
-            1:(td)=>(new Date(td.innerText)),
-            3:(td)=>(new Date(td.innerText)),
+        TableEnhancer.sortable(this.myMailTable, {
+            0: (td) => (td.querySelector("li").style.display),
+            1: (td) => (new Date(td.innerText)),
+            3: (td) => (new Date(td.innerText)),
         });
 
 
@@ -185,13 +185,13 @@ class BonMails {
 
     onSelectBon(bon) {
 
-        if(bon.id.startsWith(Globals.bonPrefix)) {
+        if (bon.id.startsWith(Globals.bonPrefix)) {
 
-            Globals.myCalender.myBonForm.initFromBonId(bon.id.replace(Globals.bonPrefix+"-",""));
+            Globals.myCalender.myBonForm.initFromBonId(bon.id.replace(Globals.bonPrefix + "-", ""));
 
         } else {
-            this.myBonStrip.initFromBon(bon,bon.orders);
-            this.myPopUp.show(this.myBonStripDiv);    
+            this.myBonStrip.initFromBon(bon, bon.orders);
+            this.myPopUp.show(this.myBonStripDiv);
         }
     }
 

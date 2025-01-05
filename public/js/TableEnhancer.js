@@ -37,7 +37,7 @@ class TableEnhancer {
    * @param {Object{colNr:function}} valuefunctions a function(td-element) thats extract the value from a table column
    * @returns
    */
-  static sortable(table,valueFunctions={}) {
+  static sortable(table, valueFunctions = {}) {
     let headers = table.querySelectorAll("th");
 
     let tableBody = table.querySelector("tbody");
@@ -54,7 +54,7 @@ class TableEnhancer {
       h.style.cursor = "pointer";
 
       h.onclick = (event) => {
-        if(!(event.target==h || event.target==arrow)) {
+        if (!(event.target == h || event.target == arrow)) {
           return;
         }
         headers.forEach((th) => {
@@ -116,8 +116,8 @@ class TableEnhancer {
       return a - b;
     }
 
-    if(a) a=a.toLowerCase();
-    if(b) b=b.toLowerCase();
+    if (a) a = a.toLowerCase();
+    if (b) b = b.toLowerCase();
 
     if (a < b) {
       return -1;
@@ -128,9 +128,9 @@ class TableEnhancer {
     }
   }
 
-  static filterable(table,valueFunctions={},excludeCols=[]) {
+  static filterable(table, valueFunctions = {}, excludeCols = []) {
     let header = table.querySelector("thead");
-    let headerRow=header.querySelector("tr");
+    let headerRow = header.querySelector("tr");
 
     let tableBody = table.querySelector("tbody");
     if (!tableBody) {
@@ -138,61 +138,61 @@ class TableEnhancer {
       return;
     }
 
-    let nrOfCols=headerRow.children.length;
-    for(let c=0;c<nrOfCols;c++) {
+    let nrOfCols = headerRow.children.length;
+    for (let c = 0; c < nrOfCols; c++) {
       headerRow.children[c].appendChild(document.createElement("br"));
 
-      let filterInput=document.createElement("input");
+      let filterInput = document.createElement("input");
       filterInput.classList.add("filter");
       filterInput.type = "text";
       filterInput.value = "";
-      filterInput.placeholder="filter..."
-      filterInput.style.maxWidth="10ch"; 
-      filterInput.style.height="20px";
-      filterInput.onkeyup=()=>{
+      filterInput.placeholder = "filter..."
+      filterInput.style.maxWidth = "10ch";
+      filterInput.style.height = "20px";
+      filterInput.onkeyup = () => {
         let rows = Array.from(tableBody.querySelectorAll("tr"));
-        let filters=headerRow.querySelectorAll(".filter");
-        rows.forEach(r=>{
-          let cols=r.children;
-          r.style.display="";
-          for(let f=0;f<r.children.length;f++) {
-            let filter=filters[f].value;
-            let value=valueFunctions[f]?valueFunctions[f](cols[f]):cols[f].textContent.toLowerCase();
-            if(!this._filterMatch(value,filter)) {
-              r.style.display="none";
+        let filters = headerRow.querySelectorAll(".filter");
+        rows.forEach(r => {
+          let cols = r.children;
+          r.style.display = "";
+          for (let f = 0; f < r.children.length; f++) {
+            let filter = filters[f].value;
+            let value = valueFunctions[f] ? valueFunctions[f](cols[f]) : cols[f].textContent.toLowerCase();
+            if (!this._filterMatch(value, filter)) {
+              r.style.display = "none";
             }
           }
         })
       }
       headerRow.children[c].appendChild(filterInput);
-      if(excludeCols.find((e)=>(e==c))) {
-        filterInput.style.display="none";
+      if (excludeCols.find((e) => (e == c))) {
+        filterInput.style.display = "none";
       }
     }
 
   }
 
-  static _filterMatch(value,filter) {
-    if(filter.startsWith("<=")) {
-      filter=filter.replace("<=","");
+  static _filterMatch(value, filter) {
+    if (filter.startsWith("<=")) {
+      filter = filter.replace("<=", "");
       return value <= filter;
     }
-    if(filter.startsWith("<")) {
-      filter=filter.replace("<","");
+    if (filter.startsWith("<")) {
+      filter = filter.replace("<", "");
       return value < filter;
     }
 
-    if(filter.startsWith(">=")) {
-      filter=filter.replace(">=","");
+    if (filter.startsWith(">=")) {
+      filter = filter.replace(">=", "");
       return value >= filter;
     }
-    if(filter.startsWith(">")) {
-      filter=filter.replace(">","");
+    if (filter.startsWith(">")) {
+      filter = filter.replace(">", "");
       return value > filter;
     }
 
-    if(filter.startsWith("!")) {
-      filter=filter.replace("!","");
+    if (filter.startsWith("!")) {
+      filter = filter.replace("!", "");
       return !value.startsWith(filter);
     }
 

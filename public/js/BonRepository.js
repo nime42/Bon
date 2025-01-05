@@ -1,20 +1,20 @@
 class BonRepository {
-    getBons(year,month,callback) {
-        let url="api/bons";
-        if(year!==undefined && month!==undefined) {
-            url+="?year="+year+"&month="+(month+"").padStart(2,"0");
+    getBons(year, month, callback) {
+        let url = "api/bons";
+        if (year !== undefined && month !== undefined) {
+            url += "?year=" + year + "&month=" + (month + "").padStart(2, "0");
         }
-        $.get(url,callback);
+        $.get(url, callback);
     }
-    saveBon(bon,callback) {
+    saveBon(bon, callback) {
         let url;
         let type;
-        if(bon.id!="") {
-            url="api/bons/"+bon.id;
-            type="PUT";
+        if (bon.id != "") {
+            url = "api/bons/" + bon.id;
+            type = "PUT";
         } else {
-            url="api/bons";
-            type="POST";
+            url = "api/bons";
+            type = "POST";
         }
 
         $.ajax({
@@ -24,108 +24,108 @@ class BonRepository {
             success: callback,
             dataType: "json",
             contentType: "application/json"
-          });
+        });
     }
-    deleteBon(id,callback) {
-        let url="api/bons/"+id;
+    deleteBon(id, callback) {
+        let url = "api/bons/" + id;
         $.ajax({
             type: "DELETE",
             url: url,
             success: callback,
-          });
+        });
     }
 
-    getBonSummary(id,callback) {
-        let url="api/bonSummary";
-        if(id) {
-            url+="/"+id;
+    getBonSummary(id, callback) {
+        let url = "api/bonSummary";
+        if (id) {
+            url += "/" + id;
         }
 
         $.ajax({
             type: "GET",
             url: url,
-            success: function(data,status,xhr) {callback(data);},
+            success: function (data, status, xhr) { callback(data); },
             contentType: "application/json",
             cache: false
-          });
+        });
     }
 
-    getCustomers(email,callback) {
-        let url="api/customers?email="+email;
-        $.get(url,callback);
+    getCustomers(email, callback) {
+        let url = "api/customers?email=" + email;
+        $.get(url, callback);
     }
 
 
     getItems(callback) {
-        let url="api/items/";
-        $.get(url,callback);
+        let url = "api/items/";
+        $.get(url, callback);
     }
 
     getItemsPrices(callback) {
-        let url="api/items_prices/";
-        $.get(url,callback);
+        let url = "api/items_prices/";
+        $.get(url, callback);
     }
 
-    getOrders(bonId,callback) {
-        let url="api/orders/"+bonId;
-        $.get(url,callback);
-    } 
+    getOrders(bonId, callback) {
+        let url = "api/orders/" + bonId;
+        $.get(url, callback);
+    }
 
     getItemsAndPrices(callback) {
-        this.getItems(items=>{
-            this.getItemsPrices(prices=>{
+        this.getItems(items => {
+            this.getItemsPrices(prices => {
                 callback(items);
             })
         })
     }
 
     getIZettleProducts(callback) {
-        let url="api/iZettleProducts";
-        $.get(url,callback);
+        let url = "api/iZettleProducts";
+        $.get(url, callback);
     }
 
 
-    updateIZettleProduct(id,grocy_id,quantity,connectable) {
-        let url="api/izettleProduct/"+id;
+    updateIZettleProduct(id, grocy_id, quantity, connectable) {
+        let url = "api/izettleProduct/" + id;
         $.ajax({
             type: "PUT",
             url: url,
-            data: JSON.stringify({grocy_id:grocy_id,quantity:quantity,connectable:connectable}),
+            data: JSON.stringify({ grocy_id: grocy_id, quantity: quantity, connectable: connectable }),
             dataType: "json",
             contentType: "application/json"
-          });
+        });
     }
 
 
 
 
     updateDB(callback) {
-        let url="api/updateDB/";
-        $.get(url,callback);
+        let url = "api/updateDB/";
+        $.get(url, callback);
     }
 
-    searchBons(searchParams,callback) {
-        let url="api/searchBons/";
+    searchBons(searchParams, callback) {
+        let url = "api/searchBons/";
 
-        url+="?"+Object.keys(searchParams).map(k=>(k+"="+searchParams[k])).join("&");
-        $.get(url,callback);   
+        url += "?" + Object.keys(searchParams).map(k => (k + "=" + searchParams[k])).join("&");
+        $.get(url, callback);
     }
 
-    updateBonStatus(id,status,callback) {
-        let url="api/bonStatus/"+id;
+    updateBonStatus(id, status, callback) {
+        let url = "api/bonStatus/" + id;
         $.ajax({
             type: "PUT",
             url: url,
-            data: JSON.stringify({status:status}),
+            data: JSON.stringify({ status: status }),
             success: callback,
             dataType: "json",
             contentType: "application/json"
-          });
+        });
     }
 
 
-    updateOrders(id,orders,callback) {
-        let url="api/orders/"+id;
+    updateOrders(id, orders, callback) {
+        let url = "api/orders/" + id;
         $.ajax({
             type: "PUT",
             url: url,
@@ -133,123 +133,123 @@ class BonRepository {
             success: callback,
             dataType: "json",
             contentType: "application/json"
-          });
+        });
     }
 
-    consumeBon(id,callback) {
-        let url="api/consumeBon/"+id;
+    consumeBon(id, callback) {
+        let url = "api/consumeBon/" + id;
         $.ajax({
             type: "PUT",
             url: url,
             success: callback,
             dataType: "json",
             contentType: "application/json"
-          });
+        });
     }
 
-    sendBonMail(id,to,message,callback) {
-        let url="api/sendBonMail/";
-        let body={
-            message:message,
-            bonId:id,
-            email:to
+    sendBonMail(id, to, message, callback) {
+        let url = "api/sendBonMail/";
+        let body = {
+            message: message,
+            bonId: id,
+            email: to
         }
         $.ajax({
             type: "POST",
             url: url,
             data: JSON.stringify(body),
-            success: function(data,status,xhr) {callback(true,data);},
-            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            success: function (data, status, xhr) { callback(true, data); },
+            error: function (data, status, xhr) { callback(false, data, status, xhr) },
             contentType: "application/json"
-          });
+        });
     }
 
-    getBonMails(bonId,callback) {
-        let url="api/bonMails/"+bonId;
-        $.get(url,callback);
-    } 
+    getBonMails(bonId, callback) {
+        let url = "api/bonMails/" + bonId;
+        $.get(url, callback);
+    }
 
     getUnseenBonIdMails(callback) {
-        let url="api/unseenBonIdMails/";
-        $.get(url,callback);
-    } 
+        let url = "api/unseenBonIdMails/";
+        $.get(url, callback);
+    }
 
 
     getAllUnseenBonIdMails(callback) {
-        let url="api/allUnseenBonIdMails/";
-        $.get(url,callback);
-    } 
+        let url = "api/allUnseenBonIdMails/";
+        $.get(url, callback);
+    }
 
     checkIncomingMails() {
-        let url="api/checkIncomingMails";
+        let url = "api/checkIncomingMails";
         $.get(url);
     }
 
-    getAllBonWithMails(mailsSince,callback) {
-        let url="api/allBonWithMails?mailsSince="+(mailsSince!==undefined?mailsSince:"");
-        $.get(url,callback);
-    }     
+    getAllBonWithMails(mailsSince, callback) {
+        let url = "api/allBonWithMails?mailsSince=" + (mailsSince !== undefined ? mailsSince : "");
+        $.get(url, callback);
+    }
 
 
-    getBonsForWeek(monday,callback) {
-        let url="api/getBonsForWeek?monday="+monday.toISOString();
-        $.get(url,callback);
+    getBonsForWeek(monday, callback) {
+        let url = "api/getBonsForWeek?monday=" + monday.toISOString();
+        $.get(url, callback);
     }
 
 
 
-    moveBon(id,prefix,force,callback) {
-        let url="api/moveBon/";
-        let body={
-            bonId:id,
-            prefix:prefix,
-            force:force
+    moveBon(id, prefix, force, callback) {
+        let url = "api/moveBon/";
+        let body = {
+            bonId: id,
+            prefix: prefix,
+            force: force
         }
         $.ajax({
             type: "POST",
             url: url,
             data: JSON.stringify(body),
-            success: function(data,status,xhr) {callback(true,data);},
-            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            success: function (data, status, xhr) { callback(true, data); },
+            error: function (data, status, xhr) { callback(false, data, status, xhr) },
             contentType: "application/json"
-          });
+        });
     }
 
 
     checkBonStock(callback) {
-        let url="api/checkStock";
+        let url = "api/checkStock";
 
         $.ajax({
             type: "GET",
             url: url,
-            success: function(data,status,xhr) {callback(true,data);},
-            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            success: function (data, status, xhr) { callback(true, data); },
+            error: function (data, status, xhr) { callback(false, data, status, xhr) },
             contentType: "application/json"
-          });
+        });
 
     }
 
     getMessages(callback) {
-        let url="api/messages/";
-        $.get(url,callback);
+        let url = "api/messages/";
+        $.get(url, callback);
     }
 
 
-    addMessage(messageName,callback) {
-        let url="api/messages/";
+    addMessage(messageName, callback) {
+        let url = "api/messages/";
         $.ajax({
             type: "POST",
             url: url,
-            data: JSON.stringify({name:messageName}),
-            success: function(data,status,xhr) {callback(true,data);},
-            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            data: JSON.stringify({ name: messageName }),
+            success: function (data, status, xhr) { callback(true, data); },
+            error: function (data, status, xhr) { callback(false, data, status, xhr) },
             dataType: "json",
             contentType: "application/json"
-          });
+        });
     }
 
-    updateMessage(id,message,callback) {
-        let url="api/messages/"+id;
+    updateMessage(id, message, callback) {
+        let url = "api/messages/" + id;
         $.ajax({
             type: "PUT",
             url: url,
@@ -257,11 +257,11 @@ class BonRepository {
             complete: callback,
             dataType: "json",
             contentType: "application/json"
-          });
+        });
     }
 
-    delMessage(id,message,callback) {
-        let url="api/messages/"+id;
+    delMessage(id, message, callback) {
+        let url = "api/messages/" + id;
         $.ajax({
             type: "DELETE",
             url: url,
@@ -269,57 +269,57 @@ class BonRepository {
             complete: callback,
             dataType: "json",
             contentType: "application/json"
-          });
+        });
     }
 
 
     getNotifiedBon(callback) {
-        let url="api/getNotifiedBon";
+        let url = "api/getNotifiedBon";
         $.ajax({
             type: "GET",
             url: url,
-            success: function(data,status,xhr) {callback(true,data);},
-            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            success: function (data, status, xhr) { callback(true, data); },
+            error: function (data, status, xhr) { callback(false, data, status, xhr) },
             contentType: "application/json",
             cache: false
-          });
+        });
     }
 
 
-    notifyBon(bonId,message,callback) {
-        let url="api/notifyBon/"+bonId;
+    notifyBon(bonId, message, callback) {
+        let url = "api/notifyBon/" + bonId;
         $.ajax({
             type: "PUT",
             url: url,
-            data: JSON.stringify({message:message}),
+            data: JSON.stringify({ message: message }),
             complete: callback,
             dataType: "json",
             contentType: "application/json"
 
-          });
+        });
     }
 
-    seeBon(bonId,callback) {
-        let url="api/seeBon/"+bonId;
+    seeBon(bonId, callback) {
+        let url = "api/seeBon/" + bonId;
         $.ajax({
             type: "PUT",
             url: url,
             complete: callback
-          });
+        });
     }
 
-    getGrocyProductsForOrders(bonId,orders,callback) {
-        let url="api/getGrocyProductsForOrders/";
+    getGrocyProductsForOrders(bonId, orders, callback) {
+        let url = "api/getGrocyProductsForOrders/";
 
         $.ajax({
             type: "POST",
             url: url,
-            data: JSON.stringify({bonId,...orders}),
-            success: function(data,status,xhr) {callback(true,data);},
-            error:function(data,status,xhr) {callback(false,data,status,xhr)},            
+            data: JSON.stringify({ bonId, ...orders }),
+            success: function (data, status, xhr) { callback(true, data); },
+            error: function (data, status, xhr) { callback(false, data, status, xhr) },
             dataType: "json",
             contentType: "application/json"
-          });
+        });
 
 
 
@@ -327,29 +327,29 @@ class BonRepository {
 
 
     getShoppingLists(callback) {
-        let url="api/getShoppingLists";
+        let url = "api/getShoppingLists";
         $.ajax({
             type: "GET",
             url: url,
-            success: function(data,status,xhr) {callback(true,data);},
-            error:function(data,status,xhr) {callback(false,data,status,xhr)},
+            success: function (data, status, xhr) { callback(true, data); },
+            error: function (data, status, xhr) { callback(false, data, status, xhr) },
             contentType: "application/json",
             cache: false
-          });
+        });
     }
 
 
-    addToShoppingList(products,shoppingListId,resetShoppingList,callback) {
-        let url="api/addToShoppingList/";
+    addToShoppingList(products, shoppingListId, resetShoppingList, callback) {
+        let url = "api/addToShoppingList/";
 
         $.ajax({
             type: "POST",
             url: url,
-            data: JSON.stringify({products,shoppingListId,resetShoppingList}),
-            success: function(data,status,xhr) {callback(true,data);},
-            error:function(data,status,xhr) {callback(false,data,status,xhr)},            
+            data: JSON.stringify({ products, shoppingListId, resetShoppingList }),
+            success: function (data, status, xhr) { callback(true, data); },
+            error: function (data, status, xhr) { callback(false, data, status, xhr) },
             contentType: "application/json"
-          });
+        });
 
 
 

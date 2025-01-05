@@ -1,6 +1,6 @@
 class ModalPopup {
 
-    style=`
+    style = `
     .modal-popup-content {
         /*width: 80%;*/
         /*border-radius: 25px;
@@ -22,37 +22,37 @@ class ModalPopup {
     
     `
     initDiv() {
-        this.div=document.createElement("div");
+        this.div = document.createElement("div");
         this.div.classList.add("modal-popup-background");
-        this.div.style.cssText="overflow: auto;";
-        let content=`
+        this.div.style.cssText = "overflow: auto;";
+        let content = `
         <style>${this.style}</style>
         <div class="modal-popup-content" style="overflow=auto;height:95%">
         <button class="modal-popup-close">&times;</button>
         </div>
         `;
-        this.div.innerHTML=content;
+        this.div.innerHTML = content;
 
         document.querySelector("body").appendChild(this.div);
     }
     show(content) {
         this.initDiv();
-        let contentDiv=this.div.querySelector(".modal-popup-content");
+        let contentDiv = this.div.querySelector(".modal-popup-content");
         /*contentDiv.innerHTML=`<span  class="modal-popup-close" style="width: min-content;align-self: end; position: -webkit-sticky;
         position: sticky;
         top: 10px;">&times;</span>`;*/
-        contentDiv.querySelector(".modal-popup-close").onclick=()=>{
+        contentDiv.querySelector(".modal-popup-close").onclick = () => {
             this.hide();
         }
 
-        if(typeof content==="string") {
-            let div=document.createElement("div");
-            div.innerHTML=content;
-            content=div;
+        if (typeof content === "string") {
+            let div = document.createElement("div");
+            div.innerHTML = content;
+            content = div;
         }
-        content.style.overflow="auto";
+        content.style.overflow = "auto";
         contentDiv.appendChild(content);
-        this.div.style.display="flex";
+        this.div.style.display = "flex";
     }
     hide() {
         document.querySelector("body").removeChild(this.div);

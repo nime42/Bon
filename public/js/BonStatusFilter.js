@@ -1,6 +1,6 @@
 class BonStatusFilter {
 
-    buttons=`
+    buttons = `
     <style>
         .status-buttons {
             display: flex;
@@ -42,39 +42,39 @@ class BonStatusFilter {
 
 
     constructor(div) {
-        if(typeof div==="string") {
+        if (typeof div === "string") {
             this.myDiv = document.querySelector(div);
         } else {
-            this.myDiv=div;
+            this.myDiv = div;
         }
-        this.myDiv.innerHTML=this.buttons;
+        this.myDiv.innerHTML = this.buttons;
 
-        let self=this;
-        this.myDiv.querySelectorAll(".status-filter").forEach(e=>{
-            e.onclick=()=> {
+        let self = this;
+        this.myDiv.querySelectorAll(".status-filter").forEach(e => {
+            e.onclick = () => {
                 let show;
-                if(e.classList.contains("filtered")) {
+                if (e.classList.contains("filtered")) {
                     e.classList.remove("filtered");
-                    show=true;
+                    show = true;
                 } else {
                     e.classList.add("filtered");
-                    show=false;
+                    show = false;
                 }
-                self.onStatusChange && self.onStatusChange(e.id,self.getStatuses());
+                self.onStatusChange && self.onStatusChange(e.id, self.getStatuses());
 
             }
         })
     }
 
     setOnStatusChange(fun) {
-        this.onStatusChange=fun;
+        this.onStatusChange = fun;
 
     }
 
-    setStatus(statusName,active) {
+    setStatus(statusName, active) {
 
-        let b=this.myDiv.querySelector("#"+statusName);
-        if(active) {
+        let b = this.myDiv.querySelector("#" + statusName);
+        if (active) {
             b.classList.remove("filtered");
         } else {
             b.classList.add("filtered");
@@ -83,20 +83,20 @@ class BonStatusFilter {
     }
 
     getStatuses() {
-        let res={};
-        this.myDiv.querySelectorAll(".status-filter").forEach(e=>{
-            let id=e.id;
-            let active=true;
-            if(e.classList.contains("filtered")) {
-                active=false;
+        let res = {};
+        this.myDiv.querySelectorAll(".status-filter").forEach(e => {
+            let id = e.id;
+            let active = true;
+            if (e.classList.contains("filtered")) {
+                active = false;
             }
-            res[id]=active;
+            res[id] = active;
         })
-        return res; 
+        return res;
     }
 
     getActiveStatuses() {
-        let statuses=this.getStatuses();
-        return Object.keys(statuses).filter(e=>(statuses[e]));
+        let statuses = this.getStatuses();
+        return Object.keys(statuses).filter(e => (statuses[e]));
     }
- }
+}

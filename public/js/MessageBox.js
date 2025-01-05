@@ -1,8 +1,8 @@
 class MessageBox {
-    static background=Globals.background;
-    static foreground=Globals.foreground;
-    static shadowColor=Globals.shadowColor;
-    static myContent=`
+    static background = Globals.background;
+    static foreground = Globals.foreground;
+    static shadowColor = Globals.shadowColor;
+    static myContent = `
     <style type="text/css">
 
     div.mb-style {
@@ -44,28 +44,28 @@ class MessageBox {
             </span>
         </div>
         `;
-    
-    static popup(message, buttons,input) {
-        let popup=new ModalPopup();
-        let div=document.createElement("div");
-        div.innerHTML=MessageBox.myContent;
-        div.querySelector("#message").innerHTML=message;
 
-        if(input) {
-            let inputArea=div.querySelector("#input-area");
-            inputArea.style.display="";
-            inputArea.placeholder=input.label;
+    static popup(message, buttons, input) {
+        let popup = new ModalPopup();
+        let div = document.createElement("div");
+        div.innerHTML = MessageBox.myContent;
+        div.querySelector("#message").innerHTML = message;
+
+        if (input) {
+            let inputArea = div.querySelector("#input-area");
+            inputArea.style.display = "";
+            inputArea.placeholder = input.label;
 
         }
 
-        div.querySelectorAll("button").forEach(e=>{e.style.display="none"});
-        buttons && ["b1","b2","b3"].forEach((b) => {
-            if(buttons[b]) {
-                let button=div.querySelector("#"+b);
-                button.innerHTML=buttons[b].text;
-                button.style.display="";
-                button.onclick=function() {
-                    let inputText=div.querySelector("#input-area").value;
+        div.querySelectorAll("button").forEach(e => { e.style.display = "none" });
+        buttons && ["b1", "b2", "b3"].forEach((b) => {
+            if (buttons[b]) {
+                let button = div.querySelector("#" + b);
+                button.innerHTML = buttons[b].text;
+                button.style.display = "";
+                button.onclick = function () {
+                    let inputText = div.querySelector("#input-area").value;
                     buttons[b].onclick && buttons[b].onclick(inputText);
                     popup.hide();
                 }
@@ -79,5 +79,5 @@ class MessageBox {
         return popup;
 
     }
-    
+
 }

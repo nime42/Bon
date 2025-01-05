@@ -129,17 +129,15 @@
                 onclick="gotoMenu(this);Globals.myMails.refreshMails(true);toggleMenu();"><i class="fa fa-envelope"></i>
                 Mails</a>
             <a href="#week" data-check-access="${ADMIN}"
-                onclick="gotoMenu(this);Globals.myWeekWiew.refresh();toggleMenu();"><i
-                    class="fa fa-home"></i> Ugeoversigt</a>
+                onclick="gotoMenu(this);Globals.myWeekWiew.refresh();toggleMenu();"><i class="fa fa-home"></i>
+                Ugeoversigt</a>
             <a href="#kitchen-today" data-check-access=""
                 onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i
                     class="fa fa-cutlery"></i> Køkken idag</a>
-            <a href="#kitchen" data-check-access=""
-                onclick="gotoMenu(this);toggleMenu();"><i
+            <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);toggleMenu();"><i
                     class="fa fa-cart-plus"></i> Indkøb/Varemodtagelse</a>
-            <a href="#production" data-check-access=""
-                onclick="gotoMenu(this);toggleMenu();"><i
-                    class="fa fa-book"></i> Produktion/Opskrifter</a>
+            <a href="#production" data-check-access="" onclick="gotoMenu(this);toggleMenu();"><i class="fa fa-book"></i>
+                Produktion/Opskrifter</a>
             <a href="#future" data-check-access="${ADMIN} || ${USER}"
                 onclick="gotoMenu(this);Globals.myFutureBonWall.getFutureBons();toggleMenu();"><i
                     class="fa fa-sun-o"></i>køkken senere</a>
@@ -150,8 +148,9 @@
                     class="fa fa-money"></i> Fakturer</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i
                     class="fa fa-wrench"></i> Admin</a>
-            <a href="#planning" data-check-access="${ADMIN} || ${USER}" onclick="gotoMenu(this);Globals.myPlanBon.getOtherBons();toggleMenu();"><i
-                    class="fa fa-tasks"></i> Planlægning</a>
+            <a href="#planning" data-check-access="${ADMIN} || ${USER}"
+                onclick="gotoMenu(this);Globals.myPlanBon.getOtherBons();toggleMenu();"><i class="fa fa-tasks"></i>
+                Planlægning</a>
             <a href="#log-in" class="active-menu" onclick="gotoMenu(this);toggleMenu()"><i
                     class="fa fa-key">Login</i></a>
             <span id="version" style="
@@ -369,9 +368,9 @@
 
             Globals.myConfig = new BonConfig("#admin");
 
-            Globals.myKitchenChores=new KitchenChores("#kitchen");
+            Globals.myKitchenChores = new KitchenChores("#kitchen");
 
-            Globals.myProductionChores=new ProductionChores("#production");
+            Globals.myProductionChores = new ProductionChores("#production");
 
             Globals.myCalender = new BonCalendar("#calendar-div");
 
@@ -383,8 +382,8 @@
 
             Globals.myFutureBonWall = new BonWall("#future", ["new", "needInfo", "approved", "preparing"]);
 
-            
-            Globals.myPlanBon=new PlanBon("#planning");
+
+            Globals.myPlanBon = new PlanBon("#planning");
 
             Globals.myWeekWiew = new WeekView("#week");
             Globals.myWeekWiew.setOnChange(Globals.myWeekWiew.fetchBons);
@@ -400,7 +399,7 @@
                     syncMenu();
                 } else {
 
-                    if (Globals.myLoginHandler.hasRole(userInfo,"ADMIN")) {
+                    if (Globals.myLoginHandler.hasRole(userInfo, "ADMIN")) {
                         document.querySelector('a[href="#calendar"]').onclick();
                         toggleMenu();
                     } else {
@@ -409,16 +408,16 @@
                     }
                 }
 
-                if (Globals.myLoginHandler.hasRole(userInfo,"ADMIN")) {
+                if (Globals.myLoginHandler.hasRole(userInfo, "ADMIN")) {
                     Globals.myPlanBon.planBonStrip.showCostPrices(true);
                 }
 
-                if (!Globals.myLoginHandler.hasRole(userInfo,"ADMIN")) {
+                if (!Globals.myLoginHandler.hasRole(userInfo, "ADMIN")) {
                     Globals.myWeekWiew.myBonStrip.isMoveable(false);
                 }
             });
 
-            
+
 
             document.querySelector("#login").style.display = "none";
             document.querySelector("#logout").style.display = "";

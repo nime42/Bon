@@ -1,106 +1,106 @@
 const fetch = require('node-fetch');
 
 module.exports = class VismaFunctions {
-    constructor(config,db) {
-        this.config=config;
-        this.db=db;
+    constructor(config, db) {
+        this.config = config;
+        this.db = db;
     }
 
-    getCustomer(email,companyName,callback=console.log) {
-        if(!this.config) {
-            let msg="vismaConfig is missing";
+    getCustomer(email, companyName, callback = console.log) {
+        if (!this.config) {
+            let msg = "vismaConfig is missing";
             console.log(msg);
-            callback(false,msg);
+            callback(false, msg);
             return;
         }
 
         let headers = {
-            "Content-Type":"application/json",
-            "X-AppSecretToken":this.config.appSecretToken,
-            "X-AgreementGrantToken":this.config.agreementGrantToken 
+            "Content-Type": "application/json",
+            "X-AppSecretToken": this.config.appSecretToken,
+            "X-AgreementGrantToken": this.config.agreementGrantToken
         }
-        
 
-        let filter=`email$eq:${email}$or:name$eq:${companyName}`
-        let httpReq = this.config.vismaUrl + "/customers?filter="+filter;
+
+        let filter = `email$eq:${email}$or:name$eq:${companyName}`
+        let httpReq = this.config.vismaUrl + "/customers?filter=" + filter;
 
         fetch(httpReq, { headers })
-        .then(res => res.json())
-        .then(
-            json => {
-                if(json.collection[0]) {
-                    callback(true, json.collection[0]);
-                } else {
-                    callback(false, json.collection[0]);
-                }
-            },
-            err => callback(false, err)
-        );
+            .then(res => res.json())
+            .then(
+                json => {
+                    if (json.collection[0]) {
+                        callback(true, json.collection[0]);
+                    } else {
+                        callback(false, json.collection[0]);
+                    }
+                },
+                err => callback(false, err)
+            );
 
 
     }
 
 
 
-    createInvoiceDraft(bonId, callback=console.log) {
+    createInvoiceDraft(bonId, callback = console.log) {
 
-        if(!this.config) {
-            let msg="vismaConfig is missing";
+        if (!this.config) {
+            let msg = "vismaConfig is missing";
             console.log(msg);
-            callback(false,msg);
+            callback(false, msg);
             return;
         }
-        
-        let [bon]=this.db.getBonSummary(bonId);
-        let orders=this.db.getOrders(bonId);
+
+        let [bon] = this.db.getBonSummary(bonId);
+        let orders = this.db.getOrders(bonId);
         console.log(bon);
-        this.getCustomer(bon.email,bon.company,(status,customerInfo)=>{
-            let customerNr=this.config.unknownCustomerId;
-            let currency=this.config.currency;
-            let paymentTermsNr=this.config.paymentTermsNumber;
-            let layoutNumber=this.config.layoutNumber;
-            let vatZoneNumber=this.config.vatZoneNumber;
-            let recipient={
-                name:"UKENT: "+ bon.company,
-                ean:bon.ean_nr,
-                vatZone:{
-                    vatZoneNumber:vatZoneNumber
+        this.getCustomer(bon.email, bon.company, (status, customerInfo) => {
+            let customerNr = this.config.unknownCustomerId;
+            let currency = this.config.currency;
+            let paymentTermsNr = this.config.paymentTermsNumber;
+            let layoutNumber = this.config.layoutNumber;
+            let vatZoneNumber = this.config.vatZoneNumber;
+            let recipient = {
+                name: "UKENT: " + bon.company,
+                ean: bon.ean_nr,
+                vatZone: {
+                    vatZoneNumber: vatZoneNumber
                 }
             }
 
-            if(status) {
-                customerNr=customerInfo.customerNumber;
-                if(customerInfo.currency) {
-                    currency=customerInfo.currency;
+            if (status) {
+                customerNr = customerInfo.customerNumber;
+                if (customerInfo.currency) {
+                    currency = customerInfo.currency;
                 }
-                if(customerInfo.paymentTerms?.paymentTermsNumber) {
-                    paymentTermsNr=customerInfo.paymentTerms.paymentTermsNumber;
-                } 
-                recipient.name=customerInfo.name;
-                recipient.address=customerInfo.address;
-                recipient.zip=customerInfo.zip;
-                recipient.city=customerInfo.city;
-                recipient.ean=customerInfo.ean;
-                recipient.vatZone.vatZoneNumber=customerInfo.vatZone?.vatZoneNumber;              
+                if (customerInfo.paymentTerms?.paymentTermsNumber) {
+                    paymentTermsNr = customerInfo.paymentTerms.paymentTermsNumber;
+                }
+                recipient.name = customerInfo.name;
+                recipient.address = customerInfo.address;
+                recipient.zip = customerInfo.zip;
+                recipient.city = customerInfo.city;
+                recipient.ean = customerInfo.ean;
+                recipient.vatZone.vatZoneNumber = customerInfo.vatZone?.vatZoneNumber;
             }
 
-            let payload={};
-            payload.currency=currency;
-            payload.customer={customerNumber:customerNr};
-            payload.date=new Date().toISOString().split('T')[0];
-            payload.layout={layoutNumber:layoutNumber};
-            payload.paymentTerms={paymentTermsNumber:paymentTermsNr};
-            payload.delivery={
-                name:bon.name,
-                address:`${bon.street_name2?(bon.street_name2+" "):""}${bon.street_name} ${bon.street_nr}`,
-                zip:bon.zip_code+"",
-                city:bon.city,
-                deliveryDate:(bon.delivery_date?new Date(bon.delivery_date):new Date()).toISOString().split('T')[0]
+            let payload = {};
+            payload.currency = currency;
+            payload.customer = { customerNumber: customerNr };
+            payload.date = new Date().toISOString().split('T')[0];
+            payload.layout = { layoutNumber: layoutNumber };
+            payload.paymentTerms = { paymentTermsNumber: paymentTermsNr };
+            payload.delivery = {
+                name: bon.name,
+                address: `${bon.street_name2 ? (bon.street_name2 + " ") : ""}${bon.street_name} ${bon.street_nr}`,
+                zip: bon.zip_code + "",
+                city: bon.city,
+                deliveryDate: (bon.delivery_date ? new Date(bon.delivery_date) : new Date()).toISOString().split('T')[0]
             }
-            payload.recipient=recipient;
+            payload.recipient = recipient;
             console.log(payload);
-            callback(status,customerInfo);
+            callback(status, customerInfo);
         });
 
-   }
+    }
 }

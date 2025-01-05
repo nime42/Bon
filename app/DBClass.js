@@ -465,7 +465,7 @@ module.exports = class DB {
 
   addGeoInfo(bonId) {
 
-    let sql=`
+    let sql = `
     select b.id,b.delivery_address_id,g.adress_id as current_address_id,a.lat,a.lon from bons b
     left join geo_information g on b.id =g.bon_id 
     left join addresses a on a.id =b.delivery_address_id 
@@ -473,13 +473,13 @@ module.exports = class DB {
     `;
     let r = this.db.prepare(sql).get(bonId) ?? [];
 
-    if(r.delivery_address_id!=r.current_address_id) {
-      sql="delete from geo_information where bon_id=?";
+    if (r.delivery_address_id != r.current_address_id) {
+      sql = "delete from geo_information where bon_id=?";
       this.db.prepare(sql).run(bonId);
-      if(r.lat!=null && r.lon!=null) {
+      if (r.lat != null && r.lon != null) {
         this.addressLookupFunctions.getRouteFromHome(r.lat, r.lon, (data) => {
-          sql="INSERT INTO geo_information(bon_id, adress_id, distance, duration, route_feature) VALUES(?,?,?,?,?)"; 
-          this.db.prepare(sql).run(bonId,r.delivery_address_id,data.distance,data.duration,JSON.stringify(data.feature));
+          sql = "INSERT INTO geo_information(bon_id, adress_id, distance, duration, route_feature) VALUES(?,?,?,?,?)";
+          this.db.prepare(sql).run(bonId, r.delivery_address_id, data.distance, data.duration, JSON.stringify(data.feature));
         })
       }
     }

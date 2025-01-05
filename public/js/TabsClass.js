@@ -1,7 +1,7 @@
 class TabsClass {
-    background=Globals.background;
-    foreground=Globals.foreground;
-    div = `
+  background = Globals.background;
+  foreground = Globals.foreground;
+  div = `
     <style>
     .hori-tab .tab {
         overflow: hidden;
@@ -59,53 +59,53 @@ class TabsClass {
     <div class="content-container"></div>
     `;
 
-    currentIndex = -1;
-    tabs=0;
+  currentIndex = -1;
+  tabs = 0;
 
-    constructor(div) {
-        if(typeof div==="string") {
-            this.myDiv = document.querySelector(div);
-        } else {
-            this.myDiv=div;
-        }
-        this.myDiv.innerHTML = this.div;
-        this.myDiv.classList.add("hori-tab");
+  constructor(div) {
+    if (typeof div === "string") {
+      this.myDiv = document.querySelector(div);
+    } else {
+      this.myDiv = div;
+    }
+    this.myDiv.innerHTML = this.div;
+    this.myDiv.classList.add("hori-tab");
+  }
+
+  addTab(header, content, onclick) {
+    let headerElem = document.createElement("button");
+    headerElem.classList.add("tablinks");
+    headerElem.innerHTML = header;
+    this.myDiv.querySelector(".tab").appendChild(headerElem);
+    let contentElem = document.createElement("div");
+    contentElem.classList.add("tabcontent");
+    this.myDiv.querySelector(".content-container").appendChild(contentElem);
+    if (typeof content === "string") {
+      contentElem.innerHTML = content;
+    } else {
+      contentElem.appendChild(content);
     }
 
-    addTab(header, content,onclick) {
-        let headerElem = document.createElement("button");
-        headerElem.classList.add("tablinks");
-        headerElem.innerHTML = header;
-        this.myDiv.querySelector(".tab").appendChild(headerElem);
-        let contentElem = document.createElement("div");
-        contentElem.classList.add("tabcontent");
-        this.myDiv.querySelector(".content-container").appendChild(contentElem);
-        if (typeof content === "string") {
-            contentElem.innerHTML = content;
-        } else {
-            contentElem.appendChild(content);
-        }
+    let tabNr = this.tabs;
 
-        let tabNr=this.tabs;
+    let self = this;
+    headerElem.onclick = () => {
+      if (self.currentIndex > -1) {
+        self.myDiv.querySelector(".tab").children.item(self.currentIndex).classList.remove("active");
+        self.myDiv.querySelector(".content-container").children.item(self.currentIndex).style.display = "none";
+      }
 
-        let self = this;
-        headerElem.onclick = () => {
-            if(self.currentIndex>-1) {
-                self.myDiv.querySelector(".tab").children.item(self.currentIndex).classList.remove("active");
-                self.myDiv.querySelector(".content-container").children.item(self.currentIndex).style.display="none";
-            }
+      self.myDiv.querySelector(".tab").children.item(tabNr).classList.add("active");
+      self.myDiv.querySelector(".content-container").children.item(tabNr).style.display = "block";
 
-            self.myDiv.querySelector(".tab").children.item(tabNr).classList.add("active");
-            self.myDiv.querySelector(".content-container").children.item(tabNr).style.display="block";
-
-            self.currentIndex=tabNr;
-            onclick && onclick();
-            return false;
-        }
-        if(this.tabs===0) {
-            headerElem.click();
-        }
-        this.tabs++;
+      self.currentIndex = tabNr;
+      onclick && onclick();
+      return false;
     }
+    if (this.tabs === 0) {
+      headerElem.click();
+    }
+    this.tabs++;
+  }
 
 }

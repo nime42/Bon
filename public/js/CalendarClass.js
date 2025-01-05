@@ -56,11 +56,11 @@ class CalendarClass {
     } else {
       this.myDiv = div;
     }
-    this.myDiv.innerHTML=this.calendarBody;
+    this.myDiv.innerHTML = this.calendarBody;
 
-    let self=this;
-    this.myDiv.querySelector("#prevMonth").onclick=function() {self.changeMonth(-1);};
-    this.myDiv.querySelector("#nextMonth").onclick=function() {self.changeMonth(1);};
+    let self = this;
+    this.myDiv.querySelector("#prevMonth").onclick = function () { self.changeMonth(-1); };
+    this.myDiv.querySelector("#nextMonth").onclick = function () { self.changeMonth(1); };
 
     this.init(year, month);
   }
@@ -83,24 +83,24 @@ class CalendarClass {
       monthName = this.labels.monthNames[month];
     }
 
-    let today=new Date();
-    this.myDiv.querySelector("#currentMonth").innerHTML=`${year} ${monthName}`;
-    let monthDiv= this.myDiv.querySelector("#month")
-    monthDiv.innerHTML="";
+    let today = new Date();
+    this.myDiv.querySelector("#currentMonth").innerHTML = `${year} ${monthName}`;
+    let monthDiv = this.myDiv.querySelector("#month")
+    monthDiv.innerHTML = "";
 
 
-   
-    let dayHeaders=document.createElement("div");
-    dayHeaders.classList.add("row","week-header","week-row");
 
-    let weekNrCol=document.createElement("div");
+    let dayHeaders = document.createElement("div");
+    dayHeaders.classList.add("row", "week-header", "week-row");
+
+    let weekNrCol = document.createElement("div");
     weekNrCol.classList.add("one", "column", "week-nr");
-    weekNrCol.innerHTML="";
-    dayHeaders.appendChild(weekNrCol);    
-    this.labels.weekDays.forEach(d=>{
-      let dayCol=document.createElement("div");
-      dayCol.classList.add("one", "column","day","day-headers");
-      dayCol.innerHTML=d;
+    weekNrCol.innerHTML = "";
+    dayHeaders.appendChild(weekNrCol);
+    this.labels.weekDays.forEach(d => {
+      let dayCol = document.createElement("div");
+      dayCol.classList.add("one", "column", "day", "day-headers");
+      dayCol.innerHTML = d;
       dayHeaders.appendChild(dayCol);
     });
 
@@ -108,35 +108,35 @@ class CalendarClass {
 
 
 
-    let days=this._createDays(year,month);
-    days.forEach(w=>{
-      let weekRow=document.createElement("div");
-      weekRow.classList.add("row","week-row");
-      let weekNrCol=document.createElement("div");
+    let days = this._createDays(year, month);
+    days.forEach(w => {
+      let weekRow = document.createElement("div");
+      weekRow.classList.add("row", "week-row");
+      let weekNrCol = document.createElement("div");
       weekNrCol.classList.add("one", "column", "week-nr");
-      weekNrCol.innerHTML=`v. ${this._calcWeekNr(w[0])}`;
+      weekNrCol.innerHTML = `v. ${this._calcWeekNr(w[0])}`;
       weekRow.appendChild(weekNrCol);
-      w.forEach(d=> {
-        let dayNrCol=document.createElement("div");
-        let disabled=d.getMonth() !== month;
-        let isToday=d.toDateString()===today.toDateString();
+      w.forEach(d => {
+        let dayNrCol = document.createElement("div");
+        let disabled = d.getMonth() !== month;
+        let isToday = d.toDateString() === today.toDateString();
 
         dayNrCol.classList.add("one", "column", "day");
-        if(disabled) {
+        if (disabled) {
           dayNrCol.classList.add("disabled");
         }
-        dayNrCol.id=`day-${d.getDate()}`;
-        dayNrCol.innerHTML=`<span class="${isToday?"circle-to-day":""} ${disabled?"not-current-month":""}" style="width: min-content;align-self: end;">${d.getDate()}</span>`;
+        dayNrCol.id = `day-${d.getDate()}`;
+        dayNrCol.innerHTML = `<span class="${isToday ? "circle-to-day" : ""} ${disabled ? "not-current-month" : ""}" style="width: min-content;align-self: end;">${d.getDate()}</span>`;
 
-        let self=this;
-        if(!disabled) {
-          dayNrCol.onclick=(event)=>{
-            if(!event.target.classList.contains('event')) {//don't trigger if clicking on a event
-              self.onDateClick && self.onDateClick(d,self);
+        let self = this;
+        if (!disabled) {
+          dayNrCol.onclick = (event) => {
+            if (!event.target.classList.contains('event')) {//don't trigger if clicking on a event
+              self.onDateClick && self.onDateClick(d, self);
             }
           }
         }
-        let events=document.createElement("div");
+        let events = document.createElement("div");
         events.classList.add("event-list");
         dayNrCol.appendChild(events);
 
@@ -145,7 +145,7 @@ class CalendarClass {
       })
       monthDiv.appendChild(weekRow);
     })
-    this.onMonthChange && this.onMonthChange(this.currentYear,this.currentMonth);
+    this.onMonthChange && this.onMonthChange(this.currentYear, this.currentMonth);
 
   }
 
@@ -160,7 +160,7 @@ class CalendarClass {
     }
     let self = this;
     let day = date.getDate();
-    let dayCell = this.myDiv.querySelector( "#day-" + day + ":not(.disabled)");
+    let dayCell = this.myDiv.querySelector("#day-" + day + ":not(.disabled)");
 
 
     let eventList = dayCell.querySelector(".event-list");
@@ -169,18 +169,18 @@ class CalendarClass {
 
     event.innerHTML = header;
 
-    icons?.forEach(iconClassTokens=>{
-      if(iconClassTokens) {
-        let icon=document.createElement("li"); 
-        iconClassTokens.forEach(t=> {
+    icons?.forEach(iconClassTokens => {
+      if (iconClassTokens) {
+        let icon = document.createElement("li");
+        iconClassTokens.forEach(t => {
           icon.classList.add(t);
         })
-        event.appendChild(icon);     
+        event.appendChild(icon);
       }
     });
 
 
-  
+
 
     event.myData = {
       eventTime: date,
@@ -207,7 +207,7 @@ class CalendarClass {
       eventList.appendChild(e);
     });
 
-  
+
 
     return true;
   }
@@ -215,9 +215,9 @@ class CalendarClass {
 
 
 
-  updateEvent(eventElem, date, header, color, misc,iconClassTokens) {
+  updateEvent(eventElem, date, header, color, misc, iconClassTokens) {
     this.deleteEvent(eventElem);
-    this.addEvent(date, header, color, misc,iconClassTokens);
+    this.addEvent(date, header, color, misc, iconClassTokens);
   }
 
 
@@ -227,7 +227,7 @@ class CalendarClass {
       return false;
     }
     let day = date.getDate();
-    let dayCell = this.myDiv.querySelector( "#day-" + day + ":not(.disabled)");
+    let dayCell = this.myDiv.querySelector("#day-" + day + ":not(.disabled)");
     let eventList = dayCell.querySelector(".event-list");
 
     eventList.removeChild(eventElem);
@@ -249,7 +249,7 @@ class CalendarClass {
   }
 
   getAllEvents() {
-    return [...this.myDiv.querySelectorAll(".event")].map(e=>({elem:e,data:e.myData}));
+    return [...this.myDiv.querySelectorAll(".event")].map(e => ({ elem: e, data: e.myData }));
   }
 
   getHeaderDiv() {
@@ -262,10 +262,10 @@ class CalendarClass {
 
     let rows = [];
     let currentRow = [];
-    let i = new Date(year, month, d.getDate()-((6+dayIndex)%7));
+    let i = new Date(year, month, d.getDate() - ((6 + dayIndex) % 7));
     let c = 0;
 
-    
+
     while (
       i.getFullYear() * 12 + i.getMonth() <= year * 12 + month ||
       c % 7 !== 0
@@ -280,11 +280,11 @@ class CalendarClass {
     }
 
     return rows;
-    
+
   }
 
   _calcWeekNr(datum) {
-    let date=new Date(datum);
+    let date = new Date(datum);
     date.setHours(0, 0, 0, 0);
     // Thursday in current week decides the year.
     date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));

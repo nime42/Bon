@@ -144,11 +144,11 @@ class Helper {
       return true;
     }
 
-    return (bon1==null?"":bon1) == (bon2==null?"":bon2 )|| bon2 == undefined;
+    return (bon1 == null ? "" : bon1) == (bon2 == null ? "" : bon2) || bon2 == undefined;
   }
 
   static sumOrders(orders1, orders2) {
-    let res = orders1.map(e=>({...e}));
+    let res = orders1.map(e => ({ ...e }));
     orders2.forEach((o) => {
       o.comment = o.special_request; //in DB it's called special_request but in bon it's called comment, my misstake :-/
       o.id = o.item_id;
@@ -164,14 +164,14 @@ class Helper {
 
 
   static getEmptyBon() {
-    let bon={
+    let bon = {
       "id": "",
       "delivery_date": "",
-      "pickup_time":null,
+      "pickup_time": null,
       "status": "",
       "status2": "",
       "nr_of_servings": "",
-      "pax_units":"",
+      "pax_units": "",
       "kitchen_selects": 0,
       "customer_collects": 0,
       "price_category": "",
@@ -179,7 +179,7 @@ class Helper {
       "customer_info": "",
       "kitchen_info": "",
       "delivery_info": "",
-      "invoice_info":"",
+      "invoice_info": "",
       "service_type": null,
       "customer": {
         "forename": "",

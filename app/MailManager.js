@@ -4,8 +4,8 @@ const bonUtils = require("./BonUtils.js");
 
 var config = require("../resources/config.js");
 
-var DBClass=require('./DBClass.js');
-var DB=new DBClass('./resources/bon.db');
+var DBClass = require('./DBClass.js');
+var DB = new DBClass('./resources/bon.db');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED =
   config.mailManager.rejectUnauthorized !== undefined
@@ -35,7 +35,7 @@ function getMails(mailbox, searchCriteria, markAsRead, callback = console.log) {
                 messageInfo.attrs = attrs;
                 if (markAsRead) {
                   const { uid } = attrs;
-                  imap.addFlags(uid, ["\\Seen"], () => {});
+                  imap.addFlags(uid, ["\\Seen"], () => { });
                 }
               });
               msg.once("end", () => {
@@ -51,7 +51,7 @@ function getMails(mailbox, searchCriteria, markAsRead, callback = console.log) {
                     unread: true,
                   };
                   if (parsed.subject?.startsWith("SENT:")) {
-                    imap.addFlags(messageInfo?.attrs.uid, ["\\Seen"], () => {});
+                    imap.addFlags(messageInfo?.attrs.uid, ["\\Seen"], () => { });
                   } else {
                     if (
                       messageInfo?.attrs?.flags?.find((e) => e === "\\Seen")
@@ -238,17 +238,17 @@ function getIncomingOrders(subjectContains, callback) {
 
   const nestedSubjectsConstainsOr = (fromOr) => {
     let nestedOr;
-  
+
     fromOr.forEach((value, index) => {
       nestedOr = index
         ? ['OR', ['SUBJECT', value], nestedOr]
         : ['SUBJECT', value];
     });
-  
+
     return nestedOr;
   };
 
-  let searchCriteria=nestedSubjectsConstainsOr(subjectContains);
+  let searchCriteria = nestedSubjectsConstainsOr(subjectContains);
 
   getMails(
     "INBOX",
@@ -279,29 +279,29 @@ function buildBon(entries) {
   bon.customer.phone_nr = entries["phone_nr"];
   bon.customer.company.name = entries["company_name"];
   bon.nr_of_servings = entries["nr_of_servings"];
-  bon.kitchen_selects = entries["kitchen_selects"] ;
+  bon.kitchen_selects = entries["kitchen_selects"];
   bon.price_category = "Store";
-  bon.payment_type="Faktura";
+  bon.payment_type = "Faktura";
   bon.delivery_date = entries["delivery_time"];
-  bon.customer_collects=entries["customer_collects"];
+  bon.customer_collects = entries["customer_collects"];
   bon.delivery_address.street_name = entries["delivery_street_name"];
   bon.delivery_address.street_nr = entries["delivery_street_nr"];
   bon.delivery_address.zip_code = entries["delivery_zipcode"];
   bon.delivery_address.city = entries["delivery_city"];
   bon.customer_info = entries["customer_info"];
   bon.invoice_info = entries["invoice_info"];
-  bon.delivery_info=entries["delivery_info"];
-  bon.customer.company.ean_nr=entries["ean_nr"]
+  bon.delivery_info = entries["delivery_info"];
+  bon.customer.company.ean_nr = entries["ean_nr"]
 
-  let lastOrder=DB.getLastOrderByCustomer(bon.customer.email);
+  let lastOrder = DB.getLastOrderByCustomer(bon.customer.email);
   //if it's a new user set price-category to Store else use pricecategory from last order
   //and also payment_type
-  if(lastOrder!==undefined) {
-    if(lastOrder.price_category!="") {
-      bon.price_category=lastOrder.price_category;
+  if (lastOrder !== undefined) {
+    if (lastOrder.price_category != "") {
+      bon.price_category = lastOrder.price_category;
     }
-    if(lastOrder.payment_type!="") {
-      bon.payment_type=lastOrder.payment_type;
+    if (lastOrder.payment_type != "") {
+      bon.payment_type = lastOrder.payment_type;
     }
   }
 
@@ -316,21 +316,21 @@ function parseDeliveryDate(entries) {
   let date = entries["delivery_date"];
   let time = entries["delivery_time"];
   let dateValue = undefined;
-  
-  if(!date) {
+
+  if (!date) {
     return undefined;
   }
 
   if (date.match(/.* \d{1,2},\d{2,4}/)) {
     dateValue = new Date(date) + 1; //need to add one day if date is on format "Month day, Year"
-  } else if(date.match(/\d+-\d+-\d/)) {
-    let [day,month,year]=date.split("-");
-    dateValue=new Date(`${year}-${month}-${day}`);
+  } else if (date.match(/\d+-\d+-\d/)) {
+    let [day, month, year] = date.split("-");
+    dateValue = new Date(`${year}-${month}-${day}`);
 
   } else {
     try {
       dateValue = new Date(date);
-    } catch (err) {}
+    } catch (err) { }
   }
   if (dateValue === undefined) {
     return undefined;
@@ -418,8 +418,8 @@ function parseIncomingMessage(message) {
 
   //setting these values to empty string instead of undefined (to avoid error in FE-function isBonEqual)
   ["delivery_street_name", "delivery_street_nr", "delivery_zipcode", "delivery_city"].forEach((k) => {
-    if(res[k]==undefined) {
-      res[k]="";
+    if (res[k] == undefined) {
+      res[k] = "";
     }
   });
 
@@ -457,10 +457,10 @@ function parseIncomingMessage(message) {
     if (ean_nr) {
       res["ean_nr"] = ean_nr[0];
     } else {
-      res["ean_nr"]="";
+      res["ean_nr"] = "";
     }
   } catch (err) {
-    res["ean_nr"]="";
+    res["ean_nr"] = "";
   }
 
   return res;

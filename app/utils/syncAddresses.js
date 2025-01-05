@@ -18,11 +18,11 @@ function getCoordFromMaster(address, masterDb) {
   return row;
 }
 
-function updateAddress(adr, coord,db) {
+function updateAddress(adr, coord, db) {
   console.log(`updating ${adr.street_name} ${adr.street_nr} ${adr.zip_code} ${adr.city} (id=${adr.id}) with ${JSON.stringify(coord)}`);
-  let {lat,lon}=coord;
-  let sql="update addresses set lat=?,lon=? where id=?";
-  const res = db.prepare(sql).run(lat,lon,adr.id);
+  let { lat, lon } = coord;
+  let sql = "update addresses set lat=?,lon=? where id=?";
+  const res = db.prepare(sql).run(lat, lon, adr.id);
 
 }
 
@@ -49,15 +49,15 @@ async function main(args) {
     let coord = getCoordFromMaster(adr, dbMaster);
 
     if (coord) {
-      updateAddress(adr, coord,db);
+      updateAddress(adr, coord, db);
       continue;
     } else {
       let [status, coordinates] = await AddressSearch.findCoordinates(adr);
-        if (status) {
-          updateAddress(adr, coordinates,db);
-        } else {
-            console.log( `failed to update ${adr.street_name} ${adr.street_nr} ${adr.zip_code} ${adr.city} (id=${adr.id})`)
-        }
+      if (status) {
+        updateAddress(adr, coordinates, db);
+      } else {
+        console.log(`failed to update ${adr.street_name} ${adr.street_nr} ${adr.zip_code} ${adr.city} (id=${adr.id})`)
+      }
 
     }
     await sleep(2000);

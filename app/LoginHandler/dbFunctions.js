@@ -9,7 +9,7 @@ var db;
 
 function init(dbFile) {
     db = new sqlite3(dbFile);
-    db.pragma("foreign_keys = ON"); 
+    db.pragma("foreign_keys = ON");
 }
 
 var salt = "nimeproject";
@@ -22,18 +22,18 @@ function hashPassword(password) {
     return hash.digest('hex');
 }
 
-function authenticateUser(username, password, callback=console.log) {
+function authenticateUser(username, password, callback = console.log) {
     var hashed = hashPassword(password);
-    const row=db.prepare("select * from v_userinfo where (lower(username)=lower(?) or lower(email)=lower(?)) and password=?").get(username,username, hashed);
-        if (!row) {
-            callback(false);
-        } else {
-            callback(true, row.userid);
-        }
+    const row = db.prepare("select * from v_userinfo where (lower(username)=lower(?) or lower(email)=lower(?)) and password=?").get(username, username, hashed);
+    if (!row) {
+        callback(false);
+    } else {
+        callback(true, row.userid);
+    }
 }
 
 
-function createUser(username, callback=console.log) {
+function createUser(username, callback = console.log) {
     try {
         const res = db.prepare("insert into users(username) values(?)").run(username);
         callback(true, res.lastInsertRowid, null);
@@ -45,7 +45,7 @@ function createUser(username, callback=console.log) {
 
 
 
-function createPassWordResetToken(userId, callback=console.log) {
+function createPassWordResetToken(userId, callback = console.log) {
     var token = new Date().getTime() + "" + Math.floor(Math.random() * Math.floor(1000));
     var sql = "INSERT INTO password_reset_tokens(userid,token) VALUES(?,?)\
     ON CONFLICT(userid) DO UPDATE SET token=excluded.token,created=CURRENT_TIMESTAMP";
@@ -60,12 +60,12 @@ function createPassWordResetToken(userId, callback=console.log) {
 
 
 
-function updateUserInfo(userid, userprops, callback=console.log) {
+function updateUserInfo(userid, userprops, callback = console.log) {
     userprops.userid = userid;
     if (userprops.password) {
         userprops.password = hashPassword(userprops.password);
     } else {
-        userprops.password=null;
+        userprops.password = null;
     }
 
     let sql = "INSERT INTO userinfo(userid,password,email,phonenr,name) VALUES(@userid,@password,@email,@phonenr,@name)\
@@ -76,18 +76,18 @@ function updateUserInfo(userid, userprops, callback=console.log) {
         callback(true, null);
     } catch (err) {
         callback(false, err);
-    }    
+    }
 }
 
 
 
-function getUserInfo(userId, callback=console.log) {
+function getUserInfo(userId, callback = console.log) {
     const row = db.prepare('SELECT * FROM v_userinfo WHERE userid = ?').get(userId);
-    
+
 
     if (row !== undefined) {
         delete row.password;
-        row.roles=getRoles(userId).map(r=>(r.roleid));
+        row.roles = getRoles(userId).map(r => (r.roleid));
         callback(true, row);
     } else {
         callback(false);
@@ -95,23 +95,23 @@ function getUserInfo(userId, callback=console.log) {
 }
 
 
-function deleteUser(userId,callback=console.log) {
-    let sql="delete from users where id = ?";
+function deleteUser(userId, callback = console.log) {
+    let sql = "delete from users where id = ?";
     try {
         const res = db.prepare(sql).run(userId);
         callback(true, null);
     } catch (err) {
         callback(false, err);
-    }    
+    }
 
 }
 
-function getUsers(callback=console.log) {
+function getUsers(callback = console.log) {
     const rows = db.prepare('SELECT * FROM v_userinfo order by username').all();
-    
+
 
     if (rows !== undefined) {
-        rows.forEach(r=>{
+        rows.forEach(r => {
             delete r.password;
         })
         callback(true, rows);
@@ -121,36 +121,36 @@ function getUsers(callback=console.log) {
 }
 
 
-function getAllRoles(callback=console.log) {
+function getAllRoles(callback = console.log) {
     const rows = db.prepare('SELECT * FROM roles').all();
-    callback(true,rows);
+    callback(true, rows);
 
 }
 
 
 
 
-function updateRoles(userId,roles, callback = console.log) {
+function updateRoles(userId, roles, callback = console.log) {
     let sql = `delete from user_roles where userid=?`;
-  
+
     try {
-      db.transaction(() => {
-        let sql = `delete from user_roles where userid=?`;
-        db.prepare(sql).run(userId);
-        sql="insert into user_roles(userid,roleid) values(?,?)"
-        let ps = db.prepare(sql);
-        roles.forEach(r => {
-          ps.run(userId,r);
-        });
-        callback(true);
-      })();
-  
+        db.transaction(() => {
+            let sql = `delete from user_roles where userid=?`;
+            db.prepare(sql).run(userId);
+            sql = "insert into user_roles(userid,roleid) values(?,?)"
+            let ps = db.prepare(sql);
+            roles.forEach(r => {
+                ps.run(userId, r);
+            });
+            callback(true);
+        })();
+
     } catch (err) {
-      callback(false,err);
-  
+        callback(false, err);
+
     }
-  }
-  
+}
+
 
 
 
@@ -161,38 +161,38 @@ function getRoles(userId) {
 }
 
 
-function getUserInfoByUserNameOrEmailOrPhone(identity, callback=console.log) {
+function getUserInfoByUserNameOrEmailOrPhone(identity, callback = console.log) {
 
-    const row=db.prepare('SELECT distinct * FROM v_userinfo WHERE lower(username)=lower(?) or lower(email) = lower(?) or phonenr=?').get(identity,identity,identity);
-    if(row!==undefined) {
+    const row = db.prepare('SELECT distinct * FROM v_userinfo WHERE lower(username)=lower(?) or lower(email) = lower(?) or phonenr=?').get(identity, identity, identity);
+    if (row !== undefined) {
         delete row.password;
         callback(true, row);
     } else {
         callback(false);
     }
- 
+
 }
 
 
-function resetPassword(token, password, callback=console.log) {
+function resetPassword(token, password, callback = console.log) {
     try {
-    db.transaction(()=>{
-        var sql = "select userid from password_reset_tokens where token=?";
-        var row=db.prepare(sql).get(token);
-        if(row!==undefined) {
-            var userid = row.userid;
-            password = hashPassword(password);
-            sql = "update userinfo set password=? where userid=?";
-            db.prepare(sql).run(password,userid);
-            sql="delete from password_reset_tokens where token=?";
-            db.prepare(sql).run(token);
-            callback(true,userid);
-        } else {
-            callback(false);
-        }
+        db.transaction(() => {
+            var sql = "select userid from password_reset_tokens where token=?";
+            var row = db.prepare(sql).get(token);
+            if (row !== undefined) {
+                var userid = row.userid;
+                password = hashPassword(password);
+                sql = "update userinfo set password=? where userid=?";
+                db.prepare(sql).run(password, userid);
+                sql = "delete from password_reset_tokens where token=?";
+                db.prepare(sql).run(token);
+                callback(true, userid);
+            } else {
+                callback(false);
+            }
 
-    })();
-    } catch(err) {
+        })();
+    } catch (err) {
         callback(false, err);
     }
 }
@@ -203,18 +203,18 @@ function getDbInstance() {
 }
 
 module.exports = {
-    init:init,
+    init: init,
     createUser: createUser,
-    deleteUser:deleteUser,
+    deleteUser: deleteUser,
     authenticateUser: authenticateUser,
     updateUserInfo: updateUserInfo,
-    getUserInfo:getUserInfo,
-    resetPassword:resetPassword,
-    getDbInstance:getDbInstance,
-    updateRoles:updateRoles,
-    getRoles:getRoles,
-    createPassWordResetToken:createPassWordResetToken,
-    getUserInfoByUserNameOrEmailOrPhone:getUserInfoByUserNameOrEmailOrPhone,
-    getUsers:getUsers,
-    getAllRoles:getAllRoles
+    getUserInfo: getUserInfo,
+    resetPassword: resetPassword,
+    getDbInstance: getDbInstance,
+    updateRoles: updateRoles,
+    getRoles: getRoles,
+    createPassWordResetToken: createPassWordResetToken,
+    getUserInfoByUserNameOrEmailOrPhone: getUserInfoByUserNameOrEmailOrPhone,
+    getUsers: getUsers,
+    getAllRoles: getAllRoles
 }

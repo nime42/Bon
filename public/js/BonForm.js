@@ -308,11 +308,11 @@ class BonForm {
 
 
 
-   
 
-    this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"),true,{externalItemsList:this.myDiv.querySelector("#items-selector")});
+
+    this.myBonStrip = new BonStrip(this.myDiv.querySelector("#bon-strip"), true, { externalItemsList: this.myDiv.querySelector("#items-selector") });
     this.myBonStrip.showMails(this.myDiv.querySelector("#mail-conversation"));
-    this.myBonStrip.setOnMailSeen((bonId)=>{
+    this.myBonStrip.setOnMailSeen((bonId) => {
       Globals.myCalender.mailSeen(bonId)
     })
 
@@ -346,29 +346,29 @@ class BonForm {
       form.querySelector("#delivery_info")
     );
 
-    this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"),form.querySelector("#pax_units"));
-    this.myBonStrip.updatePaymentTypeOnChange(form.querySelector("#payment-types"),()=>{
-      if(form.querySelector("#payment-types").value==="Produktion") {
+    this.myBonStrip.updatePaxOnChange(form.querySelector("#nr_of_servings"), form.querySelector("#pax_units"));
+    this.myBonStrip.updatePaymentTypeOnChange(form.querySelector("#payment-types"), () => {
+      if (form.querySelector("#payment-types").value === "Produktion") {
         //If user chooses Produktion set price to Produktion also
-        let elem=form.querySelector("#price-categories");
-        elem.value="Produktion"
+        let elem = form.querySelector("#price-categories");
+        elem.value = "Produktion"
         elem.dispatchEvent(new Event('change'))
       }
-      
+
     }
     );
     this.myBonStrip.updateKitchenSelectsOnChange(
       form.querySelector("#kitchen_selects")
     );
 
-    let buttons=this.myDiv.querySelector("#buttons");
+    let buttons = this.myDiv.querySelector("#buttons");
 
-    let warnIfEmailMissing=(bon)=>{
+    let warnIfEmailMissing = (bon) => {
       //due to a design-flaw can a user not save customer-info without an email
-      if(bon.customer.email==="" &&
-        bon.customer.forename+bon.customer.surname+bon.customer.phone_nr+bon.customer.company.name!=""
+      if (bon.customer.email === "" &&
+        bon.customer.forename + bon.customer.surname + bon.customer.phone_nr + bon.customer.company.name != ""
       ) {
-          return true;
+        return true;
       } else {
         return false;
       }
@@ -379,29 +379,29 @@ class BonForm {
 
       let bon = self._createBon(props);
 
-      if(warnIfEmailMissing(bon)) {
-        let message="Uden e-mail kan du ikke gemme kundeoplysninger. Vil du stadig spare?"
-        if(!confirm(message)) {
+      if (warnIfEmailMissing(bon)) {
+        let message = "Uden e-mail kan du ikke gemme kundeoplysninger. Vil du stadig spare?"
+        if (!confirm(message)) {
           return;
         }
       }
 
       let isNew = bon.id === undefined;
       self.myRepoObj.saveBon(bon, function (bonId) {
-          bon.id=bonId;
+        bon.id = bonId;
         self.onFormClose && self.onFormClose("saved", bon, isNew);
         self.myPopupObj.hide();
       });
     };
 
-    let needUpdate=()=>{
-        let props = Helper.getFormProps(form);
-        let bon = self._createBon(props);
-        return !Helper.isBonEqual(this.orgBon,bon)
+    let needUpdate = () => {
+      let props = Helper.getFormProps(form);
+      let bon = self._createBon(props);
+      return !Helper.isBonEqual(this.orgBon, bon)
     }
 
     buttons.querySelector("#cancel").onclick = function (e) {
-      if(needUpdate()) {
+      if (needUpdate()) {
         MessageBox.popup("Vil du gemme dine ændringer?", {
           b1: {
             text: "Ja",
@@ -410,16 +410,17 @@ class BonForm {
 
             },
           },
-          b2: { text: "Nej",
-          onclick:()=>{
-            self.onFormClose && self.onFormClose("canceled");
-            self.myPopupObj.hide();
-          }
-        },
+          b2: {
+            text: "Nej",
+            onclick: () => {
+              self.onFormClose && self.onFormClose("canceled");
+              self.myPopupObj.hide();
+            }
+          },
         });
       } else {
         self.onFormClose && self.onFormClose("canceled");
-            self.myPopupObj.hide();
+        self.myPopupObj.hide();
       }
 
     };
@@ -443,7 +444,7 @@ class BonForm {
       let props = Helper.getFormProps(form);
       let bon = self._createBon(props);
       bon.id = "";
-      bon.status="new";
+      bon.status = "new";
       self.myRepoObj.saveBon(bon, function (bonId) {
         bon.id = bonId;
         self.onFormClose && self.onFormClose("copied", bon);
@@ -454,7 +455,7 @@ class BonForm {
 
 
     form.querySelectorAll(".status-button").forEach((e) => {
-      e.onclick = (event,programmatically) => {
+      e.onclick = (event, programmatically) => {
         form.querySelectorAll(".status-button").forEach((s) => {
           s.style.background = "";
           s.classList.remove("active");
@@ -463,13 +464,13 @@ class BonForm {
         elem.style.background = elem.dataset["activeBackground"];
         elem.classList.add("active");
 
-        if(elem.id===Globals.Statuses["approved"].name && !programmatically) {
+        if (elem.id === Globals.Statuses["approved"].name && !programmatically) {
           MessageBox.popup("Vil du sende en bekræftelse?", {
             b1: {
               text: "Ja",
               onclick: () => {
                 this.myBonStrip.showMailDialogue();
-  
+
               },
             },
             b2: { text: "Nej" },
@@ -477,7 +478,7 @@ class BonForm {
         }
 
 
-        if(elem.id===Globals.Statuses["delivered"].name && !programmatically && this.myBonStrip.bonId) {
+        if (elem.id === Globals.Statuses["delivered"].name && !programmatically && this.myBonStrip.bonId) {
           MessageBox.popup("Ønsker du at trække varerne fra lageret?", {
             b1: {
               text: "Ja",
@@ -544,11 +545,11 @@ class BonForm {
     return select.value;
   }
 
-  createBonLabelAndcolor(bon,haveUnseenMail) {
+  createBonLabelAndcolor(bon, haveUnseenMail) {
     let statusColor = this.getStatusColor(bon.status);
-    let pax="P:"+(bon.nr_of_servings != "" ? bon.nr_of_servings : 0);
-    if(bon.pax_units) {
-      pax="("+bon.pax_units.trim()+")";
+    let pax = "P:" + (bon.nr_of_servings != "" ? bon.nr_of_servings : 0);
+    if (bon.pax_units) {
+      pax = "(" + bon.pax_units.trim() + ")";
     }
     let timeStr =
       bon.delivery_date.getHours().toString().padStart(2, "0") +
@@ -556,19 +557,19 @@ class BonForm {
       bon.delivery_date.getMinutes().toString().padStart(2, "0");
     let label =
       timeStr +
-      ",#" +bon.id + ","+pax;
-    
-    let icons=[];
-    if(haveUnseenMail) {
-      let mailIcon=["fa","fa-envelope"];
+      ",#" + bon.id + "," + pax;
+
+    let icons = [];
+    if (haveUnseenMail) {
+      let mailIcon = ["fa", "fa-envelope"];
       icons.push(mailIcon);
     }
-    if(bon.payment_type=== "Produktion") {
-      let wrench=["fa","fa-wrench"];
+    if (bon.payment_type === "Produktion") {
+      let wrench = ["fa", "fa-wrench"];
       icons.push(wrench);
     }
 
-      return [label, statusColor,icons];
+    return [label, statusColor, icons];
   }
 
 
@@ -597,8 +598,8 @@ class BonForm {
     try {
       let elem = form.querySelector("#" + status);
       //second arg = true => the click is triggered programmatically
-      elem.onclick({target:elem},true);
-    } catch (err) {}
+      elem.onclick({ target: elem }, true);
+    } catch (err) { }
   }
 
   _createBon(props) {
@@ -607,14 +608,14 @@ class BonForm {
     bon.delivery_date = new Date(
       props.delivery_date + "T" + props.delivery_time
     );
-    if(props.pickup_time!=="") {
-      let pickupTime=new Date(props.delivery_date + "T" + props.pickup_time);
-      if(pickupTime>bon.delivery_date) {
+    if (props.pickup_time !== "") {
+      let pickupTime = new Date(props.delivery_date + "T" + props.pickup_time);
+      if (pickupTime > bon.delivery_date) {
         pickupTime.setDate(pickupTime.getDate() - 1);
       }
-      bon.pickup_time=pickupTime;
+      bon.pickup_time = pickupTime;
     } else {
-      bon.pickup_time=null;
+      bon.pickup_time = null;
     }
 
     bon.status = this._getStatus();
@@ -653,10 +654,10 @@ class BonForm {
     bon.delivery_address.city = props.city;
     bon.delivery_address.zip_code = props.zip_code;
 
-    let orderInfo=this.myBonStrip.getOrders();
+    let orderInfo = this.myBonStrip.getOrders();
     bon.orders = orderInfo.orders;
-    bon.price=orderInfo.totPrice;
-    bon.cost_price=orderInfo.totCostPrice;
+    bon.price = orderInfo.totPrice;
+    bon.cost_price = orderInfo.totCostPrice;
 
 
     return bon;
@@ -757,7 +758,7 @@ class BonForm {
     }
     try {
       elem.oninput();
-    } catch (err) {}
+    } catch (err) { }
   }
 
   _bonToForm(bon, formDiv) {
@@ -772,7 +773,7 @@ class BonForm {
       let pickupTime = new Date(bon.pickup_time);
       form.querySelector("input[name=pickup_time]").value = pickupTime.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
     } else {
-      form.querySelector("input[name=pickup_time]").value="";
+      form.querySelector("input[name=pickup_time]").value = "";
     }
     form.querySelector("input[name=pickup_time]").oninput();
 
@@ -794,8 +795,8 @@ class BonForm {
     form.querySelector("select[name=payment_type]").value = bon.payment_type;
     form.querySelector("select[name=payment_type]").onchange();
 
-    form.querySelector("textarea[name=customer_info]").value =bon.customer_info;
-    form.querySelector("textarea[name=invoice_info]").value =bon.invoice_info;
+    form.querySelector("textarea[name=customer_info]").value = bon.customer_info;
+    form.querySelector("textarea[name=invoice_info]").value = bon.invoice_info;
     form.querySelector("textarea[name=kitchen_info]").value = bon.kitchen_info;
     form.querySelector("textarea[name=delivery_info]").value = bon.delivery_info;
 
@@ -851,7 +852,7 @@ class BonForm {
     } else {
 
       this.myRepoObj.getOrders(bon.id, (orders) => {
-        bon.orders=orders; //OBS this will update the incoming bon-object
+        bon.orders = orders; //OBS this will update the incoming bon-object
         orders.forEach((o) => {
           this.myBonStrip.addOrder(
             o.quantity,
@@ -864,7 +865,7 @@ class BonForm {
             o.izettle_product_id
           );
         });
-        this.myBonStrip.updateTotalSum(); 
+        this.myBonStrip.updateTotalSum();
       });
     }
   }
@@ -913,16 +914,16 @@ class BonForm {
 
     this.myRepoObj.searchBons({ bonId: id }, (bons) => {
       let bonData = bons[0];
-      this.initFromBonData(bonData,onClose);
+      this.initFromBonData(bonData, onClose);
     });
   }
 
-  initFromBonData(bon,onClose) {
+  initFromBonData(bon, onClose) {
     this._clear();
     this.onFormClose = onClose;
     this.currentId = bon.id;
     this._bonToForm(bon, "#order");
-    this.orgBon=bon;
+    this.orgBon = bon;
     this.myDiv.querySelectorAll(".for-update").forEach((e) => {
       e.style.display = "";
     });
@@ -948,10 +949,10 @@ class BonForm {
       let name = e.getAttribute("name");
       if (name !== null) {
         e.value = "";
-        if(e.selectedIndex) {e.selectedIndex=0};
+        if (e.selectedIndex) { e.selectedIndex = 0 };
         try {
           e.oninput();
-        } catch (err) {}
+        } catch (err) { }
       }
     });
 

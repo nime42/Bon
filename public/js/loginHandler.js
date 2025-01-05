@@ -255,48 +255,48 @@ class LoginHandler {
 
     }
 
-    createUser(userParams,callback) {
+    createUser(userParams, callback) {
         $.ajax({
             type: "POST",
             url: "register",
             cache: false,
             data: userParams,
             success: function (data, status, jqxhr) {
-               callback(true,data);
+                callback(true, data);
             },
             error: function (data, status, jqxhr) {
-                callback(false,data);
+                callback(false, data);
             }
 
         });
     }
 
-    updateUser(userParams,callback) {
+    updateUser(userParams, callback) {
         $.ajax({
             type: "POST",
             url: "updateInfo",
             cache: false,
             data: userParams,
             success: function (data, status, jqxhr) {
-               callback(true,data);
+                callback(true, data);
             },
             error: function (data, status, jqxhr) {
-                callback(false,data);
+                callback(false, data);
             }
 
         });
     }
 
-    deleteUser(userId,callback) {
+    deleteUser(userId, callback) {
         $.ajax({
             type: "DELETE",
-            url: "user/"+userId,
+            url: "user/" + userId,
             cache: false,
             success: function (data, status, jqxhr) {
-               callback(true,data);
+                callback(true, data);
             },
             error: function (data, status, jqxhr) {
-                callback(false,data);
+                callback(false, data);
             }
 
         });
@@ -305,14 +305,14 @@ class LoginHandler {
 
     getAllUsers(callback) {
 
-        let url="getUsers/";
-        $.get(url,callback);
+        let url = "getUsers/";
+        $.get(url, callback);
     }
 
     getAllRoles(callback) {
 
-        let url="getAllRoles/";
-        $.get(url,callback);
+        let url = "getAllRoles/";
+        $.get(url, callback);
     }
 
 
@@ -367,27 +367,27 @@ class LoginHandler {
         $.get(url, callback);
     }
 
-    getUserRoles(id,callback) {
-        let url="roles/"+id;
+    getUserRoles(id, callback) {
+        let url = "roles/" + id;
         $.get(url, callback);
     }
 
-    updateUserRoles(id,roles,callback) {
-        let url="updateRoles/"+id;
-        let body={roles:roles};
+    updateUserRoles(id, roles, callback) {
+        let url = "updateRoles/" + id;
+        let body = { roles: roles };
 
         $.ajax({
             type: "PUT",
             url: url,
             data: JSON.stringify(body),
             success: function (data, status, jqxhr) {
-                callback(true,data);
-             },
-             error: function (data, status, jqxhr) {
-                 callback(false,data);
-             },
+                callback(true, data);
+            },
+            error: function (data, status, jqxhr) {
+                callback(false, data);
+            },
             contentType: "application/json"
-          });
+        });
     }
 
     populateUserInfoForm(form) {
@@ -395,27 +395,27 @@ class LoginHandler {
         if (typeof form === "string") {
             formElem = document.querySelector(form);
         } else {
-            formElem= form;
+            formElem = form;
         }
 
-        formElem.querySelectorAll('input:not([type="submit"]):not([type="button"])').forEach(e=>{
-            e.value="";
+        formElem.querySelectorAll('input:not([type="submit"]):not([type="button"])').forEach(e => {
+            e.value = "";
         })
 
-        this.getUserInfo((info)=>{
-            Object.keys(info).forEach(k=>{
-                let elem=formElem.querySelector(`input[name=${k}]`);
-                if(elem) {
-                    elem.value=info[k];
+        this.getUserInfo((info) => {
+            Object.keys(info).forEach(k => {
+                let elem = formElem.querySelector(`input[name=${k}]`);
+                if (elem) {
+                    elem.value = info[k];
                 }
 
             })
         })
-        
+
 
     }
 
-    hasRole(userInfo,role) {
+    hasRole(userInfo, role) {
         if (userInfo.roles.find(r => (r === role))) {
             return true;
         } else {

@@ -1,7 +1,7 @@
 class AutoCompleteClass {
-  background=Globals.background;
-  foreground=Globals.foreground;
-  styling=`
+  background = Globals.background;
+  foreground = Globals.foreground;
+  styling = `
   <style>
   .mycontainer {
       display: inline-block;
@@ -44,38 +44,38 @@ class AutoCompleteClass {
 
   constructor(inputDiv) {
     this.myInputDiv = inputDiv;
-    let mycontainer=document.createElement("DIV");
+    let mycontainer = document.createElement("DIV");
     mycontainer.classList.add("mycontainer");
     this.myInputDiv.replaceWith(mycontainer);
-    mycontainer.insertAdjacentHTML('beforebegin',this.styling);
+    mycontainer.insertAdjacentHTML('beforebegin', this.styling);
     mycontainer.appendChild(this.myInputDiv);
     this.myList = document.createElement("DIV");
     this.myList.classList.add("dropdown");
     this.myList.style.display = 'none';
     mycontainer.appendChild(this.myList);
-    this.myOptions=[];
+    this.myOptions = [];
     let self = this;
 
     //when input looses focus then hide options (but wait a little, it could be that the user clicked an option)
-    this.myInputDiv.onblur=(event)=> {
-      setTimeout(()=>{self.clearOptions()},200); 
+    this.myInputDiv.onblur = (event) => {
+      setTimeout(() => { self.clearOptions() }, 200);
     };
 
 
-    this.myInputDiv.onkeydown=(evt) => {
-      if(self.myList.children.length===0) return;
-      switch(evt.keyCode) {
+    this.myInputDiv.onkeydown = (evt) => {
+      if (self.myList.children.length === 0) return;
+      switch (evt.keyCode) {
         case 38:
-          if(self.currentfocus>-1) {
+          if (self.currentfocus > -1) {
             self.myList.children.item(self.currentfocus).classList.remove("active");
             self.currentfocus--;
-            self.currentfocus>-1 && self.myList.children.item(self.currentfocus).classList.add("active");
+            self.currentfocus > -1 && self.myList.children.item(self.currentfocus).classList.add("active");
 
           }
-            break;
+          break;
         case 40:
-          if(self.currentfocus+1<self.myOptions.length) {
-            self.currentfocus>-1 && self.myList.children.item(self.currentfocus).classList.remove("active");
+          if (self.currentfocus + 1 < self.myOptions.length) {
+            self.currentfocus > -1 && self.myList.children.item(self.currentfocus).classList.remove("active");
             self.currentfocus++;
             self.myList.children.item(self.currentfocus).classList.add("active");
 
@@ -83,7 +83,7 @@ class AutoCompleteClass {
 
           break;
         case 13:
-          if(self.currentfocus>=0) {
+          if (self.currentfocus >= 0) {
             self.myList.children.item(self.currentfocus).click()
           }
       }
@@ -91,12 +91,12 @@ class AutoCompleteClass {
 
 
     this.myInputDiv.onkeyup = (evt) => {
-      if((evt.keyCode>=37 && evt.keyCode<=40) || evt.keyCode===13) {
+      if ((evt.keyCode >= 37 && evt.keyCode <= 40) || evt.keyCode === 13) {
         return;
       }
       if (self.typingFunction) {
- 
-        if (self.myInputDiv.value.trim()!=="") {
+
+        if (self.myInputDiv.value.trim() !== "") {
           let listElems = self.typingFunction(self.myInputDiv.value);
           if (listElems) {
             self.setOptions(listElems);
@@ -112,23 +112,23 @@ class AutoCompleteClass {
     options.forEach((o) => {
       let opt = document.createElement("div");
       opt.classList.add("dropdown-item");
-      opt.innerHTML = o.value?o.value:o;
-      let self=this;
-      opt.onclick=function() {
+      opt.innerHTML = o.value ? o.value : o;
+      let self = this;
+      opt.onclick = function () {
         self.onSelect && self.onSelect(o);
-        self.myInputDiv.value=o.value?o.value:o;
-        try {self.myInputDiv.oninput();} catch(err) {}
+        self.myInputDiv.value = o.value ? o.value : o;
+        try { self.myInputDiv.oninput(); } catch (err) { }
         self.clearOptions();
       }
       this.myList.appendChild(opt);
     });
-    this.myOptions=options;
-    if(this.myOptions.length>0) {
+    this.myOptions = options;
+    if (this.myOptions.length > 0) {
       this.myList.style.display = '';
     }
   }
   clearOptions() {
-    this.currentfocus=-1;
+    this.currentfocus = -1;
     this.myList.innerHTML = "";
     this.myList.style.display = 'none';
   }

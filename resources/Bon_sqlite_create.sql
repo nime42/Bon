@@ -125,6 +125,7 @@ CREATE TABLE bons (
 	invoice_info TEXT,
 	invoice_date DATETIME,
 	delivery_info TEXT, pickup_time DATETIME,
+	bon_units TEXT,
 	CONSTRAINT FK_bons_customers FOREIGN KEY (customer_id) REFERENCES customers(id),
 	CONSTRAINT FK_customers_addresses FOREIGN KEY (delivery_address_id) REFERENCES addresses(id) ON DELETE SET NULL
 );

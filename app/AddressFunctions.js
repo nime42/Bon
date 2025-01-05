@@ -55,7 +55,7 @@ module.exports = class AdressFunctions {
    * @param {*} callback function(data) see https://openrouteservice.org/dev/#/api-docs/v2/directions/{profile}/geojson/post
    * @param {*} routeDirectionProfile 
    */
-  getRoute(coordA, coordZ, callback = console.log,routeDirectionProfile) {
+  getRoute(coordA, coordZ, callback = console.log, routeDirectionProfile) {
     if (this.routeServiceUrl === undefined) {
       callback({});
     }
@@ -64,8 +64,8 @@ module.exports = class AdressFunctions {
       "Content-Type": "application/json; charset=utf-8",
     };
 
-    if(!routeDirectionProfile) {
-      routeDirectionProfile=this.routeDirectionProfile
+    if (!routeDirectionProfile) {
+      routeDirectionProfile = this.routeDirectionProfile
     }
     let directionsUrl = this.routeServiceUrl + "/v2/directions/" + routeDirectionProfile + "/geojson";
     let directionsBody = {
@@ -112,27 +112,27 @@ module.exports = class AdressFunctions {
    * })
    * @param {*} routeDirectionProfile see https://openrouteservice.org/dev/#/api-docs/v2/directions/{profile}/geojson/post
    */
-  getRouteFromHome(lat,lon, callback = console.log,routeDirectionProfile) {
+  getRouteFromHome(lat, lon, callback = console.log, routeDirectionProfile) {
     let homeCoord = this.homePosition;
-    let target=[lat,lon];
-    this.getRoute(homeCoord,target,(data)=>{
+    let target = [lat, lon];
+    this.getRoute(homeCoord, target, (data) => {
       let res;
-      if(data.features?.length>0) {
-      res={
-        feature:data.features[0],
-        distance:data.features[0].properties.summary.distance,
-        duration:data.features[0].properties.summary.duration,
-        profile:data.metadata.query.profile
-      }
-    } else {
-      res={}
+      if (data.features?.length > 0) {
+        res = {
+          feature: data.features[0],
+          distance: data.features[0].properties.summary.distance,
+          duration: data.features[0].properties.summary.duration,
+          profile: data.metadata.query.profile
+        }
+      } else {
+        res = {}
 
-    }
+      }
       callback(res);
-    },routeDirectionProfile)
+    }, routeDirectionProfile)
   }
 
-  
+
   /**
    * Takes a list of positions and returns distances- and duration matrices between all positions
    * @param {*} places a list [{id:"id-name",position:[lon,lat]},...]
@@ -175,6 +175,6 @@ module.exports = class AdressFunctions {
       });
   }
 
- 
+
 
 };

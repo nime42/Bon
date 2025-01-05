@@ -27,11 +27,11 @@ function toggleRoute(feature) {
       feature.route.addTo(mapObj);
     }
   } else {
-    if(MapGlobals.geoData===undefined) {
+    if (MapGlobals.geoData === undefined) {
       return;
     }
-    let bonGeoData=MapGlobals.geoData.find(e=>(e.bon_id==feature.bon.id));
-    let geojsonFeature =JSON.parse(bonGeoData?.route_feature)
+    let bonGeoData = MapGlobals.geoData.find(e => (e.bon_id == feature.bon.id));
+    let geojsonFeature = JSON.parse(bonGeoData?.route_feature)
     feature.route = L.geoJSON(geojsonFeature).addTo(mapObj);
 
   }

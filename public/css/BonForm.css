@@ -73,7 +73,17 @@
 }
 
 
-input[type="date"],input[type="time"],input[type="email"], input[type="number"], input[type="search"], input[type="text"], input[type="tel"], input[type="url"], input[type="password"], textarea, select {
+input[type="date"],
+input[type="time"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
     height: auto;
     padding: 6px 10px;
     background-color: #fff;
@@ -82,6 +92,3 @@ input[type="date"],input[type="time"],input[type="email"], input[type="number"],
     box-shadow: none;
     box-sizing: border-box;
 }
-
-
-
