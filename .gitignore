@@ -3,4 +3,5 @@ log/**
 **/*.db
 .vscode/launch.json
 app/test.js
+misc/**
 
