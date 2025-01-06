@@ -13,6 +13,7 @@
     "log-timestamp": "^0.3.0",
     "mailparser": "^3.5.0",
     "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.6.11",
     "nodemailer": "^6.7.3",
     "rotating-file-stream": "2.1.6",

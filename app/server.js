@@ -1201,9 +1201,6 @@ app.get("/api/getNotifiedBon", (req, res) => {
             res.sendStatus(404);
         }
     })
-
-
-
 })
 
 
@@ -1301,4 +1298,13 @@ app.post("/api/geo/timeAndDistanceMatrix", (req, res) => {
 app.post("/api/geo/geoInfo", (req, res) => {
     let bonIds = req.body;
     res.json(DB.getGeoInfo(bonIds));
+})
+
+const multer = require('multer');
+const upload = multer();
+
+app.post("/webhook", upload.none(), (req, res) => {
+    console.log(req.body);
+
+    res.sendStatus(200);
 })
