@@ -1,4 +1,4 @@
-ssh bon@172.105.84.13
+ssh bon@139.162.152.53
 
 
 bon@ristedrug.dk
