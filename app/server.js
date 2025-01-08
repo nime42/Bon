@@ -1304,7 +1304,7 @@ const multer = require('multer');
 const upload = multer();
 
 app.post("/webhook", upload.none(), (req, res) => {
-    console.log(req.body);
+    console.log(JSON.stringify(req.body));
 
     res.sendStatus(200);
 })
