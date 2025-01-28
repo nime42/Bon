@@ -1303,8 +1303,46 @@ app.post("/api/geo/geoInfo", (req, res) => {
 const multer = require('multer');
 const upload = multer();
 
+function parseJotFormWebHook(rawRequest) {
+    const { q1_email, q8_navn, q2_telefonnummer, q10_firmaNavn, q49_typeA49, q25_typeA25, q35_typeA35, q11_date, q12_antalGaester, q15_kontaktPerson, q16_telefonnummer16, q17_dinOnsker, q21_eanfakturaInfo21, q39_addressTekst, q41_legalBasis, q40_typeA40, q50_address } = rawRequest;
+    let b = {};
+    b.forename = rawRequest.q8_navn.first;
+    b.surname = rawRequest.q8_navn.last;
+    b.email = rawRequest.q1_email;
+    b.phone = rawRequest.q2_telefonnummer.full;
+    let d = rawRequest.q11_date;
+    b.deliveryDate = new Date(`${d.year}-${d.month}-${d.day}T${d.timeInput}`);
+    b.company = rawRequest.q10_firmaNavn;
+    b.nr_of_servings = rawRequest.q12_antalGaester;
+    b.kitchen_selects = false;
+    b.price_category = "Store";
+    b.payment_type = "Faktura";
+    b.customer_collects = rawRequest.q49_typeA49 ? true : false;
+    b.kitchen_selects = rawRequest.q13_typeA ? true : false;
+
+    let adress = rawRequest.q25_typeA25;
+    let m = adress.match(/Gade: (?<streetName>.*)\r\n.*Nr.*: (?<streetNr>.*)\r\n.*By: (?<city>.*)\r\n.*Post nummer: (?<zipcode>.*)/i)
+    if (m) {
+        b.delivery_address = {
+            street_name: m.groups.streetName,
+            street_nr: m.groups.streetNr,
+            zip_code: m.groups.zipcode,
+            city: m.groups.city
+        }
+    }
+    //console.log(adress);
+    return b;
+}
+
+
+
 app.post("/webhook", upload.none(), (req, res) => {
+
     console.log(JSON.stringify(req.body));
+    console.log("---------------------");
+    console.log(JSON.stringify(req.body.rawRequest));
+    console.log("---------------------");
+    console.log(parseJotFormWebHook(req.body.rawRequest));
 
     res.sendStatus(200);
 })
