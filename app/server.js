@@ -1342,7 +1342,7 @@ app.post("/webhook", upload.none(), (req, res) => {
     console.log("---------------------");
     console.log(JSON.stringify(req.body.rawRequest));
     console.log("---------------------");
-    console.log(parseJotFormWebHook(req.body.rawRequest));
+    console.log(parseJotFormWebHook(JSON.parse(req.body.rawRequest)));
 
     res.sendStatus(200);
 })
