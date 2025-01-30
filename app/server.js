@@ -1300,49 +1300,42 @@ app.post("/api/geo/geoInfo", (req, res) => {
     res.json(DB.getGeoInfo(bonIds));
 })
 
+const JotFormParser = require("./JotFormParser.js");
+
 const multer = require('multer');
 const upload = multer();
+app.post("/webhook", upload.none(), async (req, res) => {
+    let submissionId = req.body.submissionID;
+    let bonApiKey = req.query.bonApiKey;
 
-function parseJotFormWebHook(rawRequest) {
-    const { q1_email, q8_navn, q2_telefonnummer, q10_firmaNavn, q49_typeA49, q25_typeA25, q35_typeA35, q11_date, q12_antalGaester, q15_kontaktPerson, q16_telefonnummer16, q17_dinOnsker, q21_eanfakturaInfo21, q39_addressTekst, q41_legalBasis, q40_typeA40, q50_address } = rawRequest;
-    let b = {};
-    b.forename = rawRequest.q8_navn.first;
-    b.surname = rawRequest.q8_navn.last;
-    b.email = rawRequest.q1_email;
-    b.phone = rawRequest.q2_telefonnummer.full;
-    let d = rawRequest.q11_date;
-    b.deliveryDate = new Date(`${d.year}-${d.month}-${d.day}T${d.timeInput}`);
-    b.company = rawRequest.q10_firmaNavn;
-    b.nr_of_servings = rawRequest.q12_antalGaester;
-    b.kitchen_selects = false;
-    b.price_category = "Store";
-    b.payment_type = "Faktura";
-    b.customer_collects = rawRequest.q49_typeA49 ? true : false;
-    b.kitchen_selects = rawRequest.q13_typeA ? true : false;
-
-    let adress = rawRequest.q25_typeA25;
-    let m = adress.match(/Gade: (?<streetName>.*)\r\n.*Nr.*: (?<streetNr>.*)\r\n.*By: (?<city>.*)\r\n.*Post nummer: (?<zipcode>.*)/i)
-    if (m) {
-        b.delivery_address = {
-            street_name: m.groups.streetName,
-            street_nr: m.groups.streetNr,
-            zip_code: m.groups.zipcode,
-            city: m.groups.city
-        }
+    if (!config.jotForm) {
+        console.log("JotForm config not set");
+        res.sendStatus(404);
+        return;
     }
-    //console.log(adress);
-    return b;
-}
 
+    if (config.jotForm?.apiKey && config.jotForm.apiKey !== bonApiKey) {
+        console.log("Invalid webhook apiKey");
+        res.sendStatus(401);
+        return;
+    }
 
+    let bonId = "???";
+    try {
+        let rawRequest = JSON.parse(req.body.rawRequest);
+        let bon = JotFormParser.getBon(rawRequest, DB);
+        bonId = await DB.createBon(bon, null);
+        bon.id = bonId;
+        if (config.jotForm?.sendConfirmationMail) {
+            JotFormParser.sendConfirmationMail(bon, config, mailSender, DB);
+        }
+        res.sendStatus(200);
+    } catch (err) {
+        console.log("Error in webhook", err);
+        if (config.jotForm?.mailOnError) {
+            JotFormParser.sendOnErrorMail(err, bonId, submissionId, config);
+        }
+        res.sendStatus(500);
+    }
 
-app.post("/webhook", upload.none(), (req, res) => {
-
-    console.log(JSON.stringify(req.body));
-    console.log("---------------------");
-    console.log(JSON.stringify(req.body.rawRequest));
-    console.log("---------------------");
-    console.log(parseJotFormWebHook(JSON.parse(req.body.rawRequest)));
-
-    res.sendStatus(200);
 })

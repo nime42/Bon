@@ -58,9 +58,9 @@ module.exports = class BonUtils {
 
     let deliveryDate = new Date(bon.delivery_date);
 
-    if (config.mailManager.incomingMails.fromTimeZone) {
+    /*if (config.mailManager.incomingMails.fromTimeZone) {
       deliveryDate = this.adjustForTimeZone(deliveryDate, config.mailManager.incomingMails.fromTimeZone);
-    }
+    }*/
 
     let values = {
       bonId: bon.id,
