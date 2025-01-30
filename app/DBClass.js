@@ -466,14 +466,14 @@ module.exports = class DB {
   addGeoInfo(bonId) {
 
     let sql = `
-    select b.id,b.delivery_address_id,g.adress_id as current_address_id,a.lat,a.lon from bons b
+    select b.id,b.delivery_address_id,g.adress_id as current_address_id,a.lat,a.lon,g.route_feature from bons b
     left join geo_information g on b.id =g.bon_id 
     left join addresses a on a.id =b.delivery_address_id 
     where b.id=?
     `;
     let r = this.db.prepare(sql).get(bonId) ?? [];
 
-    if (r.delivery_address_id != r.current_address_id) {
+    if (r.delivery_address_id != r.current_address_id || (!r.route_feature && r.lat)) {
       sql = "delete from geo_information where bon_id=?";
       this.db.prepare(sql).run(bonId);
       if (r.lat != null && r.lon != null) {
