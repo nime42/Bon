@@ -15,13 +15,13 @@ module.exports = class IzettleFunctionsClass {
     let self = this;
 
     let fun = () => {
-      console.log("Fetching Izettle Purchases");
-
       self.updateProducts(null);
       self.getPurchaseList((purchases) => {
         self.savePurchases(purchases);
         self.consumePurchases(purchases);
-        console.log(`processed ${purchases.length} Izettle purchases`);
+        if (purchases.length > 0) {
+          console.log(`processed ${purchases.length} Izettle purchases`);
+        }
       }, this.config.iZettle.lookDaysBack !== undefined ? this.config.iZettle.lookDaysBack : 1);
     }
 
