@@ -57,10 +57,9 @@ module.exports = class BonUtils {
     `;
 
     let deliveryDate = new Date(bon.delivery_date);
+    deliveryDate = this.adjustForTimeZone(deliveryDate);
 
-    /*if (config.mailManager.incomingMails.fromTimeZone) {
-      deliveryDate = this.adjustForTimeZone(deliveryDate, config.mailManager.incomingMails.fromTimeZone);
-    }*/
+
 
     let values = {
       bonId: bon.id,
@@ -99,7 +98,10 @@ module.exports = class BonUtils {
    * @param {String} timeZone - A TZ database name (see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
    * @returns {Integer} difference in milliseconds
    */
-  static getLocalTimeOffsetDiff(date, timeZone) {
+  static getLocalTimeOffsetDiff(date, timeZone = config.LocalTimeZone) {
+    if (!timeZone) {
+      return 0;
+    }
     let dateWithoutSec = new Date(date);
     dateWithoutSec.setSeconds(0, 0);
     let local = new Date(
@@ -109,9 +111,9 @@ module.exports = class BonUtils {
     return local - dateWithoutSec;
   }
 
-  static adjustForTimeZone(date, timeZone) {
+  static adjustForTimeZone(date) {
     let d = new Date(date);
-    d.setTime(d.getTime() + this.getLocalTimeOffsetDiff(d, timeZone));
+    d.setTime(d.getTime() + this.getLocalTimeOffsetDiff(d));
     return d;
   }
 
