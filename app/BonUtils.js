@@ -98,7 +98,7 @@ module.exports = class BonUtils {
    * @param {String} timeZone - A TZ database name (see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
    * @returns {Integer} difference in milliseconds
    */
-  static getLocalTimeOffsetDiff(date, timeZone = config.LocalTimeZone) {
+  static getLocalTimeOffsetDiff(date, timeZone = config.localTimeZone) {
     if (!timeZone) {
       return 0;
     }
