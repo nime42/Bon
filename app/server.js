@@ -1333,7 +1333,7 @@ app.post("/webhook", upload.none(), async (req, res) => {
     } catch (err) {
         console.log("Error in webhook", err);
         if (config.jotForm?.mailOnError) {
-            JotFormParser.sendOnErrorMail(err, bonId, submissionId, config, mailSender);
+            JotFormParser.sendOnErrorMail(bonId, submissionId, err, config, mailSender);
         }
         res.sendStatus(500);
     }

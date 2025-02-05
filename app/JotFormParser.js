@@ -9,7 +9,7 @@ function parseJotFormWebHook(rawRequest) {
 
     let d = rawRequest.q11_date;
     res.delivery_date = new Date(`${d.year}-${d.month}-${d.day}T${d.timeInput}`);
-    res.delivery_date.setTime(dateValue - BonUtils.getLocalTimeOffsetDiff(delivery_date));
+    res.delivery_date.setTime(res.delivery_date - BonUtils.getLocalTimeOffsetDiff(delivery_date));
 
     res.company = rawRequest.q10_firmaNavn;
 
