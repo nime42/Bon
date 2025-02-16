@@ -817,62 +817,6 @@ app.get("/api/bonMails/:id", (req, res) => {
     })
 })
 
-function mailConfirmations(confirmMessage, orders, callback) {
-    if (orders.length === 0) {
-        callback(true);
-        return;
-    }
-
-    let dateFormat = config.mailManager.incomingMails.dateFormat;
-    let subjectMessage = config.mailManager.incomingMails.confirmSubject;
-
-    let order = orders[0];
-    let rest = orders.slice(1);
-
-    let bon = DB.searchBons({ bonId: order.bonId }, true, null)[0]
-
-
-    let subject = "#Bon:" + config.bonPrefix + "-" + order.bonId + ":" + (subjectMessage ? subjectMessage : "");
-    let message = BonUtils.expandMessageFromBon(confirmMessage, bon, dateFormat);
-
-    if (bon.customer.email) {
-        mailSender.sendMail(config.mail.user, bon.customer.email, undefined, undefined, subject, message, undefined, function (err) {
-            if (err !== null) {
-                console.log("mailConfirmations", err);
-                callback(false, err)
-            } else {
-                mailConfirmations(rest, callback);
-            }
-        });
-    } else {
-        mailConfirmations(rest, callback);
-    }
-
-
-
-
-}
-
-
-function mailIncomingOrders(orders, callback) {
-    if (orders.length === 0) {
-        callback(true);
-        return;
-    }
-    let order = orders[0];
-    let rest = orders.slice(1);
-    let subject = "#Bon:" + config.bonPrefix + "-" + order.bonId + ":";
-    let message = order.orgMessage;
-
-    mailSender.sendMail(config.mail.user, config.mail.user, undefined, undefined, "INCOMING:" + subject, message, undefined, function (err) {
-        if (err !== null) {
-            console.log("mailIncomingOrders", err);
-            callback(false, err)
-        } else {
-            mailIncomingOrders(rest, callback)
-        }
-    });
-}
 
 
 app.get("/api/unseenBonIdMails", (req, res) => {
