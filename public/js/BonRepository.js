@@ -180,10 +180,6 @@ class BonRepository {
         $.get(url, callback);
     }
 
-    checkIncomingMails() {
-        let url = "api/checkIncomingMails";
-        $.get(url);
-    }
 
     getAllBonWithMails(mailsSince, callback) {
         let url = "api/allBonWithMails?mailsSince=" + (mailsSince !== undefined ? mailsSince : "");

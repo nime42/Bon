@@ -113,9 +113,6 @@ function sendConfirmationMail(bon, config, mailSender, dbInstance) {
         message = "This is actually a mail to: " + bon.customer.email + "\n\n" + message;
     }
 
-    console.log("mailSender");
-    console.log(config.mail.user, mailTo, "", "", subject, message, "");
-    return;
     mailSender.sendMail(config.mail.user, mailTo, "", "", subject, message, "", (err) => {
         if (err) {
             console.error("Failed to send confirmation mail", err);

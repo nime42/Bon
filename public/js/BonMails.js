@@ -86,7 +86,6 @@ class BonMails {
         let refreshButton = this.myDiv.querySelector("#refresh-mails");
         refreshButton.onclick = function () {
             self.refreshMails(true);
-            self.myRepo.checkIncomingMails();
         }
 
 
