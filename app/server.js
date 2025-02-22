@@ -1180,6 +1180,8 @@ app.post("/webhook", upload.none(), async (req, res) => {
     let submissionId = req.body.submissionID;
     let bonApiKey = req.query.bonApiKey;
 
+    console.log("New submission from Jotform", submissionId);
+
     if (!config.jotForm) {
         console.log("JotForm config not set");
         res.sendStatus(404);
