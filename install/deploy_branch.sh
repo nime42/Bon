@@ -1,7 +1,7 @@
 #! /bin/sh
 WDIR=`dirname $0`
 
-if [ $# -eq 1 ]; then
+if [ $# -le 1 ]; then
         echo "Usage: $0 bonDir branch"
         echo "* bondir: path to bonServer directory e.g ~/bonServer"
         echo "* branch: name of branch"
