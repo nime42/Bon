@@ -78,53 +78,57 @@ function getAllMails(callback = console.log) {
 }
 
 function initCheckNewMails(callback = console.log) {
-    imap.on("mail", () => {
-        imap.search(["UNSEEN"], (err, results) => {
-            if (err) throw err;
-            if (results.length > 0) {
-                const f = imap.fetch(results, { bodies: "" });
-                f.on("message", (msg) => {
-                    let messageInfo = {};
-                    msg.on("body", (stream) => {
-                        messageInfo.stream = stream;
-                    });
-                    msg.once("attributes", (attrs) => {
-                        messageInfo.attrs = attrs;
-                    });
-                    msg.once("end", () => {
-                        simpleParser(messageInfo.stream, (err, parsed) => {
-                            if (err) throw err;
-                            let mail = {
-                                date: parsed.date,
-                                from: parsed.from.text,
-                                to: parsed.to.text,
-                                subject: parsed.subject ?? "",
-                                message: parsed.text,
-                                messageId: parsed.messageId,
-                                unread: !messageInfo.attrs.flags.includes("\\Seen")
-                            };
-                            let mailExists = allCachedMails.find((m) => m.messageId == mail.messageId);
-                            if (!mailExists) {
-                                allCachedMails.push(mail);
-                                callback(true, mail);
-                            }
+    try {
+        imap.on("mail", () => {
+            imap.search(["UNSEEN"], (err, results) => {
+                if (err) throw err;
+                if (results.length > 0) {
+                    const f = imap.fetch(results, { bodies: "" });
+                    f.on("message", (msg) => {
+                        let messageInfo = {};
+                        msg.on("body", (stream) => {
+                            messageInfo.stream = stream;
+                        });
+                        msg.once("attributes", (attrs) => {
+                            messageInfo.attrs = attrs;
+                        });
+                        msg.once("end", () => {
+                            simpleParser(messageInfo.stream, (err, parsed) => {
+                                if (err) throw err;
+                                let mail = {
+                                    date: parsed.date,
+                                    from: parsed.from.text,
+                                    to: parsed.to.text,
+                                    subject: parsed.subject ?? "",
+                                    message: parsed.text,
+                                    messageId: parsed.messageId,
+                                    unread: !messageInfo.attrs.flags.includes("\\Seen")
+                                };
+                                let mailExists = allCachedMails.find((m) => m.messageId == mail.messageId);
+                                if (!mailExists) {
+                                    allCachedMails.push(mail);
+                                    callback(true, mail);
+                                }
+                            });
+                        });
+                        msg.once("error", (err) => {
+                            callback(false, err);
                         });
                     });
-                    msg.once("error", (err) => {
+                    f.once("error", (err) => {
                         callback(false, err);
                     });
-                });
-                f.once("error", (err) => {
-                    callback(false, err);
-                });
-            }
+                }
+            });
         });
-    });
 
-    imap.once("error", (err) => {
-        callback(false, err);
-        imap.end();
-    });
+        imap.once("error", (err) => {
+            callback(false, err);
+            imap.end();
+        });
+    } catch (error) {
+        callback(false, error);
+    }
 }
 
 
@@ -208,7 +212,7 @@ function getAllCachedMails() {
 }
 
 /*
-
+ 
 initMailCache((status, mails) => {
     console.log("Mail cache initialized");
     markAsRead("SENT:#Bon")
