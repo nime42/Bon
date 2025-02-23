@@ -181,8 +181,8 @@ class BonRepository {
     }
 
 
-    getAllBonWithMails(mailsSince, callback) {
-        let url = "api/allBonWithMails?mailsSince=" + (mailsSince !== undefined ? mailsSince : "");
+    getAllBonWithMails(callback) {
+        let url = "api/allBonWithMails";
         $.get(url, callback);
     }
 
