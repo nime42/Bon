@@ -117,9 +117,8 @@ class BonMails {
         if (withProgressMessage) {
             p = MessageBox.popup("henter mail...");
         }
-        let mailsSince = this.lastRefresh;
-        this.lastRefresh = new Date();
-        this.myRepo.getAllBonWithMails(mailsSince, (mails) => {
+
+        this.myRepo.getAllBonWithMails((mails) => {
             p && p.hide();
             mails.forEach(m => {
                 this.myMails[m.bon.id] = m;

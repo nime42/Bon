@@ -843,11 +843,7 @@ app.get("/api/allBonWithMails", (req, res) => {
         return;
     }
 
-    let mailsSince = undefined;
-    if (req.query.mailsSince !== "") {
-        mailsSince = new Date(req.query.mailsSince);
-    }
-    mailManager.getBonWithMails("*", mailsSince, (status, mails) => {
+    mailManager.getBonWithMails("*", (status, mails) => {
         mails.forEach(m => {
             let searchParams = { bonId: m.bonId };
             let [bon] = allBonInstances.searchBons(m.prefix, searchParams, true, null);

@@ -78,7 +78,7 @@ function getUnseenMails(prefix, callback = console.log) {
   callback(true, mails);
 }
 
-function getBonWithMails(prefix, mailsSince, callBack = console.log) {
+function getBonWithMails(prefix, callBack = console.log) {
   let searchSubject;
   if (prefix === "*") {
     searchSubject = "#Bon:";
@@ -87,9 +87,7 @@ function getBonWithMails(prefix, mailsSince, callBack = console.log) {
   }
   const allCachedMails = MailCache.getAllCachedMails();
   let mails = allCachedMails.filter((m) => m.subject.includes(searchSubject));
-  /*if (mailsSince) {
-    mails = mails.filter((m) => new Date(m.date) > mailsSince);
-  }*/
+
   mails = mails.filter((m) => !m.subject.includes("SENT"));
   let groupedMails = {};
   mails.forEach((m) => {
