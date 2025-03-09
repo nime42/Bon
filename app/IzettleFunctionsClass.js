@@ -247,9 +247,9 @@ module.exports = class IzettleFunctionsClass {
     `;
     let statement = this.db.prepare(sql);
 
-    purchases.forEach((p) => {
+    purchases.forEach(async (p) => {
 
-      p.bon_id = this.createBon(p);
+      p.bon_id = await this.createBon(p);
       p.purchase_data_string = JSON.stringify(p);
       statement.run(p);
     });
@@ -305,7 +305,7 @@ module.exports = class IzettleFunctionsClass {
 
 
 
-  createBon(purchase) {
+  async createBon(purchase) {
     let bon = bonUtils.getEmptyBon();
     bon.status = 'payed';
     bon.customer.email = purchase.userDisplayName;
@@ -320,7 +320,7 @@ module.exports = class IzettleFunctionsClass {
       return total + parseInt(o.quantity);
     }, 0)
     bon.nr_of_servings = pax;
-    let bonId = this.bonDB.createBon(bon, null);
+    let bonId = await this.bonDB.createBon(bon, null);
     return bonId;
   }
 

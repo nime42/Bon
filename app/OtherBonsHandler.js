@@ -156,7 +156,7 @@ module.exports = class OtherBonsHandler {
 
     }
 
-    moveBon(bonId, toInstancePrefix, force, callback) {
+    async moveBon(bonId, toInstancePrefix, force, callback) {
         bonId = bonId + "";
         let prefix = this.defaultBonPrefix;
         let parts = bonId.split("-");
@@ -184,7 +184,7 @@ module.exports = class OtherBonsHandler {
             }
         })
         bon.orders = newOrders;
-        let newBonId = toBonInstance.db.createBon(bon, null);
+        let newBonId = await toBonInstance.db.createBon(bon, null);
         fromBonInstance.db.delBon(bonId, null);
         callback(true, {
             newBon: {
