@@ -177,6 +177,7 @@ class BonConfig {
         </table>
         </div>
         <a href="api/productFile">Download</a>
+        <a style="float: right;" href="api/getProductsPerBon">Ingredienser per Bon</a>
         </div>
         </div>
     `;
