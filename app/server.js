@@ -1093,6 +1093,99 @@ app.post("/api/getGrocyProductsForOrders", (req, res) => {
     }
 });
 
+
+app.get("/api/getProductsPerBon", (req, res) => {
+
+    let headers = [...grocyFuncs.allProducts].sort((a, b) => { (a.product_group_id * 10000000 + a.id) - (b.product_group_id * 10000000 + b.id) }).map(e => ({ id: e.id, header: `${e.name}(${e.default_stock_unit})` }));
+    DB.getBons(undefined, undefined, (status, bons) => {
+        if (status) {
+            bons.filter(b => (b.id == 2437 || true)).forEach(b => {
+                getProductsPerBon(b, headers);
+            })
+            createProductsPerBonExcel(bons, headers, res);
+
+
+        } else {
+            console.log("getBons", bons);
+            res.sendStatus(500);
+            return;
+        }
+    })
+
+});
+
+
+
+
+function getProductsPerBon(bon, headers) {
+    let orders = DB.getOrders(bon.id);
+    orders = DB.complementWithGrocyIds(orders, null)
+    let products = {}
+    orders.forEach(o => {
+        o.ingredients = grocyFuncs.getIngredients(o.external_id);
+        let ingredients = grocyFuncs.getProductsPerRecipy(o.external_id).map(p => ({ product_id: p.product_id, name: p.name, amount: o.quantity * p.stock_amount, unit: p.stock_unit.name }));
+        ingredients.forEach(i => {
+            if (products[i.product_id]) {
+                products[i.product_id].amount = products[i.product_id].amount + i.amount;
+            } else {
+                products[i.product_id] = i;
+            }
+        })
+    });
+
+
+    bon.orders = orders;
+    bon.products = headers.map(h => (products[h.id] !== undefined ? +products[h.id].amount.toFixed(2) : 0));
+}
+
+
+function createProductsPerBonExcel(bons, headers, res) {
+    const excel = require('excel4node');
+    const workbook = new excel.Workbook();
+    let headerStyle = workbook.createStyle({
+        font: {
+            bold: true
+        }
+    });
+    try {
+        const worksheet = workbook.addWorksheet('Sheet 1');
+        let row = 1;
+        let col = 1;
+        worksheet.cell(row, col++).string("Bon-id").style(headerStyle);
+        worksheet.cell(row, col++).string("Leveringsdato").style(headerStyle);
+        worksheet.cell(row, col++).string("Pris kategorie").style(headerStyle);
+
+
+        headers.forEach(h => {
+            worksheet.cell(row, col++).string(h.header).style(headerStyle);
+        });
+        row++;
+        bons.forEach(b => {
+            col = 1;
+            worksheet.cell(row, col++).number(b.id);
+            worksheet.cell(row, col++).date(b.delivery_date);
+            worksheet.cell(row, col++).string(b.price_category);
+
+            b.products.forEach(p => {
+                //console.log(b.id, row, col, p);
+                worksheet.cell(row, col++).number(!isNaN(p) ? p : 0);
+            })
+            row++;
+        })
+        workbook.write('productsPerBon.xlsx', res);
+
+
+    } catch (err) {
+        console.log(err);
+        res.sendStatus(500);
+    }
+
+
+}
+
+
+
+
 app.post("/api/createInvoiceDraft", (req, res) => { });
 
 

@@ -217,6 +217,43 @@ module.exports = class GrocyFunctions {
     return (productsPrice + nestedPrices) / recipy.base_servings;
   }
 
+  getProductsPerRecipy(recipyId) {
+    let recipy = this.allRecipies[recipyId];
+    if (!recipy) {
+      return [];
+    }
+
+    let unique = {};
+    recipy.ingredients?.forEach((i) => {
+      unique[i.product_id] = {
+        product_id: i.product_id,
+        name: i.name,
+        stock_amount: i.stock_amount / (recipy.base_servings * 1.0),
+        stock_unit: i.qu_id_stock,
+        in_stock: i.in_stock,
+      };
+
+    });
+    recipy.nested_recipies?.forEach((n) => {
+      let products = this.getProductsPerRecipy(n.recipy.external_id);
+      products.forEach((p) => {
+        if (!unique[p.product_id]) {
+          unique[p.product_id] = {
+            product_id: p.product_id,
+            name: p.name,
+            stock_amount: p.stock_amount * n.servings,
+            stock_unit: p.stock_unit,
+            in_stock: p.in_stock,
+          };
+        } else {
+          unique[p.product_id].stock_amount += p.stock_amount * n.servings;
+        }
+      });
+    });
+
+    return Object.values(unique);
+  }
+
   getAllProductsForRecipy(recipyId) {
     let recipy = this.allRecipies[recipyId];
     if (!recipy) {
@@ -589,6 +626,10 @@ module.exports = class GrocyFunctions {
           )
         );
       });
+
+      objects["products"].forEach(p => {
+        p.default_stock_unit = quantityUnitLookUp[p.qu_id_stock].name
+      })
 
       objects["recipes"].forEach((r) => {
         let recipe_id = r.id;

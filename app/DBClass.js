@@ -739,15 +739,19 @@ module.exports = class DB {
     let izettleStmt = this.db.prepare(izettleSQl);
 
     orders.forEach((o) => {
-      if (o.id != null && o.id != "") {
-        let row = grocyStmt.get(o.id);
+      if (o.id != null && o.id != "" || (o.item_id != null && o.item_id != "")) {
+        let row = grocyStmt.get(o.id ?? o.item_id);
         o.external_id = row?.external_id;
       } else if (o.izettle_product_id != null && o.izettle_product_id != "") {
         let row = izettleStmt.get(o.izettle_product_id);
         o.external_id = row?.external_id;
       }
     });
-    callback(true, orders);
+    if (callback === null) {
+      return orders;
+    } else {
+      callback(true, orders);
+    }
   }
 
   getLastOrderByCustomer(mailAddress) {
