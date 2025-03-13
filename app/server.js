@@ -1153,6 +1153,10 @@ function createProductsPerBonExcel(bons, headers, res) {
         let col = 1;
         worksheet.cell(row, col++).string("Bon-id").style(headerStyle);
         worksheet.cell(row, col++).string("Leveringsdato").style(headerStyle);
+        worksheet.cell(row, col++).string("Navn").style(headerStyle);
+        worksheet.cell(row, col++).string("Firma").style(headerStyle);
+        worksheet.cell(row, col++).string("Status").style(headerStyle);
+
         worksheet.cell(row, col++).string("Pris kategorie").style(headerStyle);
 
 
@@ -1161,9 +1165,14 @@ function createProductsPerBonExcel(bons, headers, res) {
         });
         row++;
         bons.forEach(b => {
+            let name = b.customer?.forename + " " + b.customer?.surname;
+            let company = b.customer?.company?.name;
             col = 1;
             worksheet.cell(row, col++).number(b.id);
             worksheet.cell(row, col++).date(b.delivery_date);
+            worksheet.cell(row, col++).string(name ? name : "");
+            worksheet.cell(row, col++).string(company ? company : "");
+            worksheet.cell(row, col++).string(b.status);
             worksheet.cell(row, col++).string(b.price_category);
 
             b.products.forEach(p => {
