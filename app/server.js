@@ -1135,7 +1135,7 @@ function getProductsPerBon(bon, headers) {
 
 
     bon.orders = orders;
-    bon.products = headers.map(h => (products[h.id] !== undefined ? +products[h.id].amount.toFixed(2) : 0));
+    bon.products = headers.map(h => (products[h.id] !== undefined ? +products[h.id].amount.toFixed(4) : 0));
 }
 
 
