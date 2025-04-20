@@ -157,7 +157,7 @@ class TableEnhancer {
           r.style.display = "";
           for (let f = 0; f < r.children.length; f++) {
             let filter = filters[f].value;
-            let value = valueFunctions[f] ? valueFunctions[f](cols[f]) : cols[f].textContent.toLowerCase();
+            let value = valueFunctions[f] ? valueFunctions[f](cols[f]) : cols[f].textContent;
             if (!this._filterMatch(value, filter)) {
               r.style.display = "none";
             }
@@ -173,6 +173,8 @@ class TableEnhancer {
   }
 
   static _filterMatch(value, filter) {
+    value = value?.toLowerCase();
+    filter = filter?.toLowerCase();
     if (filter.startsWith("<=")) {
       filter = filter.replace("<=", "");
       return value <= filter;

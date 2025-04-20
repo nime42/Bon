@@ -136,6 +136,7 @@ class BonMails {
         <tr>
         <th>Ulæst</th>
         <th>Dato</th>
+        <th>Status
         <th>Bon-ID</th>
         <th>Leveringsdato</th>
         <th>Kunde</th>
@@ -152,6 +153,7 @@ class BonMails {
             let r = `
                 <td><li id="bon-id-${m.bon.id}" class="fa fa-envelope mail unread-mails" style="display:${m.mail.unread ? "" : "none"}"></li></td>
                 <td>${new Date(m.mail.date).toLocaleString()}</td>
+                <td style="background-color:${Globals.Statuses[m.bon.status].color};color:${Helper.contrastColor(Globals.Statuses[m.bon.status].color)}">${Globals.Statuses[m.bon.status].label}</td>
                 <td><a href="#">${m.bon.id}</a></td>
                 <td>${new Date(m.bon.delivery_date).toLocaleString()}</td>
                 <td>${m.bon.customer.forename + " " + m.bon.customer.surname}</td>
@@ -177,6 +179,7 @@ class BonMails {
             1: (td) => (new Date(td.innerText)),
             3: (td) => (new Date(td.innerText)),
         });
+        TableEnhancer.filterable(this.myMailTable);
 
 
     }
