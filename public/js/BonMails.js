@@ -51,7 +51,7 @@ class BonMails {
         ${this.style}
     </style>
     <div class="mail-style">
-    <div class="tableFixHead" style="width: 90%; margin-left:10px;">
+    <div class="tableFixHead" style="width: 90%; margin-left:10px;height: 450px;">
     <table id="mail-table">
     </table>
     </div>

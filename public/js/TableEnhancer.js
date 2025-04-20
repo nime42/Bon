@@ -149,6 +149,7 @@ class TableEnhancer {
       filterInput.placeholder = "filter..."
       filterInput.style.maxWidth = "10ch";
       filterInput.style.height = "20px";
+      filterInput.style.color = "brown";
       filterInput.onkeyup = () => {
         let rows = Array.from(tableBody.querySelectorAll("tr"));
         let filters = headerRow.querySelectorAll(".filter");
