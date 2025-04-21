@@ -64,6 +64,7 @@ class BonConfig {
     .config-style input[type=date],
     .config-style input[type=datetime],
     .config-style input[type=number],
+    .config-style input[type=numeric],
     .config-style input[type=search],
     .config-style input[type=time],
     .config-style input[type=url],
@@ -120,11 +121,14 @@ class BonConfig {
         border: 1px solid ${this.foreground};
         padding: 8px;
         color: ${this.foreground};
-        text-overflow: ellips;
+        text-overflow: ellipsis;
+        max-width: 200px;
         white-space: nowrap;
         overflow:hidden;
         
       }
+
+
       
       .tableFixHead { 
           overflow: auto; 
@@ -159,6 +163,20 @@ class BonConfig {
           #izettle-products-table {
             width:70%;
           }
+
+          .config-style .input-field {
+          width: 10ch;
+          margin: 0px 0px 0px 0px;
+          }
+
+          .config-style .save-button {
+          margin: 0px 0px 0px 0px;
+          box-shadow: 2px 2px 4px ${this.shadowColor}; 
+          padding: 4px; 
+          border-radius: 50%;
+          display: none;
+         }
+
 
 
     `;
@@ -507,6 +525,7 @@ class BonConfig {
         <th>Vare</th>
         <th>Pris</th>
         ${categoryHeaders}
+        <th>Co2e</th>
         </tr>
         `;
         let headerRow = document.createElement("thead");
@@ -523,10 +542,33 @@ class BonConfig {
                 <td>${i.name}</td>
                 <td>${i.cost_price}</td>
                 ${priceCategories}
+                <td><input type="numeric" class="input-field" value=${i.co2e}><i class="fa fa-check save-button"></i></td>                
             `;
 
             let row = document.createElement("tr");
             row.innerHTML = cols;
+            row.querySelector(".input-field").oninput = () => {
+                row.querySelector(".save-button").style.display = "inline";
+            }
+            row.querySelector(".save-button").onclick = () => {
+                let co2e = row.querySelector(".input-field").value.trim();
+                co2e = co2e.replace(",", ".");
+                if (co2e == "") {
+                    co2e = 0;
+                }
+                row.querySelector(".input-field").value = co2e;
+
+                let id = i.id;
+                this.myRepo.updateItemAttribute(id, { co2e: co2e }, (status) => {
+                    if (status) {
+                        row.querySelector(".save-button").style.display = "none";
+                    } else {
+                        MessageBox.popup("Det gik ikke at opdatere varen", { b1: { text: "Ok" } });
+                    }
+                });
+            }
+
+
             tableRows.append(row);
 
         })
@@ -776,11 +818,11 @@ class BonConfig {
         <td>${c.nr_of_servings}</td>
         <td>${c.pax_units}</td>      
         <td>${c.kitchen_selects ? "Ja" : "Nej"}</td>
-        <td>${c.customer_collects ? "Afhentes" : c.delivery_adr}</td>
+        <td title="${c.delivery_adr}">${c.customer_collects ? "Afhentes" : c.delivery_adr}</td>
         <td>${c.name}</td>
         <td>${c.email}</td>
         <td>${c.phone_nr}</td>
-        <td>${c.company}</td>
+        <td title="${c.company}">${c.company}</td>
         <td>${c.ean_nr}</td>
         <td>${c.payment_type}</td>
         <td>${c.price_category}</td>

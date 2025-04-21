@@ -1311,3 +1311,23 @@ app.post("/webhook", upload.none(), async (req, res) => {
     }
 
 })
+
+app.put("/api/itemAttributes/:id", (req, res) => {
+    if (!loginHandler.checkRoles(req, "${ADMIN}")) {
+        res.sendStatus(401);
+        return;
+    }
+    let id = req.params.id;
+    let attributes = req.body.attributes;
+    DB.updateItemAttributes(id, attributes, function (status, err) {
+        if (status) {
+            res.sendStatus(200);
+
+        } else {
+            console.log("updateItemAttributes", err);
+            res.sendStatus(500);
+
+        }
+    })
+}
+)

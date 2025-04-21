@@ -189,3 +189,10 @@ CREATE TABLE geo_information (
 	route_feature TEXT,
 	CONSTRAINT distances_bons_FK FOREIGN KEY (bon_id) REFERENCES bons(id) ON DELETE CASCADE
 );
+
+
+CREATE TABLE item_attributes (
+	item_id numeric,
+	co2e numeric,
+	CONSTRAINT item_attributes_FK FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
+);

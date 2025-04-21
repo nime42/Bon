@@ -351,4 +351,15 @@ class BonRepository {
 
     }
 
+    updateItemAttribute(id, attributes, callback) {
+        let url = "api/itemAttributes/" + id;
+        $.ajax({
+            type: "PUT",
+            url: url,
+            data: JSON.stringify({ attributes }),
+            success: (data, status, xhr) => { callback(true, data, status, xhr) },
+            error: (data, status, xhr) => { callback(false, data, status, xhr) },
+            contentType: "application/json"
+        });
+    }
 }

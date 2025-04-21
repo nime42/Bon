@@ -497,7 +497,11 @@ module.exports = class DB {
   }
 
   getItems(callback = console.log) {
-    let sql = "SELECT * FROM items order by category is null,category,name is null,name;";
+    let sql = `
+    SELECT i.*,coalesce(a.co2e,0) as co2e FROM items i
+    left join item_attributes a on i.id=a.item_id
+    order by i.category is null,i.category,name is null,i.name; 
+    `
     try {
       const rows = this.db.prepare(sql).all();
 
@@ -772,4 +776,23 @@ module.exports = class DB {
       return undefined;
     }
   }
+
+  updateItemAttributes(itemId, attributes, callback) {
+    let sql = `
+      DELETE FROM item_attributes WHERE item_id=?
+    `;
+    let ps = this.db.prepare(sql);
+    ps.run(itemId);
+    sql = `
+      INSERT INTO item_attributes(item_id,co2e) VALUES(?,?) 
+    `;
+    ps = this.db.prepare(sql);
+    ps.run(itemId, attributes.co2e);
+    callback(true);
+
+
+
+  }
+
+
 };
