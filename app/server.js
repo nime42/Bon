@@ -238,6 +238,7 @@ app.get("/api/bonSummaryFile", (req, res) => {
         "Købspris",
         "Pris",
         "Fakturadato",
+        "Co2e",
         "afstand (km)"
     ];
 
@@ -295,6 +296,7 @@ app.get("/api/bonSummaryFile", (req, res) => {
         } else {
             worksheet.cell(row, col++).string("");
         }
+        worksheet.cell(row, col++).number(safeNumber(b.co2e));
         worksheet.cell(row, col++).number(+safeNumber(b.distance / 1000).toFixed(2));
 
 
@@ -309,6 +311,7 @@ app.get("/api/bonSummaryFile", (req, res) => {
         "Købspris",
         "Pris",
         "Extra info",
+        "Co2e",
         "Afstand(km)"
     ];
     row = 1;
@@ -327,6 +330,7 @@ app.get("/api/bonSummaryFile", (req, res) => {
         ordersWorksheet.cell(row, col++).number(safeNumber(o.cost_price));
         ordersWorksheet.cell(row, col++).number(safeNumber(o.price));
         ordersWorksheet.cell(row, col++).string(safeString(o.special_request));
+        ordersWorksheet.cell(row, col++).number(safeNumber(o.co2e));
         if (o.category.match(/.*levering*./i)) {
             ordersWorksheet.cell(row, col++).number(+safeNumber(distanceLookup[o.bon_id] / 1000).toFixed(2));
         }
@@ -353,6 +357,7 @@ app.get("/api/bonSummaryFile", (req, res) => {
         "Priskategorie",
         "Købspris(totalt)",
         "Pris(totalt)",
+        "Co2e(totalt)",
         "Fakturadato",
         "Kategorie",
         "Produkt",
@@ -360,6 +365,7 @@ app.get("/api/bonSummaryFile", (req, res) => {
         "Købspris(produkt)",
         "Pris(produkt)",
         "Extra info",
+        "Co2e(produkt)",
         "Afstand(km)"
     ];
     row = 1;
@@ -405,8 +411,9 @@ app.get("/api/bonSummaryFile", (req, res) => {
         allWorksheet.cell(row, col++).string(safeString(b.ean_nr));
         allWorksheet.cell(row, col++).string(safeString(b.payment_type));
         allWorksheet.cell(row, col++).string(safeString(b.price_category));
-        allWorksheet.cell(row, col++).number(safeNumber(b.cost_price));
-        allWorksheet.cell(row, col++).number(safeNumber(b.price));
+        allWorksheet.cell(row, col++).number(safeNumber(b.total_cost_price));
+        allWorksheet.cell(row, col++).number(safeNumber(b.total_price));
+        allWorksheet.cell(row, col++).number(safeNumber(b.total_co2e));
         if (b.invoice_date) {
             allWorksheet.cell(row, col++).date(new Date(b.invoice_date));
         } else {
@@ -419,6 +426,7 @@ app.get("/api/bonSummaryFile", (req, res) => {
         allWorksheet.cell(row, col++).number(safeNumber(b.product_cost_price)).style(productInfoStyle);
         allWorksheet.cell(row, col++).number(safeNumber(b.product_price)).style(productInfoStyle);
         allWorksheet.cell(row, col++).string(safeString(b.special_request)).style(productInfoStyle);
+        allWorksheet.cell(row, col++).number(safeNumber(b.product_co2e)).style(productInfoStyle);
         if (b.product_category.match(/.*levering*./i)) {
             allWorksheet.cell(row, col++).number(+safeNumber(distanceLookup[b.id] / 1000).toFixed(2)).style(productInfoStyle);
         }
@@ -444,7 +452,7 @@ function getProducts(callback = console.log) {
                     prices.items.forEach(p => {
                         item_lookUpPrices[p.id] = p;
                     })
-                    let headers = ["Kategorie", "Vare", "Pris", ...prices.categoryNames.map(e => ("Pris - " + e))];
+                    let headers = ["Kategorie", "Vare", "Pris", ...prices.categoryNames.map(e => ("Pris - " + e)), "Co2e"];
                     let rows = [];
                     rows.push(headers);
                     items.filter(e => (e.sellable === 1)).forEach(i => {
@@ -456,6 +464,7 @@ function getProducts(callback = console.log) {
                         prices.categoryNames.forEach(n => {
                             row.push(categoryPrices.price_categories[n]);
                         })
+                        row.push(i.co2e);
                         rows.push(row);
                     })
                     callback(true, rows);

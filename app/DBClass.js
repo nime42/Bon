@@ -74,6 +74,7 @@ module.exports = class DB {
           co.name as company,co.ean_nr,
           o.quantity * o.price as price,
           o.quantity * o.cost_price as cost_price,
+          o.quantity * o.co2e as co2e,
           g.distance
         from bons b
         left join addresses a on b.delivery_address_id=a.id
@@ -82,7 +83,7 @@ module.exports = class DB {
         left join addresses co_a on co_a.id=co.address_id
         left join orders o on b.id=o.bon_id
         left join geo_information g on g.bon_id=b.id)
-        select id,delivery_date,pickup_time,status ,nr_of_servings,pax_units,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,sum(price) as price,sum(cost_price) as cost_price,invoice_date,distance from boninfo
+        select id,delivery_date,pickup_time,status ,nr_of_servings,pax_units,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,sum(price) as price,sum(cost_price) as cost_price,sum(co2e) as co2e,invoice_date,distance from boninfo
         where coalesce(?,id)=id
         group by id order by id desc
     `;
@@ -110,14 +111,15 @@ module.exports = class DB {
                   c.email,c.phone_nr,
                   co.name as company,co.ean_nr,
                   o.quantity * o.price as price,
-                  o.quantity * o.cost_price cost_price
+                  o.quantity * o.cost_price cost_price,
+                  o.quantity * o.co2e as co2e
                 from bons b
                  left join addresses a on b.delivery_address_id=a.id
                  left join customers c on b.customer_id =c.id
                  left join companies co on c.company_id =co.id
                  left join addresses co_a on co_a.id=co.address_id
                  left join orders o on b.id=o.bon_id)
-                select id,delivery_date,pickup_time,status ,nr_of_servings,pax_units,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,coalesce(sum(price),0) as total_price,coalesce(sum(cost_price),0) as total_cost_price,invoice_date from boninfo
+                select id,delivery_date,pickup_time,status ,nr_of_servings,pax_units,price_category,payment_type,kitchen_selects,customer_collects,delivery_adr,street_name2,street_name,street_nr,zip_code,city,name,email,phone_nr,company,ean_nr,coalesce(sum(price),0) as total_price,coalesce(sum(cost_price),0) as total_cost_price,coalesce(sum(co2e),0) as total_co2e,invoice_date from boninfo
                 group by id 
             ),
             all_orders as (
@@ -126,7 +128,7 @@ module.exports = class DB {
                     left join (select *,'izettle' as category from izettle_products) ip on o.izettle_product_id = ip.id
                     
             )
-            select b.*,coalesce(o.category,'') as product_category,coalesce(o.name,'') as product,coalesce(o.quantity,0) as quantity,coalesce(o.price,0) as product_price,coalesce(o.cost_price,0) as product_cost_price,o.special_request from all_bons b
+            select b.*,coalesce(o.category,'') as product_category,coalesce(o.name,'') as product,coalesce(o.quantity,0) as quantity,coalesce(o.price,0) as product_price,coalesce(o.cost_price,0) as product_cost_price,coalesce(o.co2e,0) as product_co2e,o.special_request from all_bons b
             left join all_orders o on b.id=o.bon_id
             where coalesce(?,b.id)=b.id
                 order by id desc 
@@ -581,7 +583,8 @@ module.exports = class DB {
 
   getItemPrices(callback = console.log) {
     let sql = `
-      select i.id,i.name,i.category,i.cost_price,p.price_categories from items i
+      select i.id,i.name,i.category,i.cost_price,coalesce(ia.co2e,0) as co2e,p.price_categories from items i
+      left join item_attributes ia on i.id=ia.item_id
       join (select item_id,group_concat(price_category||'='||coalesce(price,0),';') as price_categories from salesprice_categories group by item_id ) p on i.id=p.item_id  
       `;
     try {
@@ -595,6 +598,7 @@ module.exports = class DB {
             name: r.name,
             category: r.category,
             cost_price: r.cost_price,
+            co2e: r.co2e
           };
           let price_categories = {};
           r.price_categories.split(";").forEach((c) => {
@@ -623,8 +627,8 @@ module.exports = class DB {
       return o;
     });
 
-    sql = `insert into orders(bon_id,item_id,price,cost_price,quantity,special_request,izettle_product_id,sorting_order) 
-            values(@bon_id,@id,@price,@cost_price,@quantity,@comment,@izettle_product_id,@sorting_order)`;
+    sql = `insert into orders(bon_id,item_id,price,cost_price,quantity,special_request,izettle_product_id,co2e,sorting_order) 
+            values(@bon_id,@id,@price,@cost_price,@quantity,@comment,@izettle_product_id,@co2e,@sorting_order)`;
 
     let ps = this.db.prepare(sql);
     preparedOrders.forEach((o) => {
@@ -792,6 +796,20 @@ module.exports = class DB {
 
 
 
+  }
+
+  calculateCo2e(bonId, callback) {
+    let sql = `
+      SELECT sum(coalesce(i.co2e,0)*o.quantity) as co2e FROM orders o
+      JOIN items i ON o.item_id =i.id
+      WHERE o.bon_id=?
+    `;
+    let res = this.db.prepare(sql).get(bonId);
+    if (res) {
+      callback(true, res.co2e);
+    } else {
+      callback(false, 0);
+    }
   }
 
 

@@ -64,19 +64,30 @@ module.exports = class BonUtils {
     let values = {
       bonId: bon.id,
       bonPrefix: config.bonPrefix,
-      deliveryAdr: deliveryAdress,
-      deliveryDate: deliveryDate.toLocaleDateString(dateFormat),
-      deliveryTime: deliveryDate.toLocaleTimeString(dateFormat, { hour: '2-digit', minute: '2-digit' }),
-      orderWithPrices: bon.orders.map(o => (`${o.quantity} X ${o.name} (${o.price * o.quantity} kr)${o.special_request !== "" ? "  \n\t" + o.special_request : ""}`)).join("\n"),
-      orders: bon.orders.map(o => (`${o.quantity} X ${o.name}${o.special_request !== "" ? "  \n\t" + o.special_request : ""}`)).join("\n"),
-      totSum: bon.orders.reduce((s, e) => (s + e.quantity * e.price), 0),
+
       foreName: bon.customer.forename,
       surName: bon.customer.surname,
-      pax: bon.nr_of_servings,
+
+      deliveryAdr: deliveryAdress,
       deliveryStreet: bon.delivery_address.street_name,
       deliveryStreetNr: bon.delivery_address.street_nr,
       deliveryZipCode: bon.delivery_address.zip_code,
       deliveryCity: bon.delivery_address.city,
+
+
+      deliveryDate: deliveryDate.toLocaleDateString(dateFormat),
+      deliveryTime: deliveryDate.toLocaleTimeString(dateFormat, { hour: '2-digit', minute: '2-digit' }),
+
+      orders: bon.orders.map(o => (`${o.quantity} X ${o.name}${o.special_request !== "" ? "  \n\t" + o.special_request : ""}`)).join("\n"),
+      orderWithPrices: bon.orders.map(o => (`${o.quantity} X ${o.name} (${o.price * o.quantity} kr)${o.special_request !== "" ? "  \n\t" + o.special_request : ""}`)).join("\n"),
+      orderWithCo2e: bon.orders.map(o => (`${o.quantity} X ${o.name} (${o.co2e * o.quantity} CO2e)${o.special_request !== "" ? "  \n\t" + o.special_request : ""}`)).join("\n"),
+      orderWithPricesAndCo2e: bon.orders.map(o => (`${o.quantity} X ${o.name} (${o.price * o.quantity} kr) (${o.co2e * o.quantity} CO2e)${o.special_request !== "" ? "  \n\t" + o.special_request : ""}`)).join("\n"),
+
+      totSum: bon.orders.reduce((s, e) => (s + e.quantity * e.price), 0),
+      totCo2e: bon.orders.reduce((s, e) => (s + e.quantity * e.co2e), 0),
+
+      pax: bon.nr_of_servings,
+      paxUnits: bon.pax_units,
     }
 
     let expandedMessage = message;

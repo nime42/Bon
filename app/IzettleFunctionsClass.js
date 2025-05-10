@@ -338,6 +338,7 @@ module.exports = class IzettleFunctionsClass {
       let order = {
         comment: "",
         cost_price: product.cost_price != null ? product.cost_price : 0,
+        co2e: product.co2e != null ? product.co2e : 0,
         id: null,
         izettle_product_id: product.id,
         price: p.unitPrice / 100.0,
@@ -351,8 +352,9 @@ module.exports = class IzettleFunctionsClass {
 
   getProduct(product) {
     let sql = `
-    select p.*,i.external_id,i.cost_price from izettle_products p
+    select p.*,i.external_id,i.cost_price,ia.co2e from izettle_products p
     left join items i on p.grocy_item_id =i.id
+    left join item_attributes ia on i.id=ia.item_id
     where p.name=?
     `;
     let name = product.name;

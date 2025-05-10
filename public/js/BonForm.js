@@ -658,6 +658,7 @@ class BonForm {
     bon.orders = orderInfo.orders;
     bon.price = orderInfo.totPrice;
     bon.cost_price = orderInfo.totCostPrice;
+    bon.co2e = orderInfo.totCo2e;
 
 
     return bon;
@@ -845,7 +846,8 @@ class BonForm {
           o.price,
           o.cost_price,
           o.category,
-          o.izettle_product_id
+          o.izettle_product_id,
+          o.co2e
         );
       });
       this.myBonStrip.updateTotalSum();
@@ -862,7 +864,8 @@ class BonForm {
             o.price,
             o.cost_price,
             o.category,
-            o.izettle_product_id
+            o.izettle_product_id,
+            o.co2e
           );
         });
         this.myBonStrip.updateTotalSum();

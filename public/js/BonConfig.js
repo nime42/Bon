@@ -432,6 +432,9 @@ class BonConfig {
     getItemsFromDB(callback) {
         this.myRepo.getItems(items => {
             this.cachedItems = items;
+            this.item_lookup = {};
+            items.forEach(e => { this.item_lookup[e.id] = e; });
+
             this.myRepo.getItemsPrices(prices => {
                 this.cachedPrices = prices;
                 this.price_lookup = {};
@@ -443,6 +446,14 @@ class BonConfig {
             });
         });
 
+    }
+
+    getItem(id) {
+        if (this.item_lookup[id]) {
+            return this.item_lookup[id];
+        } else {
+            return null;
+        }
     }
 
 
@@ -787,6 +798,7 @@ class BonConfig {
         <th>Købspris</th>
         <th>Pris</th>
         <th>Fakturadato</th>
+        <th>Co2e</th>
         <th>Afstand(km)</th>
         </tr>
         `;
@@ -829,6 +841,7 @@ class BonConfig {
         <td>${c.cost_price ? c.cost_price.toFixed(2) : 0}</td>
         <td>${c.price ? c.price.toFixed(2) : 0}</td>
         <td>${Helper.formatDate(c.invoice_date)}</td>
+        <td>${c.co2e ? c.co2e.toFixed(2) : 0}</td>
         <td>${c.distance ? (c.distance / 1000).toFixed(2) : 0}</td>
         `;
     }
@@ -879,7 +892,10 @@ class BonConfig {
         pax: "2",
         paxUnits: "10x3",
         totSum: "150.00",
+        totCo2e: "0.5",
         orderWithPrices: "1 X Dansk italiene (75 kr)\n1 X Bobler (75 kr)",
+        orderWithCo2e: "1 X Dansk italiene (0.5 CO2e)\n1 X Bobler (0.5 CO2e)",
+        orderWithPricesAndCo2e: "1 X Dansk italiene (75 kr) (0.5 CO2e)\n1 X Bobler (75 kr) (0.5 CO2e)",
         orders: "1 X Dansk italiene\n1 X Bobler"
     }
 

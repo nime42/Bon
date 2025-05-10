@@ -244,7 +244,9 @@ class BonStrip {
         <i id="notify-kitchen" class="fa fa-paper-plane" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Send en besked til køkkenet!";margin-right: 10px;></i>
         <i id="ingredients-info" class="fa fa-info-circle" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="ingredienser!"></i>        
         <i id="move-bon" class="fa fa-exchange fa-rotate-90" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Flytte til anden server!"></i>
-         <i id="goto-map" class="fa fa-globe" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="gå til kortet"></i>
+        <i id="goto-map" class="fa fa-globe" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="gå til kortet"></i>
+        <i id="show-co2e" class="fa fa-envira" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Vis Co2e"></i>
+
         <select id="other-bon-instances" style="display:none;"></select>
         <div id="items-list" style="display:none"></div>
         <div id="mail-list" style="display:none"></div>
@@ -276,7 +278,7 @@ class BonStrip {
 
             this.myItemsList = new ItemsList(itemslistElem);
             this.myItemsList.SetOnItemClick((item) => {
-                this.configureOrder(1, item.name, "", item.id, item.price, item.cost_price, item.category);
+                this.configureOrder(1, item.name, "", item.id, item.price, item.cost_price, item.category, item.co2e);
             });
 
             this.myDiv.querySelector("#show-items-list").style.display = "";
@@ -308,6 +310,7 @@ class BonStrip {
                 }, { label: "extra besked" });
             }
 
+            this.myDiv.querySelector("#show-co2e").style.display = "";
 
 
         }
@@ -333,7 +336,15 @@ class BonStrip {
             };
         }
 
+        this.showCo2e = false;
+        this.myDiv.querySelector("#show-co2e").onclick = () => {
+            this.showCo2e = !this.showCo2e;
+            Array.from(this.myOrders.getElems()).forEach(order => {
+                this.refreshOrder(order);
 
+            });
+            this.updateTotalSum();
+        }
 
 
         this.myRepo = new BonRepository();
@@ -353,6 +364,7 @@ class BonStrip {
             <input type="hidden" id="izettle-product-id" value="">
             <input type="hidden" id="price" value="0">
             <input type="hidden" id="cost_price" value="0">
+            <input type="hidden" id="co2e" value="0">
             <input type="hidden" id="category" value="">
             <br>
             <div>
@@ -393,12 +405,16 @@ class BonStrip {
             let id = self.orderConfig.querySelector("#item-id").value;
             let price = self.orderConfig.querySelector("#price").value;
             let cost_price = self.orderConfig.querySelector("#cost_price").value;
+            let co2e = self.orderConfig.querySelector("#co2e").value;
             let category = self.orderConfig.querySelector("#category").value;
             let izettle_product_id = self.orderConfig.querySelector("#izettle-product-id").value;
             if (izettle_product_id == "null") { izettle_product_id = null; }
             if (self.currentOrder) {
                 self.currentOrder.querySelector("#quantity").innerText = quantity;
-                self.currentOrder.querySelector("#total-cost").innerText = (quantity * price).toFixed(2) + (this.showCostPrice ? " (" + (quantity * cost_price).toFixed(2) + ")" : "") + " kr";
+                price = (quantity * price).toFixed(2)
+                cost_price = (quantity * cost_price).toFixed(2);
+                co2e = (quantity * co2e).toFixed(2);
+                self.currentOrder.querySelector("#total-cost").innerText = this.formatPriceRow(price, cost_price, co2e);
                 if (self.hidePrice) {
                     self.currentOrder.querySelector("#total-cost").style.display = "none";
                 }
@@ -412,7 +428,7 @@ class BonStrip {
 
 
             } else {
-                self.addOrder(quantity, orderName, comment, id, price, cost_price, category, izettle_product_id);
+                self.addOrder(quantity, orderName, comment, id, price, cost_price, category, izettle_product_id, co2e);
             }
 
             self.orderConfigPopup.hide();
@@ -442,6 +458,14 @@ class BonStrip {
         this.orderConfigPopup = new ModalPopup();
 
 
+    }
+
+    formatPriceRow(price, cost_price, co2e) {
+        let cost_info = `${price}${this.showCostPrice ? "(" + cost_price + ")" : ""} kr`;
+        if (this.showCo2e) {
+            cost_info += ` (${co2e} CO2e)`;
+        }
+        return cost_info;
     }
 
     showMails(externalDiv) {
@@ -540,22 +564,32 @@ class BonStrip {
         if (values === undefined) {
             values = {};
             let orderList = this.getOrders();
-            values.orderWithPrices = orderList.orders.map(o => (`${o.quantity} X ${o.name} (${o.price * o.quantity} kr)${o.comment !== "" ? "  \n\t" + o.comment : ""}`)).join("\n");
-            values.orders = orderList.orders.map(o => (`${o.quantity} X ${o.name}${o.comment !== "" ? "  \n\t" + o.comment : ""}`)).join("\n");
-            values.totSum = orderList.totPrice;
-            values.deliveryDate = this.myDiv.querySelector("#date").innerHTML;
-            values.deliveryTime = this.myDiv.querySelector("#time").innerHTML;
+            values.bonId = this.bonId;
+            values.bonPrefix = Globals.bonPrefix;
+
+            values.foreName = this.myDiv.querySelector("#forename").innerText;
+            values.surName = this.myDiv.querySelector("#surname").innerText;
+
             values.deliveryAdr = this.myDiv.querySelector("#address").innerText;
             values.deliveryStreet = this.deliveryAdressDetails.street_name;
             values.deliveryStreetNr = this.deliveryAdressDetails.street_nr;
             values.deliveryZipCode = this.deliveryAdressDetails.zip_code;
             values.deliveryCity = this.deliveryAdressDetails.city;
-            values.foreName = this.myDiv.querySelector("#forename").innerText;
-            values.surName = this.myDiv.querySelector("#surname").innerText;
+
+
+            values.deliveryDate = this.myDiv.querySelector("#date").innerHTML;
+            values.deliveryTime = this.myDiv.querySelector("#time").innerHTML;
+
+            values.orders = orderList.orders.map(o => (`${o.quantity} X ${o.name}${o.comment !== "" ? "  \n\t" + o.comment : ""}`)).join("\n");
+            values.orderWithPrices = orderList.orders.map(o => (`${o.quantity} X ${o.name} (${o.price * o.quantity} kr)${o.comment !== "" ? "  \n\t" + o.comment : ""}`)).join("\n");
+            values.orderWithCo2e = orderList.orders.map(o => (`${o.quantity} X ${o.name} (${o.co2e * o.quantity} CO2e)${o.comment !== "" ? "  \n\t" + o.comment : ""}`)).join("\n");
+            values.orderWithPricesAndCo2e = orderList.orders.map(o => (`${o.quantity} X ${o.name} (${o.price * o.quantity} kr) (${o.co2e * o.quantity} CO2e)${o.comment !== "" ? "  \n\t" + o.comment : ""}`)).join("\n");
+
+            values.totSum = orderList.totPrice;
+            values.totCo2e = orderList.totCo2e;
             values.pax = this.myDiv.querySelector("#pax").innerHTML;
             values.paxUnits = this.myDiv.querySelector("#pax-units").innerHTML;
-            values.bonId = this.bonId;
-            values.bonPrefix = Globals.bonPrefix;
+
 
         }
 
@@ -665,7 +699,7 @@ class BonStrip {
 
         if (orders) {
             orders.forEach(o => {
-                this.addOrder(o.quantity, o.name, o.special_request, o.item_id, o.price, o.cost_price, o.category, o.izettle_product_id);
+                this.addOrder(o.quantity, o.name, o.special_request, o.item_id, o.price, o.cost_price, o.category, o.izettle_product_id, o.co2e);
             })
             this.updateTotalSum();
         }
@@ -678,18 +712,22 @@ class BonStrip {
 
 
 
-    addOrder(quantity, name, comment, id, price, cost_price, category, izettle_product_id) {
+    addOrder(quantity, name, comment, id, price, cost_price, category, izettle_product_id, co2e) {
         let totalCost = (quantity * price).toFixed(2);
         let totalCostPrice = (quantity * cost_price).toFixed(2);
+        let totalCo2e = (quantity * co2e).toFixed(2);
+        let priceRow = this.formatPriceRow(totalCost, totalCostPrice, totalCo2e);
         let tmp = `
-        <span id="quantity" class="nr-of">${quantity}</span><span class="x-sign">X</span><span id="order-name" class="order-name">${name}</span><span id="total-cost" class="price-box">${totalCost} ${this.showCostPrice ? " (" + totalCostPrice + ")" : ""} kr</span><br>
+        <span id="quantity" class="nr-of">${quantity}</span><span class="x-sign">X</span><span id="order-name" class="order-name">${name}</span><span id="total-cost" class="price-box">${priceRow}</span><br>
         <span id="comment" class="order-info">${comment}</span>
         <input type="hidden" id="item-id" value="${id}">
         <input type="hidden" id="izettle-product-id" value="${izettle_product_id}">
         
         <input type="hidden" id="price" value="${price}">
         <input type="hidden" id="cost_price" value="${cost_price}">
+        <input type="hidden" id="co2e" value="${co2e}">
         <input type="hidden" id="category" value="${category}">
+        
         `;
 
         let order = document.createElement("div");
@@ -709,6 +747,7 @@ class BonStrip {
                 this.orderConfig.querySelector("#item-id").value = order.querySelector("#item-id").value;
                 this.orderConfig.querySelector("#price").value = order.querySelector("#price").value;
                 this.orderConfig.querySelector("#cost_price").value = order.querySelector("#cost_price").value;
+                this.orderConfig.querySelector("#co2e").value = order.querySelector("#co2e").value;
                 this.orderConfig.querySelector("#category").value = order.querySelector("#category").value;
 
                 let extra = this._getExtraAttributes(order.querySelector("#order-name").innerText);
@@ -766,7 +805,7 @@ class BonStrip {
         return result;
     }
 
-    configureOrder(quantity, name, comment, itemId, price, cost_price, category) {
+    configureOrder(quantity, name, comment, itemId, price, cost_price, category, co2e) {
         this.orderConfig.querySelector("#quantity").value = quantity;
         this.orderConfig.querySelector("#order-name").innerHTML = name;
         this.orderConfig.querySelector("#comment").value = "";
@@ -774,6 +813,7 @@ class BonStrip {
         this.orderConfig.querySelector("#item-id").value = itemId;
         this.orderConfig.querySelector("#price").value = price;
         this.orderConfig.querySelector("#cost_price").value = cost_price;
+        this.orderConfig.querySelector("#co2e").value = co2e;
         this.orderConfig.querySelector("#category").value = category;
 
         let extra = this._getExtraAttributes(name);
@@ -788,18 +828,31 @@ class BonStrip {
 
     }
 
+    refreshOrder(order) {
+        let quantity = order.querySelector("#quantity").innerText;
+        let id = order.querySelector("#item-id").value;
+        let price = order.querySelector("#price").value;
+        let cost_price = order.querySelector("#cost_price").value;
+        let co2e = order.querySelector("#co2e").value;
+        order.querySelector("#total-cost").innerText = this.formatPriceRow((quantity * price).toFixed(2), (quantity * cost_price).toFixed(2), (quantity * co2e).toFixed(2));
+        if (this.hidePrice) {
+            order.querySelector("#total-cost").style.display = "none";
+        }
+    }
+
+
     updatePricesFromCategory(category) {
+
         this.myItemsList && this.myItemsList.updateItems(category);
+
         Array.from(this.myOrders.getElems()).forEach(order => {
             let id = order.querySelector("#item-id").value;
-            let quantity = order.querySelector("#quantity").textContent;
             let newPrice = Globals.myConfig.price_lookup[id].price_categories[category];
-            //Maybe update cost_price also
+            let newcostPrice = Globals.myConfig.price_lookup[id].cost_price;
+
             order.querySelector("#price").value = newPrice;
-            order.querySelector("#total-cost").innerText = (quantity * newPrice).toFixed(2) + " kr";
-            if (this.hidePrice) {
-                order.querySelector("#total-cost").style.display = "none";
-            }
+            order.querySelector("#cost_price").value = newcostPrice;
+            this.refreshOrder(order);
 
         });
         this.updateTotalSum();
@@ -825,9 +878,14 @@ class BonStrip {
     getOrders() {
         let totCostPrice = 0;
         let totPrice = 0;
+        let totCo2e = 0;
         let orders = Array.from(this.myOrders.getElems()).map(order => {
             let costPrice = order.querySelector("#cost_price").value;
             costPrice != undefined ? Number(costPrice) : 0;
+
+            let co2e = order.querySelector("#co2e").value;
+            co2e != undefined ? Number(co2e) : 0;
+
             let price = order.querySelector("#price").value;
             price != undefined ? Number(price) : 0;
 
@@ -835,6 +893,8 @@ class BonStrip {
             quantity = quantity != undefined ? Number(quantity) : 1;
             totCostPrice += costPrice * quantity;
             totPrice += price * quantity;
+            totCo2e += co2e * quantity;
+
             let id = order.querySelector("#item-id").value;
             if (id == "null") {
                 id = null;
@@ -850,13 +910,15 @@ class BonStrip {
                 id: id,
                 izettle_product_id: izettle_product_id,
                 price: price,
-                cost_price: costPrice
+                cost_price: costPrice,
+                co2e: co2e
             }
         })
         return {
             orders: orders,
             totPrice: totPrice.toFixed(2),
-            totCostPrice: totCostPrice.toFixed(2)
+            totCostPrice: totCostPrice.toFixed(2),
+            totCo2e: totCo2e.toFixed(2)
         }
 
     }
@@ -867,8 +929,9 @@ class BonStrip {
 
     updateTotalSum() {
         let totSums = this.calculateTotalSum();
-        let tot = `${totSums.totalCost.toFixed(2)} ${this.showCostPrice ? " (" + totSums.totalCostPrice.toFixed(2) + ")" : ""} kr`
-        this.myDiv.querySelector("#total-sum").innerHTML = tot;
+        let tot = `${totSums.totalCost.toFixed(2)} ${this.showCostPrice ? " (" + totSums.totalCostPrice.toFixed(2) + ")" : ""} kr (${totSums.totalCo2e.toFixed(2)})`;
+        let totSumRow = this.formatPriceRow(totSums.totalCost.toFixed(2), totSums.totalCostPrice.toFixed(2), totSums.totalCo2e.toFixed(2));
+        this.myDiv.querySelector("#total-sum").innerText = totSumRow;
     }
 
 
@@ -876,6 +939,7 @@ class BonStrip {
     calculateTotalSum() {
         let totalCost = 0;
         let totalCostPrice = 0;
+        let totalCo2e = 0;
         this.getOrders().orders.forEach(order => {
             let cost = (order.quantity * order.price);
             if (isNaN(cost)) { cost = 0 };
@@ -883,9 +947,12 @@ class BonStrip {
             let costPrice = (order.quantity * order.cost_price);
             if (isNaN(costPrice)) { costPrice = 0 };
             totalCostPrice += costPrice;
+            let co2e = (order.quantity * order.co2e);
+            if (isNaN(co2e)) { co2e = 0 };
+            totalCo2e += co2e;
 
         })
-        return { totalCost: totalCost, totalCostPrice: totalCostPrice }
+        return { totalCost: totalCost, totalCostPrice: totalCostPrice, totalCo2e: totalCo2e };
 
 
     }
@@ -1148,7 +1215,7 @@ class BonStrip {
         if (orders) {
             orders.forEach(o => {
                 if (o.quantity > 0) {
-                    this.addOrder(o.quantity, o.name, o.comment, o.id, o.price, o.cost_price, o.category, o.izettle_product_id);
+                    this.addOrder(o.quantity, o.name, o.comment, o.id, o.price, o.cost_price, o.category, o.izettle_product_id, o.co2e);
                 }
             })
             this.updateTotalSum();
