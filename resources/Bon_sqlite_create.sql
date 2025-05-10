@@ -166,18 +166,12 @@ CREATE TABLE orders (
 	price numeric,
 	quantity integer,
 	special_request text,
-	sorting_order integer, cost_price NUMERIC, izettle_product_id INTEGER,
-	FOREIGN KEY (
-        bon_id
-    )
-	REFERENCES "bons" (id) ON DELETE CASCADE
-					ON UPDATE NO ACTION,	
-	FOREIGN KEY (
-        item_id
-    )
-	REFERENCES items (id) ON DELETE CASCADE
-					ON UPDATE NO ACTION
-	
+	sorting_order integer,
+	cost_price NUMERIC,
+	izettle_product_id INTEGER,
+	co2e NUMERIC,
+	FOREIGN KEY (bon_id) REFERENCES "bons" (id) ON DELETE CASCADE ON UPDATE NO ACTION,
+	FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
 
