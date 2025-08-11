@@ -28,4 +28,4 @@ sed -i "s/%{version}%/$CURRENT_VERSION/g" public/index.html
 npm update
 npm run replaceClientVars
 npm run shutdown 2>/dev/null
-nohup npm run start 2>&1 &
+nohup npm run start 2>&1 >> $TARGET_DIR/log/server.log &
