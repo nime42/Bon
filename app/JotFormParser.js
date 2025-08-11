@@ -113,7 +113,10 @@ function sendConfirmationMail(bon, config, mailSender, dbInstance) {
         message = "This is actually a mail to: " + bon.customer.email + "\n\n" + message;
     }
 
-    mailSender.sendMail(config.mail.user, mailTo, "", "", subject, message, "", (err) => {
+    let cc = config.jotForm?.mailCc || "";
+    let bcc = config.jotForm?.mailBcc || "";
+
+    mailSender.sendMail(config.mail.user, mailTo, cc, bcc, subject, message, "", (err) => {
         if (err) {
             console.error("Failed to send confirmation mail", err);
         } else {

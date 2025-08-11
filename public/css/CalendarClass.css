@@ -50,7 +50,7 @@
 }
 
 .not-current-month {
-    color: #ddddff;
+    color: grey;
     font-style: italic;
 }
 
