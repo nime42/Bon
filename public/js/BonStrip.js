@@ -233,7 +233,7 @@ class BonStrip {
         </fieldset>
         <fieldset id="kitchen-field">
             <legend>Køkken info <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i> <i id="save-kitchen-info" class="fa fa-floppy-o" aria-hidden="true" style="float: right;margin: 5px;margin-bottom: 0;font-size:18px;display:none"></i></legend>
-            <textarea id="kitchenInfoText" class="bonstrip-items field-content" style="width: 100%; field-sizing: content;min-height: 0;"></textarea>
+            <textarea id="kitchenInfoText" class="bonstrip-items field-content" style="width: 100%; field-sizing: content;min-height: 25px;"></textarea>
         </fieldset>
 
       
@@ -345,6 +345,7 @@ class BonStrip {
             if (this.bonId) {
                 this.myRepo.patchBon(this.bonId, patch);
             } else {
+                e.checked = !e.checked;
                 alert("Gem venligst først!");
             }
         }
@@ -353,6 +354,7 @@ class BonStrip {
             if (this.bonId) {
                 this.myRepo.patchBon(this.bonId, patch);
             } else {
+                e.checked = !e.checked;
                 alert("Gem venligst først!");
             }
         }
@@ -362,6 +364,10 @@ class BonStrip {
             this.myDiv.querySelector("#kitchenInfoText").setAttribute("disabled", "true");
             this.myDiv.querySelector("#kitchen_ingredients_exists").setAttribute("disabled", "true");
             this.myDiv.querySelector("#kitchen_supplies_exists").setAttribute("disabled", "true");
+        }
+
+        if (options?.disableKitchenInfo) {
+            this.myDiv.querySelector("#kitchenInfoText").setAttribute("disabled", "true");
         }
 
 
@@ -1232,6 +1238,11 @@ class BonStrip {
         this.myDiv.querySelectorAll(".bonstrip-items").forEach(e => {
             e.innerText = "";
         })
+        this.myDiv.querySelectorAll("input[type='checkbox']").forEach(e => {
+            e.checked = false;
+        })
+
+
         this.myOrders.clear();
         this.updateTotalSum();
         if (this.chatDiv) {

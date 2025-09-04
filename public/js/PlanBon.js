@@ -135,7 +135,7 @@ class PlanBon {
       }
       this.getOtherBons();
     });
-    this.planBonStrip = new BonStrip("#plan-bon", true);
+    this.planBonStrip = new BonStrip("#plan-bon", true, { disablePatching: true });
 
     this.planBonStrip.initFromBon(emptyBon());
   }
