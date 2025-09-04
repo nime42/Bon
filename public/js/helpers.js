@@ -178,6 +178,8 @@ class Helper {
       "payment_type": "",
       "customer_info": "",
       "kitchen_info": "",
+      "kitchen_ingredients_exists": 0,
+      "kitchen_supplies_exists": 0,
       "delivery_info": "",
       "invoice_info": "",
       "service_type": null,

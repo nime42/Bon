@@ -35,6 +35,18 @@ class BonRepository {
         });
     }
 
+    patchBon(id, patch, callback) {
+        let url = "api/bons/" + id;
+        $.ajax({
+            type: "PATCH",
+            url: url,
+            data: JSON.stringify(patch),
+            success: callback,
+            dataType: "json",
+            contentType: "application/json"
+        });
+    }
+
     getBonSummary(id, callback) {
         let url = "api/bonSummary";
         if (id) {

@@ -660,6 +660,9 @@ class BonForm {
     bon.cost_price = orderInfo.totCostPrice;
     bon.co2e = orderInfo.totCo2e;
 
+    bon.kitchen_ingredients_exists = 0;
+    bon.kitchen_supplies_exists = 0;
+
 
     return bon;
   }
@@ -835,6 +838,8 @@ class BonForm {
     this._setStatus(bon.status !== "" ? bon.status : "new");
 
     this.myBonStrip.setBonId(bon.id);
+    this.myBonStrip.setKitchenIngredientsExists(bon.kitchen_ingredients_exists);
+    this.myBonStrip.setKitchenSuppliesExists(bon.kitchen_supplies_exists);
 
     if (bon.orders) {
       bon.orders.forEach((o) => {

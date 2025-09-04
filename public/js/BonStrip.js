@@ -168,8 +168,19 @@ class BonStrip {
         <div id="status-row">
         </div>
         <fieldset>
-            <legend>Bon-id <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
-                <div id="bon-id" class="bonstrip-items field-content"></div>
+            <legend style="display: flex; align-items: center; gap: 5px;">
+                Bon-id 
+                <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i>
+                <label style="font-size: small;color: ${this.foreground};font-style: italic; margin-left: 15px; display: flex; align-items: center;">
+                    <input type="checkbox" id="kitchen_ingredients_exists" style="margin-bottom: 0;">
+                    <span style="margin-left: 4px;">Råvarer</span>
+                </label>
+                <label style="font-size: small;color: ${this.foreground};font-style: italic; margin-left: 10px; display: flex; align-items: center;">
+                    <input type="checkbox" id="kitchen_supplies_exists" style="margin-bottom: 0;">
+                    <span style="margin-left: 4px;margin-right:4px" title="emballage, følgeseddel, servietter">emballage mm</span>
+                </label>
+            </legend>
+            <div id="bon-id" class="bonstrip-items field-content"></div>
         </fieldset>
         <fieldset>
             <legend>Navn <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
@@ -194,9 +205,6 @@ class BonStrip {
             <legend>Leveringsadresse <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i></legend>
             <div id="address" class="bonstrip-items field-content">
             </div>
-            
-
-
         </fieldset>
 
         <fieldset id="deliveryinfo-field">
@@ -224,8 +232,8 @@ class BonStrip {
             </div>
         </fieldset>
         <fieldset id="kitchen-field">
-            <legend>Køkken info</legend>
-            <span id="kitchenInfoText"></span>
+            <legend>Køkken info <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i> <i id="save-kitchen-info" class="fa fa-floppy-o" aria-hidden="true" style="float: right;margin: 5px;margin-bottom: 0;font-size:18px;display:none"></i></legend>
+            <textarea id="kitchenInfoText" class="bonstrip-items field-content" style="width: 100%; field-sizing: content;min-height: 0;"></textarea>
         </fieldset>
 
       
@@ -313,8 +321,49 @@ class BonStrip {
             this.myDiv.querySelector("#show-co2e").style.display = "";
 
 
+
+
         }
         this.isEditable = isEditable;
+
+        this.myDiv.querySelector("#kitchenInfoText").onkeypress = (e) => {
+            this.myDiv.querySelector("#save-kitchen-info").style.display = "";
+        }
+
+        this.myDiv.querySelector("#save-kitchen-info").onclick = (e) => {
+            this.myDiv.querySelector("#save-kitchen-info").style.display = "none";
+            if (this.bonId) {
+                const patch = { kitchen_info: this.myDiv.querySelector("#kitchenInfoText").value };
+                this.myRepo.patchBon(this.bonId, patch);
+            } else {
+                alert("Gem venligst først!");
+            }
+        }
+
+        this.myDiv.querySelector("#kitchen_ingredients_exists").onchange = (e) => {
+            const patch = { kitchen_ingredients_exists: this.myDiv.querySelector("#kitchen_ingredients_exists").checked ? 1 : 0, };
+            if (this.bonId) {
+                this.myRepo.patchBon(this.bonId, patch);
+            } else {
+                alert("Gem venligst først!");
+            }
+        }
+        this.myDiv.querySelector("#kitchen_supplies_exists").onchange = (e) => {
+            const patch = { kitchen_supplies_exists: this.myDiv.querySelector("#kitchen_supplies_exists").checked ? 1 : 0, };
+            if (this.bonId) {
+                this.myRepo.patchBon(this.bonId, patch);
+            } else {
+                alert("Gem venligst først!");
+            }
+        }
+
+
+        if (options?.disablePatching) {
+            this.myDiv.querySelector("#kitchenInfoText").setAttribute("disabled", "true");
+            this.myDiv.querySelector("#kitchen_ingredients_exists").setAttribute("disabled", "true");
+            this.myDiv.querySelector("#kitchen_supplies_exists").setAttribute("disabled", "true");
+        }
+
 
         if (!options?.hideIngredientList) {
             this.myIngredientList = new IngredientList();
@@ -692,6 +741,8 @@ class BonStrip {
         this.setPickupTime(bon.pickup_time !== null ? bon.pickup_time : bon.delivery_date);
 
         this.setKitchenInfo(bon.kitchen_info);
+        this.setKitchenIngredientsExists(bon.kitchen_ingredients_exists);
+        this.setKitchenSuppliesExists(bon.kitchen_supplies_exists);
         this.setDeliveryInfo(bon.delivery_info);
         this.setPaymentType(bon.payment_type);
 
@@ -1008,15 +1059,9 @@ class BonStrip {
     }
 
     setKitchenInfo(text) {
-        text = text.replaceAll("\n", "<br>");
+        this.myDiv.querySelector("#save-kitchen-info").style.display = "none";
 
-        if (text !== "") {
-            this.myDiv.querySelector("#kitchen-field").style.display = "";
-            this.myDiv.querySelector("#kitchenInfoText").innerHTML = text;
-        } else {
-            this.myDiv.querySelector("#kitchen-field").style.display = "none";
-
-        }
+        this.myDiv.querySelector("#kitchenInfoText").value = text;
     }
 
     setDeliveryInfo(text) {
@@ -1045,6 +1090,15 @@ class BonStrip {
         }
         this.myDiv.querySelector("#kitchen-selects").checked = bon.kitchen_selects;
     }
+
+    setKitchenSuppliesExists(exists) {
+        this.myDiv.querySelector("#kitchen_supplies_exists").checked = exists;
+    }
+    setKitchenIngredientsExists(exists) {
+        this.myDiv.querySelector("#kitchen_ingredients_exists").checked = exists;
+    }
+
+
 
 
     updateNameOnChange(forenameElem, surnameElem) {

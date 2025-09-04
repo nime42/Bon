@@ -22,7 +22,7 @@ function searchBons(searchParams, callback) {
   $.get(url, callback);
 }
 
-function updateBon(bonId, patches, callback) {
+function patchBon(bonId, patches, callback) {
   let url = "../api/bons/" + bonId;
   $.ajax({
     type: "PATCH",
@@ -193,7 +193,7 @@ function createBonMarker(bonFeature, options) {
         return;
       }
       div.innerHTML = "";
-      bs = new BonStrip(div, false, { hideIngredientList: true, hideGotoMap: true });
+      bs = new BonStrip(div, false, { hideIngredientList: true, hideGotoMap: true, disablePatching: true });
       bs.initFromBon(b, b.orders);
       console.log("popupopen", div);
       toggleRoute(bonFeature);
@@ -303,7 +303,7 @@ function populateRow(rowTemplate, feature) {
     } else {
       newPickupTime = null;
     }
-    updateBon(feature.bon.id, { pickup_time: newPickupTime }, () => {
+    patchBon(feature.bon.id, { pickup_time: newPickupTime }, () => {
       updateButton.disabled = true;
       feature.bon.pickup_time = newPickupTime;
     });

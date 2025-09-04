@@ -107,6 +107,7 @@ CREATE UNIQUE INDEX salesprice_categories_u_idx ON salesprice_categories (item_i
 
 -- bons definition
 
+
 CREATE TABLE bons (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	status TEXT,
@@ -117,18 +118,22 @@ CREATE TABLE bons (
 	nr_of_servings INTEGER,
 	customer_info TEXT,
 	service_type TEXT,
-	payment_type TEXT,
-	kitchen_info TEXT,
-	price_category TEXT,
-	kitchen_selects INTEGER DEFAULT (0) NOT NULL,
-	customer_collects INTEGER,
-	invoice_info TEXT,
-	invoice_date DATETIME,
-	delivery_info TEXT, pickup_time DATETIME,
-	bon_units TEXT,
+	payment_type TEXT, kitchen_info TEXT, price_category TEXT, 
+	kitchen_selects INTEGER DEFAULT 0 NOT NULL, 
+	customer_collects INTEGER, 
+	invoice_info TEXT, 
+	invoice_date DATETIME, 
+	delivery_info TEXT, 
+	pickup_time DATETIME, 
+	pax_units TEXT, 
+	kitchen_ingredients_exists INTEGER DEFAULT (0), 
+	kitchen_supplies_exists INTEGER DEFAULT (0), 
 	CONSTRAINT FK_bons_customers FOREIGN KEY (customer_id) REFERENCES customers(id),
-	CONSTRAINT FK_customers_addresses FOREIGN KEY (delivery_address_id) REFERENCES addresses(id) ON DELETE SET NULL
+	CONSTRAINT FK_customers_addresses FOREIGN KEY (delivery_address_id) REFERENCES Addresses(id) ON DELETE set null
 );
+
+
+
 
 -- izettle_purchases definition
 
