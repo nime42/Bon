@@ -128,6 +128,20 @@ function showHistoricFeatures(show) {
   }
 }
 
+function getDeliveryType(bon) {
+  if (bon.orders.find((e) => e.name.match(/By-ekspressen/i)) != undefined) {
+    return "By-ekspressen";
+  }
+  if (bon.orders.find((e) => e.name.match(/Levering med El-Taxa/i)) != undefined) {
+    return "El-Taxa";
+  }
+  if (bon.orders.find((e) => e.name.match(/RR leverer/i)) != undefined) {
+    return "Ristet Rug";
+  }
+  return "";
+}
+
+
 function createFeatures(bons, options) {
   let res = [];
   let mapIndex = 1;
@@ -138,14 +152,7 @@ function createFeatures(bons, options) {
       bon: b,
       date: `${year}-${month}-${day}`,
       time: `${hour}:${minute}`,
-      isDeliveredByByExpressen:
-        b.orders.find((e) => {
-          return e.name.match(/By-ekspressen/i);
-        }) != undefined,
-      isDeliveredByRistedRug:
-        b.orders.find((e) => {
-          return e.name.match(/RR leverer/i);
-        }) != undefined,
+      deliveryType: getDeliveryType(b)
     };
 
     if (b.delivery_address.lat !== null) {
@@ -164,12 +171,18 @@ function createFeatures(bons, options) {
 
 function createBonMarker(bonFeature, options) {
   let icon = undefined;
-  if (bonFeature.isDeliveredByByExpressen) {
-    icon = "fa fa-bicycle";
-  } else if (bonFeature.isDeliveredByRistedRug) {
-    icon = "fa fa-car";
+  switch (bonFeature.deliveryType) {
+    case "By-ekspressen":
+      icon = "fa fa-bicycle";
+      break;
+    case "Ristet Rug":
+      icon = "fa fa-car";
+      break;
+    case "El-Taxa":
+      icon = "fa fa-taxi";
+      break;
   }
-  let bicycleIcon = bonFeature.isDeliveredByByExpressen ? "fa fa-bicycle" : undefined;
+
   let b = bonFeature.bon;
   let address = `${b.delivery_address.street_name} ${b.delivery_address.street_nr}, ${b.delivery_address.zip_code}  ${b.delivery_address.city}`;
   let popup = address;
