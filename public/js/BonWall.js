@@ -6,6 +6,10 @@ class BonWall {
 
     content = `
     <div class="bon-container">
+        <div class="zoom-controls" style="margin-bottom: 10px;">
+        <i id="zoomIn" class="fa fa-search-plus zoom-btn"></i>
+        <i id="zoomOut" class="fa fa-search-minus zoom-btn"></i>
+        </div>
     <div id="bons" class="bon-row">
     </div>
     </div>
@@ -23,16 +27,37 @@ class BonWall {
         this.myDiv.innerHTML = this.content;
         this.bonRow = this.myDiv.querySelector("#bons");
         this.myBonRepo = new BonRepository();
-    }
 
+        this.myDiv.querySelector("#zoomIn").onclick = () => this.zoom(1);
+        this.myDiv.querySelector("#zoomOut").onclick = () => this.zoom(-1);
+
+    }
+    currentZoom = 100;
+    currentFontSize = 14;
+    zoom(delta) {
+        this.currentFontSize = Math.min(Math.max(this.currentFontSize + delta, 5), 20);
+        this.bonRow.style.fontSize = this.currentFontSize + "px";
+        // Apply scaling to each bon-column
+        const scale = this.currentZoom / 100.0;
+
+        this.bonRow.childNodes.forEach(c => {
+            c.style.scale = scale.toString();
+            c.style.transformOrigin = 'top left';
+            // Adjust the flex basis and margin to allow more columns per row
+            c.style.flexBasis = `20%`;
+            //c.style.marginRight = `${scale * 5}px`;
+            //c.style.marginBottom = `${scale * 10}px`;
+        });
+    }
 
 
     addBon(bon, orders, editable) {
         let col = document.createElement("div");
         col.classList.add("bon-column");
         col.style.cssText = `
-        margin-right: 10px;
-        margin-bottom: 15px;
+        flex: 0 0 auto;
+        margin-right: 5px;
+        margin-bottom: 10px;
         `
         let bs = new BonStrip(col, editable);
         bs.showMails();
