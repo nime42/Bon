@@ -1,3 +1,5 @@
+
+
 function init() {
   initMap("map", MapGlobals.homePosition, 13);
   let icon = '<i class="fa fa-home map-icon">';
@@ -130,15 +132,15 @@ function showHistoricFeatures(show) {
 
 function getDeliveryType(bon) {
   if (bon.orders.find((e) => e.name.match(/By-ekspressen/i)) != undefined) {
-    return "By-ekspressen";
+    return "byEkspressen";
   }
   if (bon.orders.find((e) => e.name.match(/Levering med El-Taxa/i)) != undefined) {
-    return "El-Taxa";
+    return "elTaxa";
   }
   if (bon.orders.find((e) => e.name.match(/RR leverer/i)) != undefined) {
-    return "Ristet Rug";
+    return "ristetRug";
   }
-  return "";
+  return "other";
 }
 
 
@@ -171,16 +173,11 @@ function createFeatures(bons, options) {
 
 function createBonMarker(bonFeature, options) {
   let icon = undefined;
-  switch (bonFeature.deliveryType) {
-    case "By-ekspressen":
-      icon = "fa fa-bicycle";
-      break;
-    case "Ristet Rug":
-      icon = "fa fa-car";
-      break;
-    case "El-Taxa":
-      icon = "fa fa-taxi";
-      break;
+  if (MapGlobals.legends[bonFeature.deliveryType]) {
+    icon = {
+      icon: MapGlobals.legends[bonFeature.deliveryType]?.icon,
+      color: MapGlobals.legends[bonFeature.deliveryType]?.color
+    };
   }
 
   let b = bonFeature.bon;
@@ -263,9 +260,13 @@ function populateRow(rowTemplate, feature) {
   rowTemplate.querySelector(".delivery-address").innerHTML = `${toStr(feature.bon.delivery_address.street_name)} ${toStr(feature.bon.delivery_address.street_nr)}, ${toStr(feature.bon.delivery_address.zip_code)}  ${toStr(
     feature.bon.delivery_address.city
   )}`;
-  rowTemplate.querySelector(".byexpress-delivery").style.display = feature.isDeliveredByByExpressen ? "" : "none";
-  rowTemplate.querySelector(".ristet-rug-delivery").style.display = feature.isDeliveredByRistedRug ? "" : "none";
 
+  if (feature.deliveryType !== "other") {
+    rowTemplate.querySelector(".delivery-type").style.display = "";
+    rowTemplate.querySelector(".delivery-type").style.color = MapGlobals.legends[feature.deliveryType]?.color;
+    rowTemplate.querySelector(".delivery-type").className = `delivery-type ${MapGlobals.legends[feature.deliveryType]?.icon}`;
+    rowTemplate.querySelector(".delivery-type").title = `Leveres av ${MapGlobals.legends[feature.deliveryType]?.text}`;
+  }
   if (feature.position != undefined) {
     let gotoGoogle = rowTemplate.querySelector(".goto-google");
     const [lat, lon] = feature.position;
@@ -324,7 +325,7 @@ function populateRow(rowTemplate, feature) {
 
   const suggest = () => {
     let seconds = 0;
-    if (feature.isDeliveredByByExpressen) {
+    if (feature.deliveryType == "byEkspressen") {
       seconds = MapGlobals.byExpressenPickupMinutes * 60;
     } else {
       let distDuration = getDistanceAndTime("home", feature.bon.id);

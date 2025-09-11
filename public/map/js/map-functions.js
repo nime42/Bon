@@ -12,8 +12,60 @@ function initMap(div, pos, zoom) {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(mapObj);
+
+  // Add legend
+  const legend = createLegend();
+  legend.addTo(mapObj);
 }
 
+
+
+function createLegend() {
+  const legend = L.control({ position: 'topright' });
+
+  legend.onAdd = function (map) {
+    const div = L.DomUtil.create('div', 'map-legend');
+    div.innerHTML = '<h4>Legend</h4>';
+
+    Object.entries(MapGlobals.legends).forEach(([key, value]) => {
+      div.innerHTML += `
+                <div class="legend-item">
+                    <i class="${value.icon}" style="color: ${value.color}"></i>
+                    <span>${value.text}</span>
+                </div>
+            `;
+    });
+
+    return div;
+  };
+
+  return legend;
+}
+
+
+
+function createLegend() {
+  const legend = L.control({ position: 'topright' });
+
+  legend.onAdd = function (map) {
+    const div = L.DomUtil.create('div', 'map-legend');
+    div.innerHTML = '<h4>Legend</h4>';
+
+    Object.entries(MapGlobals.legends).forEach(([key, value]) => {
+      div.innerHTML += `
+                <div class="legend-item">
+                    <div class="legend-line" style="background-color: ${value.color}"></div>
+                    <i class="${value.icon}" style="color: ${value.color}"></i>
+                    <span>${value.text}</span>
+                </div>
+            `;
+    });
+
+    return div;
+  };
+
+  return legend;
+}
 function goToPos(pos) {
   mapObj.flyTo(pos);
 }
@@ -31,8 +83,18 @@ function toggleRoute(feature) {
       return;
     }
     let bonGeoData = MapGlobals.geoData.find(e => (e.bon_id == feature.bon.id));
-    let geojsonFeature = JSON.parse(bonGeoData?.route_feature)
-    feature.route = L.geoJSON(geojsonFeature).addTo(mapObj);
+    let geojsonFeature = JSON.parse(bonGeoData?.route_feature);
+    geojsonFeature.featureData = feature;
+    const style = {
+      style: (feature) => {
+        if (MapGlobals.legends[feature.featureData.deliveryType] !== undefined) {
+          return { color: MapGlobals.legends[feature.featureData.deliveryType].color };
+        } else {
+          return { color: "#000000" };
+        }
+      }
+    }
+    feature.route = L.geoJSON(geojsonFeature, style).addTo(mapObj);
 
   }
 }
@@ -58,7 +120,7 @@ function createNumberedMarker(position, nr, popup, color, icon) {
   }
   let i = "";
   if (icon !== undefined) {
-    i = `<i class="${icon}"></i>`;
+    i = `<i class="${icon.icon}" style="color:${icon.color}"></i>`;
   }
   let html = `<div style="width:40px;"><div style="${background}" class="numberCircle map-icon">${nr}</div>${i}</div>`;
   let marker = createIconMarker(position, html, popup);

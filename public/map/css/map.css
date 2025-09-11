@@ -94,3 +94,33 @@ div#sidebar li {
   margin-left: 5px;
   border-radius: 5px;
 }
+
+
+.map-legend {
+  background: white;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  gap: 8px;
+}
+
+.legend-line {
+  width: 20px;
+  height: 2px;
+  flex-shrink: 0;
+}
+
+.legend-item i {
+  width: 20px;
+  text-align: center;
+}
+
+.legend-item span {
+  font-size: 12px;
+}
