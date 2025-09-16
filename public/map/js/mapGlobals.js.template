@@ -14,10 +14,10 @@ class MapGlobals {
 
     //see function getDeliveryType in helpers.js on how to extract the keys from a bon 
     static legends = {
-        "byEkspressen": { color: '#4A90E2', text: "By-expressen", icon: 'fa fa-bicycle' }, // Clear blue
-        "ristetRug": { color: '#E74C3C', text: "Ristet Rug", icon: 'fa fa-car' },         // Bright red
-        "elTaxa": { color: '#2ECC71', text: "El-Taxa", icon: 'fa fa-taxi' },              // Emerald green
-        "other": { color: '#95A5A6', text: "Andet", icon: '' },                            // Gray
+        "byEkspressen": { color: '#100dedff', text: "By-expressen", icon: 'fa fa-bicycle' }, // Clear blue
+        "ristetRug": { color: '#9b4e07ca', text: "Ristet Rug", icon: 'fa fa-car' },         // Bright red
+        "elTaxa": { color: '#2c7b34ff', text: "El-Taxa", icon: 'fa fa-taxi' },              // Emerald green
+        "other": { color: '#0a0a0aff', text: "Andet", icon: '' },                            // Gray
     };
 
 }
