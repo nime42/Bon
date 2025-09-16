@@ -20,7 +20,6 @@ class MapGlobals {
     "elTaxa": { color: '#2c7b34ff', text: "El-Taxa", icon: 'fa fa-taxi' },              // Emerald green
     "other": { color: '#0a0a0aff', text: "Andet", icon: '' },                            // Gray
 };
-};
 
 
 }
