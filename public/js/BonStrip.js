@@ -38,6 +38,7 @@ class BonStrip {
     }
 
     #bon #date,
+    #bon #day,
     #bon #time,
     #bon #phonenr,
     #bon #email {
@@ -195,6 +196,7 @@ class BonStrip {
         <fieldset>
             <legend>Tidspunkt (pickup tid)</legend>
             <div>
+            <div id="day" style="float:left; color: red" class="bonstrip-items"></div>
             <div id="date" style="float:left" class="bonstrip-items"></div>
             <div id="time" style="float:left" class="bonstrip-items"></div>
             <div class="pickup-time">&nbsp;&nbsp;(<span id="pickup-time"></span>)</div>
@@ -1052,7 +1054,9 @@ class BonStrip {
     }
     setDeliveryDate(deliveryDate) {
         let date = new Date(deliveryDate).toLocaleDateString();
+        let day = new Date(deliveryDate).toLocaleDateString(undefined, { weekday: 'short' });
         let time = new Date(deliveryDate).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+        this.myDiv.querySelector("#day").innerHTML = day;
         this.myDiv.querySelector("#date").innerHTML = date;
         this.myDiv.querySelector("#time").innerHTML = time;
     }
@@ -1184,6 +1188,7 @@ class BonStrip {
 
     updateDateAndTimeOnChange(dateElem, timeElem) {
         let f = () => {
+            this.myDiv.querySelector("#day").innerHTML = new Date(dateElem.value).toLocaleDateString(undefined, { weekday: 'short' });
             this.myDiv.querySelector("#date").innerHTML = dateElem.value;
             this.myDiv.querySelector("#time").innerHTML = timeElem.value;
 
