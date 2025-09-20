@@ -256,6 +256,7 @@ function toStr(val) {
 
 function populateRow(rowTemplate, feature) {
   rowTemplate.querySelector(".bon-id").innerHTML = "#" + feature.bon.id;
+  rowTemplate.querySelector(".pax").innerHTML = `${feature.bon.nr_of_servings} (${feature.bon.pax_units})`;
   rowTemplate.querySelector(".delivery-time").innerHTML = feature.time;
   rowTemplate.querySelector(".delivery-address").innerHTML = `${toStr(feature.bon.delivery_address.street_name)} ${toStr(feature.bon.delivery_address.street_nr)}, ${toStr(feature.bon.delivery_address.zip_code)}  ${toStr(
     feature.bon.delivery_address.city
