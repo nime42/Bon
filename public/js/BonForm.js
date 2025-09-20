@@ -342,6 +342,10 @@ class BonForm {
       form.querySelector("#kitchen_info")
     );
 
+    this.myBonStrip.updateInvoiceInfoOnChange(
+      form.querySelector("textarea[name=invoice_info]")
+    );
+
     this.myBonStrip.updateDeliveryInfoOnChange(
       form.querySelector("#delivery_info")
     );

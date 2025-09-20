@@ -10,8 +10,8 @@ class BonWall {
         <i id="zoomIn" class="fa fa-search-plus zoom-btn"></i>
         <i id="zoomOut" class="fa fa-search-minus zoom-btn"></i>
         </div>
-    <div id="bons" class="bon-row">
-    </div>
+        <div id="bons" class="bon-row">
+        </div>
     </div>
 
     `
@@ -51,7 +51,7 @@ class BonWall {
     }
 
 
-    addBon(bon, orders, editable) {
+    addBon(bon, orders, editable, options) {
         let col = document.createElement("div");
         col.classList.add("bon-column");
         col.style.cssText = `
@@ -59,7 +59,7 @@ class BonWall {
         margin-right: 5px;
         margin-bottom: 10px;
         `
-        let bs = new BonStrip(col, editable);
+        let bs = new BonStrip(col, editable, options);
         bs.showMails();
         bs.initFromBon(bon, orders);
         this.bonRow.appendChild(col);
@@ -116,7 +116,7 @@ class BonWall {
         let self = this;
         Globals.myConfig.myRepo.searchBons({ status: this.statusFilter.join(","), includeOrders: true }, (bons) => {
             bons.forEach(b => {
-                let [bonStrip, colElem] = self.addBon(b, b.orders, true);
+                let [bonStrip, colElem] = self.addBon(b, b.orders, true, { showInvoiceInfo: true });
                 bonStrip.setOnUpdateOrder(() => {
                     bonStrip.saveOrders();
                 });
@@ -130,7 +130,7 @@ class BonWall {
                         this._fadeout(colElem, bonStrip.bonId, "invoiced");
                     }
 
-                });
+                }, "Husk miljøgebyr");
             })
         })
 

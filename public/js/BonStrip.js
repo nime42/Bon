@@ -166,8 +166,7 @@ class BonStrip {
     </style>
 
     <div id="bon">
-        <div id="status-row">
-        </div>
+        <div id="status-row"></div>
         <fieldset>
             <legend style="display: flex; align-items: center; gap: 5px;">
                 Bon-id 
@@ -238,7 +237,12 @@ class BonStrip {
             <textarea id="kitchenInfoText" class="bonstrip-items field-content" style="width: 100%; field-sizing: content;min-height: 25px;"></textarea>
         </fieldset>
 
-      
+        <div id="show-invoice-info" style="display:none;">
+        <fieldset id="invoice-info-field">
+            <legend>Faktura info <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i> </legend>
+            <span id="invoiceInfoText" class="bonstrip-items field-content" style="width: 100%; field-sizing: content;min-height: 25px;"></span>
+        </fieldset>
+        </div>
 
         <div id="orders"></div>
         <br>
@@ -372,6 +376,9 @@ class BonStrip {
             this.myDiv.querySelector("#kitchenInfoText").setAttribute("disabled", "true");
         }
 
+        if (options?.showInvoiceInfo) {
+            this.myDiv.querySelector("#show-invoice-info").style.display = "";
+        }
 
         if (!options?.hideIngredientList) {
             this.myIngredientList = new IngredientList();
@@ -696,7 +703,7 @@ class BonStrip {
         this.onUpdateOrder = fun;
     }
 
-    addStatuses(statuses, onclick) {
+    addStatuses(statuses, onclick, message) {
         let statusRow = this.myDiv.querySelector("#status-row");
         let statusStyle = `
         float: left;
@@ -732,6 +739,15 @@ class BonStrip {
                 div.style.background = Globals.Statuses[s].color;
             }
         })
+        if (message) {
+            let div = document.createElement("div");
+            div.style.cssText = "margin-left: 100px;padding-top: 3px;color: blueviolet;font-weight: bold;";
+            div.innerText = message;
+            div.classList.add("blink");
+
+            statusRow.appendChild(div);
+
+        }
         let endDiv = document.createElement("div");
         endDiv.style.clear = "left";
         statusRow.appendChild(endDiv);
@@ -749,6 +765,7 @@ class BonStrip {
         this.setPickupTime(bon.pickup_time !== null ? bon.pickup_time : bon.delivery_date);
 
         this.setKitchenInfo(bon.kitchen_info);
+        this.setInvoiceInfo(bon.invoice_info);
         this.setKitchenIngredientsExists(bon.kitchen_ingredients_exists);
         this.setKitchenSuppliesExists(bon.kitchen_supplies_exists);
         this.setDeliveryInfo(bon.delivery_info);
@@ -1074,6 +1091,21 @@ class BonStrip {
         this.myDiv.querySelector("#kitchenInfoText").value = text;
     }
 
+    setInvoiceInfo(text) {
+        text = text?.replaceAll("\n", "<br>");
+        this.myDiv.querySelector("#invoiceInfoText").innerHTML = text;
+
+        if (text !== "") {
+            this.myDiv.querySelector("#invoice-info-field").style.display = "";
+            this.myDiv.querySelector("#invoiceInfoText").innerHTML = text;
+        } else {
+            this.myDiv.querySelector("#invoice-info-field").style.display = "none";
+
+        }
+
+
+    }
+
     setDeliveryInfo(text) {
         text = text?.replaceAll("\n", "<br>");
 
@@ -1132,6 +1164,15 @@ class BonStrip {
         }
         kitchenInfoElem.oninput = f;
 
+    }
+
+    updateInvoiceInfoOnChange(invoiceInfoElem) {
+        let self = this;
+        let f = () => {
+            let text = invoiceInfoElem.value;
+            self.setInvoiceInfo(text);
+        }
+        invoiceInfoElem.oninput = f;
     }
 
     updateDeliveryInfoOnChange(deliveryInfoElem) {
