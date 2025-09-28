@@ -268,7 +268,7 @@ class BonStrip {
         
 
 
-    </div>    
+    </div>   
     `
 
 
@@ -831,7 +831,7 @@ class BonStrip {
                     this.orderConfig.querySelector("#extra-link").style.display = "";
                     this.orderConfig.querySelector("#extra-link").setAttribute("href", extra.link.url);
                     this.orderConfig.querySelector("#extra-link").innerHtml = extra.link.label;
-                    this.orderConfig.querySelector("#extra-link").onclick = this.orderConfig.querySelector("#save").onclick;
+                    this.orderConfig.querySelector("#extra-link").onclick = () => { this.orderConfig.querySelector("#save").onclick(); this.buildPopUpForLabel(extra.link.label); };
                 } else {
                     this.orderConfig.querySelector("#extra-link").style.display = "none";
                 }
@@ -1398,6 +1398,65 @@ class BonStrip {
 
     compactLegends() {
         this.myDiv.querySelectorAll("i.fa-caret-up").forEach(e => e.click());
+    }
+
+
+    buildPopUpForLabel(label) {
+        switch (label) {
+            case "By-expressen":
+                this.buildPopUpForByExpressen();
+                break;
+        }
+    }
+
+
+    buildPopUpForByExpressen() {
+        const date = this.myDiv.querySelector("#date").innerText;
+        const time = this.myDiv.querySelector("#time").innerText;
+        const bonId = this.bonId;
+        const pickupTime = this.myDiv.querySelector("#pickup-time").innerText;
+        const forename = this.myDiv.querySelector("#forename").innerText;
+        const surname = this.myDiv.querySelector("#surname").innerText;
+        const email = this.myDiv.querySelector("#email").innerText;
+        const phoneNr = this.myDiv.querySelector("#phonenr").innerText;
+        const address = this.myDiv.querySelector("#address").innerHTML;
+        const pax = this.myDiv.querySelector("#pax").innerText;
+        const paxUnits = this.myDiv.querySelector("#pax-units").innerText;
+        const deliveryInfo = this.myDiv.querySelector("#deliveryInfoText").innerHTML;
+
+
+
+        const popup = window.open("", "_blank", "width=600,height=800");
+        if (popup) {
+            // Create and set content using DOM methods
+            const html = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Byekspressen Info</title>
+                </head>
+                <body>
+                    <h3>Relevant info at kopiere till Byekspressen</h3>
+                    <p>Dato: <b>${date}</b></p>
+                    <p>Tid: <b>${time}</b></p>
+                    <p>Bon ID: <b>${bonId}</b></p>
+                    <p>Afhentningstid (hvis relevant): <b>${pickupTime}</b></p>
+                    <p>Navn: <b>${forename} ${surname}</b></p>
+                    <p>Email: <b>${email}</b></p>
+                    <p>Telefonnummer: <b>${phoneNr}</b></p>
+                    <p>Adresse: <b><br>${address}</b></p>
+                    <p>Antal personer: <b>${pax} ${paxUnits}</b></p>
+                    <p>Leveringsinfo: <b><br>${deliveryInfo}</b></p>
+                    
+                </body>
+            </html>
+        `;
+
+            // Set the content safely using innerHTML
+            popup.document.documentElement.innerHTML = html;
+        } else {
+            alert("Popup blokeret. Tillad popups for at se informationen.");
+        }
     }
 
 }
