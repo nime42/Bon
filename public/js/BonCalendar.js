@@ -50,12 +50,10 @@ class BonCalendar {
                         break;
                     case "deleted":
                         self.myCalendar.deleteEvent(eventElem);
-                        break;
-
-
-
-
+                        break
                 }
+                self.updateDayInfo(bon.delivery_date);
+                self.updateDayInfo(eventData.eventTime);
             })
             //self.myBonForm.init(eventData, eventElem);
             //self.myPopup.show(self.myBonForm.getForm());
@@ -76,6 +74,7 @@ class BonCalendar {
                 });
                 p.hide();
                 self.UpdateUnseenIds();
+                self.updateDayInfo();
             });
 
         });
@@ -120,4 +119,40 @@ class BonCalendar {
     getAllEvents() {
         return this.myCalendar.getAllEvents();
     }
+
+    updateDayInfo(date = undefined) {
+        let events;
+        if (date) {
+            events = this.getAllEvents().filter(e => (e.data.eventTime.toDateString() === date.toDateString()));
+        } else {
+            events = this.getAllEvents();
+        }
+
+        const daysWithInfo = {};
+        events.forEach(e => {
+            const dateStr = e.data.eventTime.toISOString().split('T')[0];
+
+            if (!daysWithInfo[dateStr]) {
+                daysWithInfo[dateStr] = [];
+            }
+            daysWithInfo[dateStr].push(e.data.misc);
+        });
+        for (const [dateStr, bons] of Object.entries(daysWithInfo)) {
+            const date = new Date(dateStr);
+            const nrofPax = bons.map(b => {
+                if (Number(b.pax_units) > 0) {
+                    return Number(b.pax_units)
+                } else if (Number(b.nr_of_servings) > 0) {
+                    return Number(b.nr_of_servings)
+                } else {
+                    return 0;
+                }
+            })
+
+            const totalPax = nrofPax.reduce((a, b) => a + b, 0);
+            this.myCalendar.updateDayInfo(date, `Total: ${totalPax}`);
+
+        }
+    }
+
 }

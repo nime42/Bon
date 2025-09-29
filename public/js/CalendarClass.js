@@ -126,7 +126,7 @@ class CalendarClass {
           dayNrCol.classList.add("disabled");
         }
         dayNrCol.id = `day-${d.getDate()}`;
-        dayNrCol.innerHTML = `<span class="${isToday ? "circle-to-day" : ""} ${disabled ? "not-current-month" : ""}" style="width: min-content;align-self: end;">${d.getDate()}</span>`;
+        dayNrCol.innerHTML = `<div><span id="info" style="float:left;font-size: small;font-style: italic;padding-left: 4px;"></span><span class="${isToday ? "circle-to-day" : ""} ${disabled ? "not-current-month" : ""}" style="width: min-content;float:right">${d.getDate()}</span></div>`;
 
         let self = this;
         if (!disabled) {
@@ -231,6 +231,16 @@ class CalendarClass {
     let eventList = dayCell.querySelector(".event-list");
 
     eventList.removeChild(eventElem);
+  }
+
+  updateDayInfo(date, info) {
+    if (date.getFullYear() != this.currentYear || date.getMonth() != this.currentMonth) {
+      return false;
+    }
+    let day = date.getDate();
+    let dayCell = this.myDiv.querySelector("#day-" + day + ":not(.disabled)");
+    let infoSpan = dayCell.querySelector("#info");
+    infoSpan.innerHTML = info;
   }
 
   setOnDateClick(fun) {
