@@ -195,7 +195,7 @@ class BonStrip {
         <fieldset>
             <legend>Tidspunkt (pickup tid)</legend>
             <div>
-            <div id="day" style="float:left; color: red" class="bonstrip-items"></div>
+            <div id="day" style="float:left; color: #334af0" class="bonstrip-items"></div>
             <div id="date" style="float:left" class="bonstrip-items"></div>
             <div id="time" style="float:left" class="bonstrip-items"></div>
             <div class="pickup-time">&nbsp;&nbsp;(<span id="pickup-time"></span>)</div>
