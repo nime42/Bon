@@ -646,6 +646,12 @@ module.exports = class GrocyFunctions {
         if (!recipy.nested_recipies) {
           recipy.nested_recipies = [];
         }
+        if (!recipes[n.includes_recipe_id]) {
+          console.log(
+            `Warning: ${n.includes_recipe_id} is not an id for a recipy`
+          );
+          return;
+        }
         recipy.nested_recipies.push({
           recipy: recipes[n.includes_recipe_id],
           servings: n.servings,
