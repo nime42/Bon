@@ -1431,7 +1431,8 @@ class BonStrip {
         const paxUnits = this.myDiv.querySelector("#pax-units").innerText;
         const deliveryInfo = this.myDiv.querySelector("#deliveryInfoText").innerHTML;
 
-
+        const orders = this.getOrders().orders;
+        const emballageOrders = orders.filter(o => (o.category === "06 Emballage"))
 
         const popup = window.open("", "_blank", "width=600,height=800");
         if (popup) {
@@ -1454,6 +1455,8 @@ class BonStrip {
                     <p>Adresse: <b><br>${address}</b></p>
                     <p>Antal personer: <b>${pax} ${paxUnits}</b></p>
                     <p>Leveringsinfo: <b><br>${deliveryInfo}</b></p>
+                    <p>Antal emballager:<br>
+                    <b>${emballageOrders.length > 0 ? emballageOrders.map(o => (`${o.quantity} x ${o.name}`)).join("<br>") : "Ingen emballager"}</b></p>
                     
                 </body>
             </html>
