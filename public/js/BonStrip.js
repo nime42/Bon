@@ -257,6 +257,8 @@ class BonStrip {
         <i id="show-mails" class="fa fa-envelope" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Send mail til kunden!"></i>        
         <i id="notify-kitchen" class="fa fa-paper-plane" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Send en besked til køkkenet!";margin-right: 10px;></i>
         <i id="ingredients-info" class="fa fa-info-circle" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="ingredienser!"></i>        
+        <i id="category-info" class="fa fa-list" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Kategorier!"></i>        
+
         <i id="move-bon" class="fa fa-exchange fa-rotate-90" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Flytte til anden server!"></i>
         <i id="goto-map" class="fa fa-globe" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="gå til kortet"></i>
         <i id="show-co2e" class="fa fa-envira" style="font-size:20px; color:${this.foreground};display:none;cursor: pointer;margin-right: 10px;" title="Vis Co2e"></i>
@@ -265,9 +267,6 @@ class BonStrip {
         <div id="items-list" style="display:none"></div>
         <div id="mail-list" style="display:none"></div>
         </div>
-        
-
-
     </div>   
     `
 
@@ -386,6 +385,10 @@ class BonStrip {
             this.myDiv.querySelector("#ingredients-info").style.display = "";
             this.myDiv.querySelector("#ingredients-info").onclick = () => {
                 this.myIngredientList.show(this.bonId, this.getOrders());
+            };
+            this.myDiv.querySelector("#category-info").style.display = "";
+            this.myDiv.querySelector("#category-info").onclick = () => {
+                this.showCategories(this.getOrders());
             };
         }
 
@@ -965,6 +968,9 @@ class BonStrip {
             let price = order.querySelector("#price").value;
             price != undefined ? Number(price) : 0;
 
+            let category = order.querySelector("#category").value;
+            category != undefined ? category : "";
+
             let quantity = order.querySelector("#quantity").innerText;
             quantity = quantity != undefined ? Number(quantity) : 1;
             totCostPrice += costPrice * quantity;
@@ -987,7 +993,8 @@ class BonStrip {
                 izettle_product_id: izettle_product_id,
                 price: price,
                 cost_price: costPrice,
-                co2e: co2e
+                co2e: co2e,
+                category: category
             }
         })
         return {
@@ -1457,6 +1464,42 @@ class BonStrip {
         } else {
             alert("Popup blokeret. Tillad popups for at se informationen.");
         }
+    }
+
+    showCategories(orders) {
+        let categories = {};
+        orders.orders.forEach(o => {
+            if (!categories[o.category]) {
+                categories[o.category] = 0;
+            }
+            categories[o.category] += Number(o.quantity);
+        })
+        console.log(categories);
+        let sorted = Object.keys(categories).map(c => ({ categorie: c, number: categories[c] })).sort((a, b) => (a.categorie.localeCompare(b.categorie)))
+
+        let tableContent = `
+            <div style="padding:25px; background:${Globals.background};">
+                <table style="width:300px; border-collapse: collapse; margin-top:10px;">
+            <thead>
+                <tr>
+                    <th style="border:1px solid #ccc; padding:4px;">Kategorie</th>
+                    <th style="border:1px solid #ccc; padding:4px;">Antal</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${sorted.map(elem => `
+                    <tr>
+                        <td style="border:1px solid #ccc; padding:4px;">${elem.categorie}</td>
+                        <td style="border:1px solid #ccc; padding:4px;">${elem.number}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        </div>
+        `;
+
+        new ModalPopup().show(tableContent);
+
     }
 
 }

@@ -1,6 +1,6 @@
 class PlanBon {
   content = `
-            <div style="margin:auto;width:700px">
+            <div style="margin:auto;width:900px">
                 <div id="planning-status-filter"></div>
                 <div id="plan-bon" style="min-width: 300px;float:left"></div>
                 <div style="float:left">
