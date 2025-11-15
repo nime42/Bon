@@ -140,6 +140,8 @@ class BonCalendar {
         for (const [dateStr, bons] of Object.entries(daysWithInfo)) {
             const date = new Date(dateStr);
             const nrofPax = bons.map(b => {
+                if (b.status === "closed") return 0;
+
                 if (Number(b.pax_units) > 0) {
                     return Number(b.pax_units)
                 } else if (Number(b.nr_of_servings) > 0) {
