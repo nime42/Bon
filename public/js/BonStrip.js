@@ -833,7 +833,7 @@ class BonStrip {
                 if (extra && extra.link) {
                     this.orderConfig.querySelector("#extra-link").style.display = "";
                     this.orderConfig.querySelector("#extra-link").setAttribute("href", extra.link.url);
-                    this.orderConfig.querySelector("#extra-link").innerHtml = extra.link.label;
+                    this.orderConfig.querySelector("#extra-link").innerHTML = extra.link.label;
                     this.orderConfig.querySelector("#extra-link").onclick = () => { this.orderConfig.querySelector("#save").onclick(); this.buildPopUpForLabel(extra.link.label); };
                 } else {
                     this.orderConfig.querySelector("#extra-link").style.display = "none";
@@ -899,7 +899,7 @@ class BonStrip {
         if (extra && extra.link) {
             this.orderConfig.querySelector("#extra-link").style.display = "";
             this.orderConfig.querySelector("#extra-link").setAttribute("href", extra.link.url);
-            this.orderConfig.querySelector("#extra-link").innerHtml = extra.link.label;
+            this.orderConfig.querySelector("#extra-link").innerHTML = extra.link.label;
             this.orderConfig.querySelector("#extra-link").onclick = this.orderConfig.querySelector("#save").onclick;
         } else {
             this.orderConfig.querySelector("#extra-link").style.display = "none";
@@ -1410,6 +1410,7 @@ class BonStrip {
 
     buildPopUpForLabel(label) {
         switch (label) {
+            case "El-Taxa":
             case "By-expressen":
                 this.buildPopUpForByExpressen();
                 break;
