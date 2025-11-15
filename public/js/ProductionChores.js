@@ -84,7 +84,7 @@ class ProductionChores {
       let dropDown = this.myDiv.querySelector("#myDropDown");
       if (dropDown.style.display == "none") {
         dropDown.style.display = "";
-        this.myDiv.querySelector("#production-time").value = new Date().toLocaleTimeString([], { hourCycle: "h23", hour: "2-digit", minute: "2-digit" });
+        this.myDiv.querySelector("#production-time").value = "12:30"
       } else {
         dropDown.style.display = "none";
       }
