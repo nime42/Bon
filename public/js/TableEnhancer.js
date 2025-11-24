@@ -45,6 +45,7 @@ class TableEnhancer {
       console.warn("The table need to have a tbody element!");
       return;
     }
+    table.valueFunctions = valueFunctions;
 
     headers.forEach((h) => {
       let arrow = document.createElement("i");
@@ -64,7 +65,6 @@ class TableEnhancer {
         });
 
         let colIndex = h.cellIndex;
-        let qs = `td:nth-child(${colIndex + 1})`;
 
         let sort = "A";
 
@@ -78,31 +78,7 @@ class TableEnhancer {
           sort = "A";
           i.classList.replace("fa-caret-up", "fa-caret-down");
         }
-
-        let rows = Array.from(tableBody.querySelectorAll("tr"));
-        if (valueFunctions[colIndex]) {
-          rows.sort((a, b) => {
-            let aVal = valueFunctions[colIndex](a.querySelector(qs));
-            let bVal = valueFunctions[colIndex](b.querySelector(qs));
-            if (sort == "A") {
-              return TableEnhancer._compare(aVal, bVal);
-            } else {
-              return TableEnhancer._compare(bVal, aVal);
-            }
-          });
-        } else {
-          rows.sort((a, b) => {
-            let aVal = a.querySelector(qs).textContent;
-            let bVal = b.querySelector(qs).textContent;
-            if (sort == "A") {
-              return TableEnhancer._compare(aVal, bVal);
-            } else {
-              return TableEnhancer._compare(bVal, aVal);
-            }
-          });
-        }
-
-        rows.forEach((r) => tableBody.appendChild(r));
+        TableEnhancer._sort(table, colIndex, sort == "A");
       };
     });
   }
@@ -128,7 +104,7 @@ class TableEnhancer {
     }
   }
 
-  static filterable(table, valueFunctions = {}, excludeCols = []) {
+  static filterable(table, filterFunctions = {}, excludeCols = []) {
     let header = table.querySelector("thead");
     let headerRow = header.querySelector("tr");
 
@@ -137,6 +113,8 @@ class TableEnhancer {
       console.warn("The table need to have a tbody element!");
       return;
     }
+
+    table.filterFunctions = filterFunctions;
 
     let nrOfCols = headerRow.children.length;
     for (let c = 0; c < nrOfCols; c++) {
@@ -151,19 +129,7 @@ class TableEnhancer {
       filterInput.style.height = "20px";
       filterInput.style.color = "brown";
       filterInput.onkeyup = () => {
-        let rows = Array.from(tableBody.querySelectorAll("tr"));
-        let filters = headerRow.querySelectorAll(".filter");
-        rows.forEach(r => {
-          let cols = r.children;
-          r.style.display = "";
-          for (let f = 0; f < r.children.length; f++) {
-            let filter = filters[f].value;
-            let value = valueFunctions[f] ? valueFunctions[f](cols[f]) : cols[f].textContent;
-            if (!this._filterMatch(value, filter)) {
-              r.style.display = "none";
-            }
-          }
-        })
+        TableEnhancer.filter(table);
       }
       headerRow.children[c].appendChild(filterInput);
       if (excludeCols.find((e) => (e == c))) {
@@ -173,9 +139,90 @@ class TableEnhancer {
 
   }
 
-  static _filterMatch(value, filter) {
+  static filter(table) {
+    let header = table.querySelector("thead");
+    let headerRow = header.querySelector("tr");
+    let tableBody = table.querySelector("tbody");
+    if (!tableBody) {
+      console.warn("The table need to have a tbody element!");
+      return;
+    }
+    let rows = Array.from(tableBody.querySelectorAll("tr"));
+    let filters = headerRow.querySelectorAll(".filter");
+    rows.forEach(r => {
+      let cols = r.children;
+      r.style.display = "";
+      for (let f = 0; f < r.children.length; f++) {
+        let filter = filters[f].value;
+        let value = cols[f].textContent;
+        if (!this._filterMatch(value, filter, table.filterFunctions[f])) {
+          r.style.display = "none";
+        }
+      }
+    });
+
+  }
+
+  static sort(table) {
+    let header = table.querySelector("thead");
+    let headerRow = header.querySelector("tr");
+    let headers = headerRow.children;
+    for (let c = 0; c < headers.length; c++) {
+      let h = headers[c];
+      let i = h.querySelector("i");
+      if (i.style.display !== "none") {
+        let colIndex = h.cellIndex;
+        let ascending = i.classList.contains("fa-caret-down");
+        TableEnhancer._sort(table, colIndex, ascending);
+        break;
+      }
+    }
+  }
+
+  static _sort(table, colIndex, ascending = true) {
+    let tableBody = table.querySelector("tbody");
+    if (!tableBody) {
+      console.warn("The table need to have a tbody element!");
+      return;
+    }
+    let rows = Array.from(tableBody.querySelectorAll("tr"));
+    let qs = `td:nth-child(${colIndex + 1})`;
+    if (table.valueFunctions && table.valueFunctions[colIndex]) {
+      rows.sort((a, b) => {
+        let aVal = table.valueFunctions[colIndex](a.querySelector(qs));
+        let bVal = table.valueFunctions[colIndex](b.querySelector(qs));
+        if (ascending) {
+          return TableEnhancer._compare(aVal, bVal);
+        } else {
+          return TableEnhancer._compare(bVal, aVal);
+        }
+      });
+    } else {
+      rows.sort((a, b) => {
+        let aVal = a.querySelector(qs).textContent;
+        let bVal = b.querySelector(qs).textContent;
+        if (ascending) {
+          return TableEnhancer._compare(aVal, bVal);
+        } else {
+          return TableEnhancer._compare(bVal, aVal);
+        }
+      });
+    }
+
+    rows.forEach((r) => tableBody.appendChild(r));
+  }
+
+  static _filterMatch(value, filter, filterFunction) {
+
+
+    if (filterFunction) {
+      return filterFunction(value, filter);
+    }
+
     value = value?.toLowerCase();
     filter = filter?.toLowerCase();
+
+
     if (filter.startsWith("<=")) {
       filter = filter.replace("<=", "");
       return value <= filter;
@@ -201,6 +248,11 @@ class TableEnhancer {
 
     return value.startsWith(filter);
 
+  }
+
+  static refresh(table) {
+    TableEnhancer.sort(table);
+    TableEnhancer.filter(table);
   }
 
 }

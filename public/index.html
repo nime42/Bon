@@ -33,6 +33,7 @@
     <script src="js/MessageBox.js"></script>
     <script src="js/AutocompleteClass.js"></script>
     <script src="js/BonCalendar.js"></script>
+    <script src="js/BonCalendarList.js"></script>
     <script src="js/BonStrip.js"></script>
     <script src="js/helpers.js"></script>
     <script src="js/ItemsList.js"></script>
@@ -123,7 +124,8 @@
                 style="float: right;margin-right: 50%;margin-bottom: 0;font-weight: bold;"></span></a>
         <div id="myLinks">
             <a href="#calendar" data-check-access="${ADMIN} || ${USER}"
-                onclick="gotoMenu(this);Globals.myCalender.refresh();toggleMenu();"><i class="fa fa-home"></i>
+                onclick="gotoMenu(this);Globals.myCalender.refresh();Globals.myCalenderList.refresh();toggleMenu();"><i
+                    class="fa fa-home"></i>
                 Kalender</a>
             <a href="#mails" data-check-access="${ADMIN} || ${USER}"
                 onclick="gotoMenu(this);Globals.myMails.refreshMails(true);toggleMenu();"><i class="fa fa-envelope"></i>
@@ -312,7 +314,17 @@
 
         </section>
         <section id="calendar" style="display:none">
-            <div id="calendar-div">
+            <div>
+                <div>
+                    <span style="cursor: pointer; color: #8e631f; float: right; margin-right: 20px;">
+                        <i id="calender-view" class="fa fa-calendar" aria-hidden="true"
+                            style="margin-right:5px; opacity:0.3"></i>
+                        <i id="calender-list-view" class="fa fa-list" aria-hidden="true" style="opacity:1"></i>
+                    </span>
+                    <br>
+                </div>
+                <div id="calendar-div"></div>
+                <div id="calendar-list-div"></div>
             </div>
         </section>
         <section id="mails" style="display:none">
@@ -354,6 +366,34 @@
             });
         });
 
+        function toggleCalenderView(view) {
+            let calView = document.querySelector("#calender-view");
+            let calListView = document.querySelector("#calender-list-view");
+            if (view === "calendar") {
+                //switch to calender view
+                calView.style.opacity = "0.3";
+                calListView.style.opacity = "1";
+                document.querySelector("#calendar-div").style.display = "";
+                document.querySelector("#calendar-list-div").style.display = "none";
+                Globals.myCalender.refresh();
+            } else {
+                //switch to list view
+                calView.style.opacity = "1";
+                calListView.style.opacity = "0.3";
+                document.querySelector("#calendar-div").style.display = "none";
+                document.querySelector("#calendar-list-div").style.display = "";
+                Globals.myCalenderList.refresh();
+            }
+        }
+
+        document.querySelector("#calender-view").onclick = () => {
+            toggleCalenderView("calendar");
+        };
+        document.querySelector("#calender-list-view").onclick = () => {
+            toggleCalenderView("list");
+        };
+
+
 
         document.querySelector("#link-to-map").href = "map/index.html";
 
@@ -373,6 +413,9 @@
             Globals.myProductionChores = new ProductionChores("#production");
 
             Globals.myCalender = new BonCalendar("#calendar-div");
+
+            Globals.myCalenderList = new BonCalendarList("#calendar-list-div");
+            document.querySelector("#calender-view").onclick();
 
             Globals.myMails = new BonMails("#mails");
 
