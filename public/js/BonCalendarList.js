@@ -35,7 +35,7 @@ class BonCalendarList {
             }
         </style>
         
-        <div class="tableFixHead" style="width:100%; overflow-x:auto; margin-top:10px; max-height:18em; overflow-y:auto;">
+        <div class="tableFixHead" style="width:100%;height: 55vh; overflow-x:auto; margin-top:10px; overflow-y:auto;">
             <table id="table-calendar-list" style="margin:auto; width:95%;" border="1">
                 <thead style="background-color: #f5f5f5; font-weight: bold;">
                     <tr>
@@ -144,6 +144,12 @@ class BonCalendarList {
         this.init();
     }
 
+
+    haveUnSeenMail(bonId) {
+        let unseen = Globals?.unSeenMailIds?.find(e => (e == bonId));
+        return unseen ? true : false;
+    }
+
     loadBons(bons) {
         let tableBody = this.myDiv.querySelector("#bons-table-body");
         tableBody.innerHTML = "";
@@ -159,7 +165,7 @@ class BonCalendarList {
             row.style.borderBottom = "1px solid #ddd";
             const addr = `${b.delivery_address.street_name ?? ""} ${b.delivery_address.street_nr ?? ""} , ${b.delivery_address.zip_code ?? ""} ${b.delivery_address.city ?? ""}`
             let rowTemplate = `
-                <td><a class="goto-bon-form" href="javascript:void(0);");">#${b.id}</a></td>
+                <td><a class="goto-bon-form" href="javascript:void(0);");">#${b.id}</a>${this.haveUnSeenMail(b.id) ? '<i class="fa fa-envelope" aria-hidden="true" title="Ulæst mail" style="margin-left: 15px"></i>' : ''}</td>
                 <td>${Helper.formatDate(b.delivery_date)}</td>
                 <td style="background-color:${Globals.Statuses[b.status].color};color:${Helper.contrastColor(Globals.Statuses[b.status].color)}">${Globals.Statuses[b.status].label}</td>
                 <td>${b.nr_of_servings}</td>
