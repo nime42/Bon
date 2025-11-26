@@ -364,6 +364,9 @@ class BonForm {
     this.myBonStrip.updateKitchenSelectsOnChange(
       form.querySelector("#kitchen_selects")
     );
+    this.myBonStrip.updateCompanyNameOnChange(
+      form.querySelector("input[name=company_name]")
+    );
 
     let buttons = this.myDiv.querySelector("#buttons");
 

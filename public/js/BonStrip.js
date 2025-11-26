@@ -7,6 +7,7 @@ class BonStrip {
     style = `
     #bon {
         min-width:250px;
+        max-width: 400px;
         background: ${this.background};
         box-shadow: 5px 5px 5px grey;
         padding-left: 10px;
@@ -242,6 +243,9 @@ class BonStrip {
             <legend>Faktura info <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i> </legend>
             <span id="invoiceInfoText" class="bonstrip-items field-content" style="width: 100%; field-sizing: content;min-height: 25px;"></span>
         </fieldset>
+        <fieldset id="company-info-field">
+            <legend>Firma info <i class="fa fa-caret-up" onclick="Helper.expandShrinkField(this)"></i> </legend>
+            <span id="company-name" class="bonstrip-items field-content" style="font-weight: bold;font-style: italic;padding-left: 10px;"></span>
         </div>
 
         <div id="orders"></div>
@@ -773,6 +777,7 @@ class BonStrip {
         this.setKitchenSuppliesExists(bon.kitchen_supplies_exists);
         this.setDeliveryInfo(bon.delivery_info);
         this.setPaymentType(bon.payment_type);
+        this.setCompanyName(bon.customer?.company?.name);
 
         this.status = bon.status;
 
@@ -1130,6 +1135,10 @@ class BonStrip {
         this.myDiv.querySelector("#payment-type").innerHTML = pType;
     }
 
+    setCompanyName(companyName) {
+        this.myDiv.querySelector("#company-name").innerHTML = companyName;
+    }
+
     setPaxAndKitchenSelects(bon) {
         this.myDiv.querySelector("#pax").innerHTML = bon.nr_of_servings;
         if (bon.pax_units) {
@@ -1248,6 +1257,12 @@ class BonStrip {
     updatePickupTimeOnChange(timeElem) {
         timeElem.oninput = () => {
             this.myDiv.querySelector("#pickup-time").innerHTML = timeElem.value;
+        }
+    }
+
+    updateCompanyNameOnChange(companyNameElem) {
+        companyNameElem.oninput = () => {
+            this.myDiv.querySelector("#company-name").innerHTML = companyNameElem.value;
         }
     }
 
@@ -1412,13 +1427,13 @@ class BonStrip {
         switch (label) {
             case "El-Taxa":
             case "By-expressen":
-                this.buildPopUpForByExpressen();
+                this.buildPopUpForDeliveryInfo(label);
                 break;
         }
     }
 
 
-    buildPopUpForByExpressen() {
+    buildPopUpForDeliveryInfo(windowTitle) {
         const date = this.myDiv.querySelector("#date").innerText;
         const time = this.myDiv.querySelector("#time").innerText;
         const bonId = this.bonId;
@@ -1431,6 +1446,7 @@ class BonStrip {
         const pax = this.myDiv.querySelector("#pax").innerText;
         const paxUnits = this.myDiv.querySelector("#pax-units").innerText;
         const deliveryInfo = this.myDiv.querySelector("#deliveryInfoText").innerHTML;
+        const companyName = this.myDiv.querySelector("#company-name").innerText;
 
         const orders = this.getOrders().orders;
         const emballageOrders = orders.filter(o => (o.category === "06 Emballage"))
@@ -1442,7 +1458,7 @@ class BonStrip {
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Byekspressen Info</title>
+                    <title>${windowTitle}</title>
                 </head>
                 <body>
                     <h3>Relevant info at kopiere till Byekspressen</h3>
