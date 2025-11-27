@@ -1433,7 +1433,7 @@ class BonStrip {
     }
 
 
-    buildPopUpForDeliveryInfo(windowTitle) {
+    buildPopUpForDeliveryInfo(label) {
         const date = this.myDiv.querySelector("#date").innerText;
         const time = this.myDiv.querySelector("#time").innerText;
         const bonId = this.bonId;
@@ -1458,23 +1458,28 @@ class BonStrip {
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>${windowTitle}</title>
+                    <title>${label}</title>
                 </head>
                 <body>
-                    <h3>Relevant info at kopiere till Byekspressen</h3>
-                    <p>Dato: <b>${date}</b></p>
-                    <p>Tid: <b>${time}</b></p>
-                    <p>Bon ID: <b>${bonId}</b></p>
-                    <p>Afhentningstid (hvis relevant): <b>${pickupTime}</b></p>
-                    <p>Navn: <b>${forename} ${surname}</b></p>
-                    <p>Email: <b>${email}</b></p>
-                    <p>Telefonnummer: <b>${phoneNr}</b></p>
+                    <h3>Relevant info at kopiere till ${label}</h3>
+                    <p>Bon ID: <b>#${bonId}</b></p>
                     <p>Adresse: <b><br>${address}</b></p>
-                    <p>Antal personer: <b>${pax} ${paxUnits}</b></p>
-                    <p>Leveringsinfo: <b><br>${deliveryInfo}</b></p>
+                    <p>Firma:<br> <b>${companyName}</b></p>
+
+                    <p>Navn: <b>${forename} ${surname}</b></p>
+                    <p>Telefonnummer: <b>${phoneNr}</b></p>
+
+                    <p>Levering:<br><b>${time} &nbsp; #${bonId} </b></p>
+
                     <p>Antal emballager:<br>
                     <b>${emballageOrders.length > 0 ? emballageOrders.map(o => (`${o.quantity} x ${o.name}`)).join("<br>") : "Ingen emballager"}</b></p>
+
+                    <p>Leveringsinfo: <b><br>${deliveryInfo}</b></p>
+
+                    <p>Dato: <b>${date}</b></p>
                     
+                    <p>Afhentningstid: <b>${pickupTime}</b></p>
+                   
                 </body>
             </html>
         `;
