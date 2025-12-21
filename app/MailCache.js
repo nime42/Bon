@@ -55,6 +55,7 @@ function getAllMails(callback = console.log) {
                                 subject: parsed.subject ?? "",
                                 message: parsed.text,
                                 messageId: parsed.messageId,
+                                uid: messageInfo.attrs && messageInfo.attrs.uid,
                                 unread: !messageInfo.attrs.flags.includes("\\Seen")
                             };
                             allCachedMails.push(mail);
@@ -102,9 +103,13 @@ function initCheckNewMails(callback = console.log) {
                                     subject: parsed.subject ?? "",
                                     message: parsed.text,
                                     messageId: parsed.messageId,
+                                    uid: messageInfo.attrs && messageInfo.attrs.uid,
                                     unread: !messageInfo.attrs.flags.includes("\\Seen")
                                 };
-                                let mailExists = allCachedMails.find((m) => m.messageId == mail.messageId);
+                                let mailExists = allCachedMails.find((m) => (
+                                    (mail.uid && m.uid && m.uid == mail.uid) ||
+                                    (mail.messageId && m.messageId && m.messageId == mail.messageId)
+                                ));
                                 if (!mailExists) {
                                     allCachedMails.push(mail);
                                     callback(true, mail);
@@ -120,6 +125,54 @@ function initCheckNewMails(callback = console.log) {
                     });
                 }
             });
+        });
+
+
+        // Listen for attribute/flag updates and update cache accordingly.
+        // If the update event doesn't include `uid`, fetch attributes by sequence number.
+        imap.on("update", (seqno, info) => {
+            try {
+                const attrs = info || {};
+                let uid = attrs.uid || (attrs.attributes && attrs.attributes.uid);
+                let flags = attrs.flags || (attrs.attributes && attrs.attributes.flags);
+
+                if (!uid) {
+                    const seqFetch = imap.seq.fetch(seqno, { bodies: [], struct: false });
+                    seqFetch.on('message', (msg) => {
+                        msg.once('attributes', (fattrs) => {
+                            try {
+                                const fuid = fattrs.uid;
+                                const fflags = fattrs.flags || [];
+                                const cached = allCachedMails.find(m => m.uid == fuid || (m.messageId && m.messageId == attrs['messageId']));
+                                if (cached) {
+                                    const nowUnread = !fflags.includes("\\Seen");
+                                    if (cached.unread !== nowUnread) {
+                                        cached.unread = nowUnread;
+                                        if (nowUnread) callback(true, cached);
+                                    }
+                                }
+                            } catch (err) {
+                                callback(false, err);
+                            }
+                        });
+                    });
+                    seqFetch.once('error', (err) => {
+                        console.error('seq.fetch error', err);
+                    });
+                    return;
+                }
+
+                const cached = allCachedMails.find(m => m.uid == uid || (m.messageId && attrs['messageId'] && m.messageId == attrs['messageId']));
+                if (cached && Array.isArray(flags)) {
+                    const nowUnread = !flags.includes("\\Seen");
+                    if (cached.unread !== nowUnread) {
+                        cached.unread = nowUnread;
+                        if (nowUnread) callback(true, cached);
+                    }
+                }
+            } catch (err) {
+                callback(false, err);
+            }
         });
 
         imap.once("error", (err) => {

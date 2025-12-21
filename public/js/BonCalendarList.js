@@ -155,9 +155,7 @@ class BonCalendarList {
         tableBody.innerHTML = "";
 
         const reloadTable = (event) => {
-            if (event !== "canceled") {
-                this.init();
-            }
+            this.init();
         }
 
         bons.forEach(b => {
