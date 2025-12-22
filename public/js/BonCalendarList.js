@@ -128,11 +128,12 @@ class BonCalendarList {
         let firstDay = new Date(this.currentDate);
         firstDay = firstDay.toISOString().split('T')[0];
 
-
-        this.myRepo.searchBons({ afterDate: firstDay }, (bons) => {
-            this.loadBons(bons);
-
-        })
+        this.myRepo.getUnseenBonIdMails((ids) => {
+            Globals.unSeenMailIds = ids;
+            this.myRepo.searchBons({ afterDate: firstDay }, (bons) => {
+                this.loadBons(bons);
+            })
+        });
     }
 
     refresh() {
