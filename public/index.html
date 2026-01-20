@@ -150,6 +150,7 @@
                     class="fa fa-money"></i> Fakturer</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i
                     class="fa fa-wrench"></i> Admin</a>
+            <a href="#sop" id="link-to-sop" target=”_blank” onclick="toggleMenu();"><i class="fa fa-book"> SOP</i></a>
             <a href="#planning" data-check-access="${ADMIN} || ${USER}"
                 onclick="gotoMenu(this);Globals.myPlanBon.getOtherBons();toggleMenu();"><i class="fa fa-tasks"></i>
                 Planlægning</a>
@@ -396,6 +397,7 @@
 
 
         document.querySelector("#link-to-map").href = "map/index.html";
+        document.querySelector("#link-to-sop").href = "https://grocycafe.ristetrug.dk/sop/";
 
         document.querySelector("#bon-instance").innerHTML = Globals.bonInstance;
         document.querySelector("#version").style.color = Globals.foreground;
