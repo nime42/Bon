@@ -150,7 +150,16 @@
                     class="fa fa-money"></i> Fakturer</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i
                     class="fa fa-wrench"></i> Admin</a>
-            <a href="#sop" id="link-to-sop" target=”_blank” onclick="toggleMenu();"><i class="fa fa-book"> SOP</i></a>
+            <a href="https://whiteboard.ristetrug.dk" target="_blank"
+                style="position:relative; display:inline-flex; align-items:center; gap:8px;">
+                📋 Whiteboard
+                <span id="wb-badge" style="
+                background:#e06b5e; color:white;
+                font-size:11px; font-weight:700;
+                padding:2px 7px; border-radius:10px;
+                display:none;
+              "></span>
+            </a>
             <a href="#planning" data-check-access="${ADMIN} || ${USER}"
                 onclick="gotoMenu(this);Globals.myPlanBon.getOtherBons();toggleMenu();"><i class="fa fa-tasks"></i>
                 Planlægning</a>
@@ -359,6 +368,27 @@
     </div>
 
     <script>
+
+        async function updateWbCount() {
+            const today = new Date().toISOString().slice(0, 10);
+            try {
+                const tasks = await fetch(`api/whiteboard-tasks/`)
+                    .then(r => r.json());
+
+                const antal = tasks.filter(t =>
+                    t.status !== 'done' &&
+                    t.due_date &&
+                    new Date(t.due_date).toISOString().slice(0, 10) <= today
+                ).length;
+
+                const badge = document.getElementById('wb-badge');
+                badge.textContent = antal;
+                badge.style.display = antal > 0 ? 'inline-flex' : 'none';
+            } catch { }
+        }
+
+
+
         $(document).ready(function () {
             $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
                 if (jqxhr.status === 401 && settings.url != "login") {
@@ -397,7 +427,6 @@
 
 
         document.querySelector("#link-to-map").href = "map/index.html";
-        document.querySelector("#link-to-sop").href = "https://sop.ristetrug.dk";
 
         document.querySelector("#bon-instance").innerHTML = Globals.bonInstance;
         document.querySelector("#version").style.color = Globals.foreground;
@@ -465,6 +494,10 @@
 
             document.querySelector("#login").style.display = "none";
             document.querySelector("#logout").style.display = "";
+
+
+            updateWbCount();
+            setInterval(updateWbCount, 60_000);
 
         })
         Globals.myLoginHandler.setForgotPasswordForm("#forgot-password");

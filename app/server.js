@@ -1340,3 +1340,29 @@ app.put("/api/itemAttributes/:id", (req, res) => {
     })
 }
 )
+
+// Add a new endpoint to fetch tasks by date
+const fetch = require('node-fetch');
+
+app.get('/api/whiteboard-tasks', async (req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    res.set('Surrogate-Control', 'no-store');
+
+    const apiUrl = `https://whiteboard.ristetrug.dk/api/tasks/`;
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            return res.status(response.status).json({ error: 'Failed to fetch tasks from external API' });
+        }
+
+        const tasks = await response.json();
+        res.json(tasks);
+    } catch (error) {
+        console.error('Error fetching tasks:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
