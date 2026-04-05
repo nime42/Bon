@@ -136,6 +136,16 @@
             <a href="#kitchen-today" data-check-access=""
                 onclick="gotoMenu(this);Globals.myKitchenBonWall.getBonsForToday();toggleMenu();"><i
                     class="fa fa-cutlery"></i> Køkken idag</a>
+            <a href="https://whiteboard.ristetrug.dk" target="_blank"
+                style="position:relative; display:inline-flex; align-items:center; gap:8px;">
+                📋 Whiteboard
+                <span id="wb-badge" style="
+                background:#e06b5e; color:white;
+                font-size:11px; font-weight:700;
+                padding:2px 7px; border-radius:10px;
+                display:none;
+              "></span>
+            </a>
             <a href="#kitchen" data-check-access="" onclick="gotoMenu(this);toggleMenu();"><i
                     class="fa fa-cart-plus"></i> Indkøb/Varemodtagelse</a>
             <a href="#production" data-check-access="" onclick="gotoMenu(this);toggleMenu();"><i class="fa fa-book"></i>
@@ -150,16 +160,6 @@
                     class="fa fa-money"></i> Fakturer</a>
             <a href="#admin" data-check-access="${ADMIN}" onclick="gotoMenu(this);toggleMenu();"><i
                     class="fa fa-wrench"></i> Admin</a>
-            <a href="https://whiteboard.ristetrug.dk" target="_blank"
-                style="position:relative; display:inline-flex; align-items:center; gap:8px;">
-                📋 Whiteboard
-                <span id="wb-badge" style="
-                background:#e06b5e; color:white;
-                font-size:11px; font-weight:700;
-                padding:2px 7px; border-radius:10px;
-                display:none;
-              "></span>
-            </a>
             <a href="#planning" data-check-access="${ADMIN} || ${USER}"
                 onclick="gotoMenu(this);Globals.myPlanBon.getOtherBons();toggleMenu();"><i class="fa fa-tasks"></i>
                 Planlægning</a>
